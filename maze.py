@@ -12,6 +12,12 @@
 # End : 20/03/2024 at 22h30 FR
 # Changelogs : Added numpy loop, type checking, rasing error, better code, better logic and more
 
+# v1.2 :
+# Start : 21/03/2024 at 11h00 FR
+# End : 04/03/2024 at h FR
+# Changelogs : Minor changes, just improved some code by optimizing it and/or refactoring it
+#              and implementing better logic
+
 
 from typing import Any, Generator
 
@@ -28,18 +34,20 @@ class Maze:
     """ Maze class
     """
 
-    def __init__(self, shape: Any | tuple[Any, ...] = 5) -> None:
+    def __init__(self, shape: Any | int | tuple[int, int] = 5) -> None:
         shape = verify_shape(shape)
-        self.maze = np.zeros(shape, dtype=np.uint16)
-        self.algorithm = None
+        self.maze = np.zeros(shape, dtype=object)
+        self.algorithm: None | str = None
         self.is_complexe = False
-        self.is_perfect = False
         self.was_scuplted = False
 
     def __str__(self) -> str:
         maze = [['# ' if value in (0, 1) else '  ' for value in row]
                 for row in self.maze]
         return '\n'.join(''.join(row) for row in maze)
+
+    def __repr__(self) -> str:
+        return np.array2string(self.maze, separator=' ')
 
     def __iter__(self) -> Generator[tuple[tuple[int, ...], np.uint16], None, None]:
         for index, value in np.ndenumerate(self.maze):
@@ -52,17 +60,15 @@ class Maze:
         tile_value = 2
         for index, _ in self:
             # If we are not at the edges
-            if not (index[0] in (0, self.maze.shape[0] - 1) or
-                    index[1] in (0, self.maze.shape[1] - 1)):
+            if not (index[0] in (0, self.maze.shape[0] - 1)
+                    or index[1] in (0, self.maze.shape[1] - 1)):
                 # If coordinates are odd
                 if (index[0] % 2, index[1] % 2) == (1, 1):
-                    self.maze[index[0]
-                              ][index[1]] = tile_value
+                    self.maze[index[0]][index[1]] = tile_value
                     tile_value += 1
                 # If wall are not intersections
                 elif (index[0] % 2, index[1] % 2) != (0, 0):
-                    self.maze[index[0]][index[1]] = 1
-        self.maze[1][0], self.maze[self.maze.shape[0] - 2][self.maze.shape[1]-1] = (2, tile_value-1)
+                    self.maze[index] = 1
         self.was_scuplted = True
         return self
 
@@ -71,67 +77,15 @@ class Maze:
         """_summary_
 
         Args:
-            breakable_walls (None | list[tuple[int, int]], optional): 
-            List of all breakable walls coordinates Defaults to None.
-        """
-        if 0 in (self.maze.shape[0] % 2, self.maze.shape[1] % 2):
-            if raise_error:
-                raise ValueError("For merge_path alogithm, shape[0] AND shape[1] must be odd")
-            # Removing the penultimate line/column (not the last because it's the edge of the maze)
-            if self.maze.shape[0] % 2 == 0:
-                self.maze = np.delete(self.maze, -2, axis=0)
-                # We replace the exit since we removed it by deleting the penultimate line
-                self.maze[self.maze.shape[0] - 2][self.maze.shape[1]-1] = 2
-            if self.maze.shape[1] % 2 == 0:
-                self.maze = np.delete(self.maze, -2, axis=1)
-        if not self.was_scuplted:
-            self.sculpt_grid()
-        if breakable_walls is None:
-            breakable_walls = self.get_breakable_walls()
-        values = (value for row in self.maze for value in row)
-        if len(np.unique(self.maze)) == 3:
-            return self
-        coordinates = rdm.choice(breakable_walls)
-        if coordinates[0] % 2 == 0:
-            upper_value = self.maze[coordinates[0]-1, coordinates[1]]
-            bottom_value = self.maze[coordinates[0]+1, coordinates[1]]
-            values = (upper_value, bottom_value)
-        else:
-            left_value = self.maze[coordinates[0], coordinates[1]-1]
-            right_value = self.maze[coordinates[0], coordinates[1]+1]
-            values = (left_value, right_value)
-        breakable_walls.remove(coordinates)
-        if values[0] == values[1]:
-            return self.merge_path(breakable_walls)
-        self.destroy_wall(coordinates, values)
-        return self.merge_path(breakable_walls)
+            breakable_walls (None | list[tuple[int, int]], optional): _description_.
+            Defaults to None.
+            raise_error (bool, optional): _description_. Defaults to True.
 
-    # def merge_path_iterative(self, breakable_walls: None | list[tuple[int, int]] = None,
-    #                 raise_error: bool = True) -> 'Maze':
-    #     if self.maze.shape[1] % 2 == 0:
-    #         if raise_error:
-    #             raise ValueError("For merge_path alogithm, shape[1] must be odd")
-    #         # Removing the penultimate column (not the last because it's the edge of the maze)
-    #         self.maze = np.delete(self.maze, -2, axis=1)
-    #     if not self.was_scuplted:
-    #         self.sculpt_grid()
-    #     if breakable_walls is None:
-    #         breakable_walls = self.get_breakable_walls()
-    #     values = (value for row in self.maze for value in row)
-    #     while len(np.unique(self.maze)) != 3:
-    #         breakable_wall = rdm.choice(breakable_walls)
-    #         if breakable_wall[0] % 2 == 0:
-    #             upper_value = self.maze[breakable_wall[0]-1, breakable_wall[1]]
-    #             bottom_value = self.maze[breakable_wall[0]+1, breakable_wall[1]]
-    #             values = (upper_value, bottom_value)
-    #         else:
-    #             left_value = self.maze[breakable_wall[0], breakable_wall[1]-1]
-    #             right_value = self.maze[breakable_wall[0], breakable_wall[1]+1]
-    #             values = (left_value, right_value)
-    #         if values[0] == values[1]:
-    #             continue
-    #         self.destroy_wall(breakable_wall, values)
-    #     return self
+        Returns:
+            Maze: _description_
+        """
+        verified_maze = verify_maze_for_merge_path(self, raise_error)
+        return merge_path_algorithm(verified_maze, breakable_walls)
 
     def get_breakable_walls(self) -> list[tuple[int, int]]:
         """ Get all breakable walls coordinates
@@ -141,8 +95,9 @@ class Maze:
         """
         coordinates: list[tuple[int, int]] = []
         for index, value in self:
-            if value.item() == 1:  # type: ignore
+            if value == 1 or isinstance(value, tuple) and value[0] == 1:
                 coordinates.append((index[0], index[1]))
+        rdm.shuffle(coordinates)
         return coordinates
 
     def make_complex_maze(self, probability: int | float = 0.2) -> 'Maze':
@@ -154,8 +109,9 @@ class Maze:
         # Force the probability to be between 0 and 1
         probability = max(0, min(1, probability))
         for index, value in self:
-            if value.item() == 1 and 0 < rdm.uniform(0, 1) <= probability:  # type: ignore
-                self.maze[index[0]][index[1]] = 2
+            if value == 1 and 0 < rdm.uniform(0, 1) <= probability:
+                self.maze[index] = 2
+        self.is_complexe = True
         return self
 
     def destroy_wall(self, wall_coordinate: tuple[int, int], values: tuple[int, int]) -> 'Maze':
@@ -168,8 +124,8 @@ class Maze:
         selected_value = rdm.choice(values)
         value_to_replace = values[0] if selected_value == values[1] else values[1]
         for index, value in self:
-            if value.item() == value_to_replace:  # type: ignore
-                self.maze[index[0]][index[1]] = selected_value
+            if value == value_to_replace:
+                self.maze[index] = selected_value
         self.maze[wall_coordinate[0], wall_coordinate[1]] = selected_value
         return self
 
@@ -193,4 +149,59 @@ def verify_shape(shape: Any | tuple[Any, ...]) -> tuple[int, int]:
     raise ValueError("Shape must be an int or a tuple[int, int]")
 
 
-print(Maze((12, 11)).sculpt_grid().merge_path(raise_error=False))
+def verify_maze_for_merge_path(maze: Maze, raise_error: bool) -> 'Maze':
+    """ Verify if the maze is correct for the merge path algorithm
+
+    Args:
+        maze (Maze): The maze to verify
+    """
+    if 0 in (maze.maze.shape[0] % 2, maze.maze.shape[1] % 2):
+        if raise_error:
+            raise ValueError("For merge_path alogithm, shape[0] AND shape[1] must be odd")
+        # Removing the penultimate line/column (not the last because it's the edge of the maze)
+        if maze.maze.shape[0] % 2 == 0:
+            maze.maze = np.delete(maze.maze, -2, axis=0)
+        if maze.maze.shape[1] % 2 == 0:
+            maze.maze = np.delete(maze.maze, -2, axis=1)
+    if not maze.was_scuplted:
+        maze.sculpt_grid()
+    return maze
+
+
+def merge_path_algorithm(maze: Maze, breakable_walls: list[tuple[int, int]] | None) -> 'Maze':
+    """_summary_
+
+    Args:
+        maze (Maze): _description_
+        breakable_walls (None | list[tuple[int, int]]): _description_
+
+    Returns:
+        Maze: _description_
+    """
+    if breakable_walls is None:
+        breakable_walls = maze.get_breakable_walls()
+    if not breakable_walls:
+        # We set the entry and the exit
+        maze.maze[1][0], maze.maze[maze.maze.shape[0] - 2][maze.maze.shape[1]-1] = (2, 2)
+        maze.algorithm = "Merge Path"
+        return maze
+    coordinates = breakable_walls[0]
+    if coordinates[0] % 2 == 0:
+        upper_value = maze.maze[coordinates[0]-1, coordinates[1]]
+        bottom_value = maze.maze[coordinates[0]+1, coordinates[1]]
+        values = (upper_value, bottom_value)
+    else:
+        left_value = maze.maze[coordinates[0], coordinates[1]-1]
+        right_value = maze.maze[coordinates[0], coordinates[1]+1]
+        values = (left_value, right_value)
+    breakable_walls.remove(coordinates)
+    # If the values are the same, we don't destroy the wall or we will create a loop
+    if values[0] == values[1]:
+        return merge_path_algorithm(maze, breakable_walls)
+    maze.destroy_wall(coordinates, values)
+    return merge_path_algorithm(maze, breakable_walls)
+
+
+x = Maze(11)
+print(x.merge_path())
+print(repr(x))
