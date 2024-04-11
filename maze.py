@@ -16,7 +16,7 @@
 # Start : 21/03/2024 at 11h00 FR
 # End : 04/03/2024 at h FR
 # Changelogs : Minor changes, just improved some code by optimizing it and/or refactoring it
-#              and implementing better logic
+#              and implemented better logic
 
 
 from typing import Any, Generator
@@ -34,12 +34,12 @@ class Maze:
     """ Maze class
     """
 
-    def __init__(self, shape: Any | int | tuple[int, int] = 5) -> None:
-        shape = verify_shape(shape)
+    def __init__(self, shape: Any | int | tuple[int, int] = 5, raise_error: bool = True) -> None:
+        shape = verify_shape(shape, raise_error)
         self.maze = np.zeros(shape, dtype=object)
         self.algorithm: None | str = None
         self.is_complexe = False
-        self.was_scuplted = False
+        self.sculpt_grid()
 
     def __str__(self) -> str:
         maze = [['# ' if value in (0, 1) else '  ' for value in row]
@@ -54,7 +54,7 @@ class Maze:
             yield index, value
 
     def sculpt_grid(self) -> 'Maze':
-        """ Create the grid with entry and exit, 0 is for pillars,
+        """ Create the grid , 0 is for pillars,
             1 for breakable walls and other for paths
         """
         tile_value = 2
@@ -72,8 +72,7 @@ class Maze:
         self.was_scuplted = True
         return self
 
-    def merge_path(self, breakable_walls: None | list[tuple[int, int]] = None,
-                   raise_error: bool = True) -> 'Maze':
+    def kruskal(self, breakable_walls: None | list[tuple[int, int]] = None) -> 'Maze':
         """_summary_
 
         Args:
@@ -84,8 +83,28 @@ class Maze:
         Returns:
             Maze: _description_
         """
-        verified_maze = verify_maze_for_merge_path(self, raise_error)
-        return merge_path_algorithm(verified_maze, breakable_walls)
+        if breakable_walls is None:
+            breakable_walls = self.get_breakable_walls()
+        if not breakable_walls:
+            # We set the entry and the exit
+            self.maze[1][0], self.maze[self.maze.shape[0] - 2][self.maze.shape[1]-1] = (2, 2)
+            self.algorithm = "Merge Path"
+            return self
+        coordinates = breakable_walls[0]
+        if coordinates[0] % 2 == 0:
+            upper_value = self.maze[coordinates[0]-1, coordinates[1]]
+            bottom_value = self.maze[coordinates[0]+1, coordinates[1]]
+            values = (upper_value, bottom_value)
+        else:
+            left_value = self.maze[coordinates[0], coordinates[1]-1]
+            right_value = self.maze[coordinates[0], coordinates[1]+1]
+            values = (left_value, right_value)
+        breakable_walls.remove(coordinates)
+        # If the values are the same, we don't destroy the wall or we will create a loop
+        if values[0] == values[1]:
+            return self.kruskal(breakable_walls)
+        self.destroy_wall(coordinates, values)
+        return self.kruskal(breakable_walls)
 
     def get_breakable_walls(self) -> list[tuple[int, int]]:
         """ Get all breakable walls coordinates
@@ -130,78 +149,30 @@ class Maze:
         return self
 
 
-def verify_shape(shape: Any | tuple[Any, ...]) -> tuple[int, int]:
+def verify_shape(shape: Any | tuple[Any, ...], raise_error: bool) -> tuple[int, int]:
     """ Verify the shape of the maze
 
     Args:
         shape (Any | tuple[Any, ...]): Shape of the maze.
     """
     if isinstance(shape, int):
-        if shape < 5:
-            raise ValueError("Shape must greater than 5")
-        return shape, shape
-    if isinstance(shape, tuple):
-        if len(shape) != 2:
-            raise ValueError("Shape must be a tuple of 2 integer greater than 5")
-        if not all(isinstance(i, int) for i in shape if i > 5):
-            raise ValueError("Shape must be a tuple of 2 integer greater than 5")
-        return shape
-    raise ValueError("Shape must be an int or a tuple[int, int]")
-
-
-def verify_maze_for_merge_path(maze: Maze, raise_error: bool) -> 'Maze':
-    """ Verify if the maze is correct for the merge path algorithm
-
-    Args:
-        maze (Maze): The maze to verify
-    """
-    if 0 in (maze.maze.shape[0] % 2, maze.maze.shape[1] % 2):
+        if not (shape < 5 or shape % 2 == 0):
+            return shape, shape
         if raise_error:
-            raise ValueError("For merge_path alogithm, shape[0] AND shape[1] must be odd")
-        # Removing the penultimate line/column (not the last because it's the edge of the maze)
-        if maze.maze.shape[0] % 2 == 0:
-            maze.maze = np.delete(maze.maze, -2, axis=0)
-        if maze.maze.shape[1] % 2 == 0:
-            maze.maze = np.delete(maze.maze, -2, axis=1)
-    if not maze.was_scuplted:
-        maze.sculpt_grid()
-    return maze
-
-
-def merge_path_algorithm(maze: Maze, breakable_walls: list[tuple[int, int]] | None) -> 'Maze':
-    """_summary_
-
-    Args:
-        maze (Maze): _description_
-        breakable_walls (None | list[tuple[int, int]]): _description_
-
-    Returns:
-        Maze: _description_
-    """
-    if breakable_walls is None:
-        breakable_walls = maze.get_breakable_walls()
-    if not breakable_walls:
-        # We set the entry and the exit
-        maze.maze[1][0], maze.maze[maze.maze.shape[0] - 2][maze.maze.shape[1]-1] = (2, 2)
-        maze.algorithm = "Merge Path"
-        return maze
-    coordinates = breakable_walls[0]
-    if coordinates[0] % 2 == 0:
-        upper_value = maze.maze[coordinates[0]-1, coordinates[1]]
-        bottom_value = maze.maze[coordinates[0]+1, coordinates[1]]
-        values = (upper_value, bottom_value)
-    else:
-        left_value = maze.maze[coordinates[0], coordinates[1]-1]
-        right_value = maze.maze[coordinates[0], coordinates[1]+1]
-        values = (left_value, right_value)
-    breakable_walls.remove(coordinates)
-    # If the values are the same, we don't destroy the wall or we will create a loop
-    if values[0] == values[1]:
-        return merge_path_algorithm(maze, breakable_walls)
-    maze.destroy_wall(coordinates, values)
-    return merge_path_algorithm(maze, breakable_walls)
+            raise ValueError("Shape must be greater than 5 and odd")
+        return shape-1, shape-1
+    if isinstance(shape, tuple):
+        if len(shape) == 2 and all(isinstance(i, int) for i in shape if i > 5 and i % 2 == 1):
+            return shape
+        if raise_error:
+            raise ValueError("Shape must be a tuple of 2 integer greater than 5 and odd")
+        return ((shape[0] - 1) if shape[0] % 2 == 0 else shape[0],
+                (shape[1] - 1) if shape[1] % 2 == 0 else shape[1])
+    if raise_error:
+        raise ValueError("Shape must be an int or a tuple[int, int]")
+    return 5, 5
 
 
 x = Maze(11)
-print(x.merge_path())
+print(x.kruskal())
 print(repr(x))
