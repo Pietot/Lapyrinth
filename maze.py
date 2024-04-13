@@ -1,4 +1,5 @@
-"""Maze Maker Solver"""
+""" A program capable of creating mazes with many different algorithms
+and solving them with different pathfinders """
 
 
 # By Pietot
@@ -31,7 +32,7 @@ sys.setrecursionlimit(10000)
 
 
 class Maze:
-    """ Maze class
+    """ The Maze class
     """
 
     def __init__(self, shape: Any | int | tuple[int, int] = 5, raise_error: bool = True) -> None:
@@ -54,7 +55,7 @@ class Maze:
             yield index, value
 
     def sculpt_grid(self) -> 'Maze':
-        """ Create the grid , 0 is for pillars,
+        """ Creates the grid , 0 is for pillars,
             1 for breakable walls and other for paths
         """
         tile_value = 2
@@ -73,22 +74,30 @@ class Maze:
         return self
 
     def kruskal(self, breakable_walls: None | list[tuple[int, int]] = None) -> 'Maze':
-        """_summary_
+        """ Applies Kruskal's recursive algorithm to generate a maze.
+
+        Kruskal's algorithm generates a maze by initializing each non-wall cell as unique value.
+        For each breakable_walls (shuffled) it checks if the cells it connects are different.
+        If they are, the program picks a value between them randomly
+        and change all the other by the chosen value including the wall.
+        If they are the same, the wall is not destroyed to avoid creating a loop.
+        Finally, the wall is removed from the list of breakable walls.
+        This process continues until the list if empty, resulting in a maze
+        where each cell is connected to every other cell via a unique path without forming loops.
 
         Args:
-            breakable_walls (None | list[tuple[int, int]], optional): _description_.
-            Defaults to None.
-            raise_error (bool, optional): _description_. Defaults to True.
+            breakable_walls (None | list[tuple[int, int]], optional):
+            A list of coordinates of all breakable walls. Defaults to None.
 
         Returns:
-            Maze: _description_
+            Maze: The generated maze after applying Kruskal's algorithm.
         """
         if breakable_walls is None:
             breakable_walls = self.get_breakable_walls()
         if not breakable_walls:
             # We set the entry and the exit
             self.maze[1][0], self.maze[self.maze.shape[0] - 2][self.maze.shape[1]-1] = (2, 2)
-            self.algorithm = "Merge Path"
+            self.algorithm = "Kruskal's algorithm"
             return self
         coordinates = breakable_walls[0]
         if coordinates[0] % 2 == 0:
@@ -107,7 +116,7 @@ class Maze:
         return self.kruskal(breakable_walls)
 
     def get_breakable_walls(self) -> list[tuple[int, int]]:
-        """ Get all breakable walls coordinates
+        """ Gets all breakable walls coordinates
 
         Returns:
             list[tuple[int, int]]: List of all breakable walls coordinates
@@ -120,10 +129,11 @@ class Maze:
         return coordinates
 
     def make_complex_maze(self, probability: int | float = 0.2) -> 'Maze':
-        """ Make the maze more complex by removing some walls randomly
+        """ Makes the maze complex by removing some walls randomly
 
         Args:
-            probability (int | float, optional): Probability of removing a wall. Defaults to 0.2.
+            probability (int | float, optional):
+            The probability of removing a wall. Defaults to 0.2.
         """
         # Force the probability to be between 0 and 1
         probability = max(0, min(1, probability))
@@ -134,7 +144,7 @@ class Maze:
         return self
 
     def destroy_wall(self, wall_coordinate: tuple[int, int], values: tuple[int, int]) -> 'Maze':
-        """ Destroy a wall and merging the values
+        """ Destroys a wall and merging the values
 
         Args:
             wall_coordinate (tuple[int, int]): The wall coordinates
@@ -150,10 +160,13 @@ class Maze:
 
 
 def verify_shape(shape: Any | tuple[Any, ...], raise_error: bool) -> tuple[int, int]:
-    """ Verify the shape of the maze
+    """ Verifies if shape of the maze if an int greater than 5 and odd
+        or a tuple of 2 int greater than 5 and odd
 
     Args:
         shape (Any | tuple[Any, ...]): Shape of the maze.
+        raise_error (bool):
+        If the shape is invalid, raise an error if True,else return a valid or default shape. 
     """
     if isinstance(shape, int):
         if not (shape < 5 or shape % 2 == 0):
