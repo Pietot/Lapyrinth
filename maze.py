@@ -15,9 +15,14 @@ and solving them with different pathfinders """
 
 # v1.2 :
 # Start : 21/03/2024 at 11h00 FR
-# End : 04/03/2024 at h FR
+# End : 04/03/2024
 # Changelogs : Minor changes, just improved some code by optimizing it and/or refactoring it
 #              and implemented better logic
+
+# v1.3 :
+# Start : 13/04/2024
+# End : 04/04/2024 at 17h42 FR
+# Changelogs : Added Depth First Search Algorithm
 
 
 from typing import Any, Generator
@@ -37,7 +42,7 @@ class Maze:
 
     def __init__(self, shape: Any | int | tuple[int, int] = 5, raise_error: bool = True) -> None:
         shape = verify_shape(shape, raise_error)
-        self.maze = np.zeros(shape, dtype=object)
+        self.maze = np.zeros(shape, dtype=np.uint16)
         self.algorithm: None | str = None
         self.is_complexe = False
         self.sculpt_grid()
@@ -73,10 +78,10 @@ class Maze:
         self.was_scuplted = True
         return self
 
-    def kruskal(self, breakable_walls: None | list[tuple[int, int]] = None) -> 'Maze':
+    def kruskal(self, breakable_walls: list[tuple[int, int]] | None = None) -> 'Maze':
         """ Applies Kruskal's recursive algorithm to generate a maze.
 
-        Kruskal's algorithm generates a maze by initializing each non-wall cell as unique value.
+        It starts by initializing each non-wall cell as unique value.
         For each breakable_walls (shuffled) it checks if the cells it connects are different.
         If they are, the program picks a value between them randomly
         and change all the other by the chosen value including the wall.
@@ -87,14 +92,14 @@ class Maze:
 
         Args:
             breakable_walls (None | list[tuple[int, int]], optional):
-            A list of coordinates of all breakable walls. Defaults to None.
+                A list of coordinates of all breakable walls. Defaults to None.
 
         Returns:
             Maze: The generated maze after applying Kruskal's algorithm.
         """
         if breakable_walls is None:
             breakable_walls = self.get_breakable_walls()
-        if not breakable_walls:
+        if breakable_walls == []:
             # We set the entry and the exit
             self.maze[1][0], self.maze[self.maze.shape[0] - 2][self.maze.shape[1]-1] = (2, 2)
             self.algorithm = "Kruskal's algorithm"
@@ -114,6 +119,48 @@ class Maze:
             return self.kruskal(breakable_walls)
         self.destroy_wall(coordinates, values)
         return self.kruskal(breakable_walls)
+
+    def depth_first_search(self, current_cell: tuple[int, int] = (0, 0),
+                           visited: list[tuple[int, int]] | None = None) -> 'Maze':
+        """ Applies the Depth First Search algorithm to generate a maze.
+
+        It starts by initializing an empty list and choosing a random cell to start.
+        If the neighbor cell has not been visited (or can't be visited),
+        the wall between the two cells is destroyed and the neighbor cell becomes the current cell.
+        This process continues until the current cell has no unvisited neighbors.
+        The algorithm backtracks to the previous cell
+        and repeats the process until all cells have been visited.
+
+        Args:
+            current_cell (tuple[int, int], optional):
+                The current cell being visited. Defaults to (0, 0).
+            visited (list[tuple[int, int]] | None, optional):
+                A list of cells that have already been visited by the algorithm. Defaults to None.
+
+        Returns:
+            Maze: The generated maze after applying DFS algorithm.
+        """
+        if visited is None:
+            visited = []
+        if current_cell == (0, 0):
+            current_cell = (rdm.randrange(1, self.maze.shape[0] - 2, 2),
+                            rdm.randrange(1, self.maze.shape[1] - 2, 2))
+        visited.append(current_cell)
+        # North, East, South, West
+        directions = [(-2, 0), (0, 2), (2, 0), (0, -2)]
+        rdm.shuffle(directions)
+        for direction in directions:
+            next_cell_row = current_cell[0] + direction[0]
+            next_cell_column = current_cell[1] + direction[1]
+            if not was_visited(self, next_cell_row, next_cell_column, visited):
+                wall_coordinates = (current_cell[0] + direction[0] //
+                                    2, current_cell[1] + direction[1] // 2)
+                self.maze[wall_coordinates] = 2
+                self.depth_first_search((next_cell_row, next_cell_column), visited)
+        # We set the entry and the exit
+        self.maze[1][0], self.maze[self.maze.shape[0] - 2][self.maze.shape[1]-1] = (2, 2)
+        self.algorithm = "Depth First Search algorithm"
+        return self
 
     def get_breakable_walls(self) -> list[tuple[int, int]]:
         """ Gets all breakable walls coordinates
@@ -166,7 +213,7 @@ def verify_shape(shape: Any | tuple[Any, ...], raise_error: bool) -> tuple[int, 
     Args:
         shape (Any | tuple[Any, ...]): Shape of the maze.
         raise_error (bool):
-        If the shape is invalid, raise an error if True,else return a valid or default shape. 
+            If the shape is invalid, raise an error if True, else return a valid or default shape.
     """
     if isinstance(shape, int):
         if not (shape < 5 or shape % 2 == 0):
@@ -186,6 +233,22 @@ def verify_shape(shape: Any | tuple[Any, ...], raise_error: bool) -> tuple[int, 
     return 5, 5
 
 
-x = Maze(11)
-print(x.kruskal())
-print(repr(x))
+def was_visited(self: Maze, row: int, column: int, visited: list[tuple[int, int]]) -> bool:
+    """ Check if a cell has been visited.
+
+    Args:
+        self (Maze): The maze object.
+        row (int): The row index of the cell.
+        column (int): The column index of the cell.
+        visited (list[tuple[int, int]]): A list of visited cells.
+
+    Returns:
+        bool: True if the cell has been visited, False otherwise.
+    """
+    if not 0 <= row < self.maze.shape[0] or not 0 <= column < self.maze.shape[1]:
+        return True
+    if self.maze[row][column] == 0:
+        return True
+    if (row, column) in visited:
+        return True
+    return False
