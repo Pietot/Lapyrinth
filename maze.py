@@ -302,6 +302,17 @@ def was_visited(self: Maze, row: int, column: int, visited: list[tuple[int, int]
 
 def get_neighbors(self: Maze,
                   cell: tuple[int, int]) -> list[tuple[tuple[int, int], tuple[int, int]]]:
+    """Returns a list of neighboring cells that are accessible from the given cell.
+
+    Args:
+        self (Maze): The maze object.
+        cell (tuple[int, int]): The coordinates of the cell.
+
+    Returns:
+        list[tuple[tuple[int, int], tuple[int, int]]]:
+            A list of tuples representing neighboring cells along
+            with the direction from the given cell.
+    """
     neighbors: list[tuple[tuple[int, int], tuple[int, int]]] = []
     # North, East, South, West
     directions = [(-2, 0), (0, 2), (2, 0), (0, -2)]
@@ -312,7 +323,3 @@ def get_neighbors(self: Maze,
         if self.maze[neighbor] not in (0, 2):
             neighbors.append((neighbor, direction))
     return neighbors
-
-
-x = Maze(31).prim()
-print(x)
