@@ -21,8 +21,13 @@ and solving them with different pathfinders """
 
 # v1.3 :
 # Start : 13/04/2024
-# End : 04/04/2024 at 17h42 FR
+# End : 14/04/2024 at 17h42 FR
 # Changelogs : Added Depth First Search Algorithm
+
+# v1.3 :
+# Start : 15/04/2024 at 14h00 FR
+# End : 15/04/2024 at 23h12 FR
+# Changelogs :
 
 
 from typing import Any, Generator
@@ -42,10 +47,11 @@ class Maze:
 
     def __init__(self, shape: Any | int | tuple[int, int] = 5, raise_error: bool = True) -> None:
         shape = verify_shape(shape, raise_error)
-        self.maze = np.zeros(shape, dtype=np.uint16)
+        self.maze = np.zeros(shape, dtype=np.uint)
         self.algorithm: None | str = None
         self.is_complexe = False
         self.sculpt_grid()
+        self.is_full_of_wall = False
 
     def __str__(self) -> str:
         maze = [['# ' if value in (0, 1) else '  ' for value in row]
@@ -55,7 +61,7 @@ class Maze:
     def __repr__(self) -> str:
         return np.array2string(self.maze, separator=' ')
 
-    def __iter__(self) -> Generator[tuple[tuple[int, ...], np.uint16], None, None]:
+    def __iter__(self) -> Generator[tuple[tuple[int, ...], np.uint], None, None]:
         for index, value in np.ndenumerate(self.maze):
             yield index, value
 
@@ -63,18 +69,19 @@ class Maze:
         """ Creates the grid , 0 is for pillars,
             1 for breakable walls and other for paths
         """
-        tile_value = 2
+        tile_value = 3
         for index, _ in self:
-            # If we are not at the edges
-            if not (index[0] in (0, self.maze.shape[0] - 1)
+            # If we are at the edges
+            if (index[0] in (0, self.maze.shape[0] - 1)
                     or index[1] in (0, self.maze.shape[1] - 1)):
-                # If coordinates are odd
-                if (index[0] % 2, index[1] % 2) == (1, 1):
-                    self.maze[index[0]][index[1]] = tile_value
-                    tile_value += 1
-                # If wall are not intersections
-                elif (index[0] % 2, index[1] % 2) != (0, 0):
-                    self.maze[index] = 1
+                continue
+            # If coordinates are odd
+            if (index[0] % 2, index[1] % 2) == (1, 1):
+                self.maze[index] = tile_value
+                tile_value += 1
+            # If wall are not intersections
+            elif (index[0] % 2, index[1] % 2) != (0, 0):
+                self.maze[index] = 1
         self.was_scuplted = True
         return self
 
@@ -153,13 +160,52 @@ class Maze:
             next_cell_row = current_cell[0] + direction[0]
             next_cell_column = current_cell[1] + direction[1]
             if not was_visited(self, next_cell_row, next_cell_column, visited):
-                wall_coordinates = (current_cell[0] + direction[0] //
-                                    2, current_cell[1] + direction[1] // 2)
+                wall_coordinates = (current_cell[0] + direction[0] // 2,
+                                    current_cell[1] + direction[1] // 2)
                 self.maze[wall_coordinates] = 2
                 self.depth_first_search((next_cell_row, next_cell_column), visited)
         # We set the entry and the exit
         self.maze[1][0], self.maze[self.maze.shape[0] - 2][self.maze.shape[1]-1] = (2, 2)
         self.algorithm = "Depth First Search algorithm"
+        return self
+
+    def prim(self, start: tuple[int, int] = (0, 0)) -> 'Maze':
+        """Applies Prim's algorithm to generate a maze.
+
+        It starts by selecting a starting cell, either specified in parameter or chosen randomly.
+        Then it lists all its neighbors and adds them to the list of cells to explore.
+        While there are neighbors to explore, it randomly selects one
+        and if it was not explored, the wall between the two cells is destroyed.
+        Finally it removes the neighbors from the list
+
+        Args:
+            start (tuple[int, int], optional): 
+                The starting cell coordinates. 
+                Defaults to (0, 0), meaning a random starting cell will be chosen within the maze.
+
+        Returns:
+            Maze: The generated maze after applying Prim's algorithm.
+        """
+        neighbors: list[tuple[tuple[int, int], tuple[int, int]]] = []
+        if start == (0, 0):
+            start = (rdm.randrange(1, self.maze.shape[0] - 2, 2),
+                     rdm.randrange(1, self.maze.shape[1] - 2, 2))
+        self.maze[start] = 2
+        neighbors.extend(get_neighbors(self, start))
+        while neighbors:
+            neighbor, direction = rdm.choice(neighbors)
+            # Avoid overlapping, maybe this condition can be removed idk
+            if self.maze[neighbor] != 2:
+                self.maze[neighbor] = 2
+                wall_coordinates = (neighbor[0] - direction[0] // 2,
+                                    neighbor[1] - direction[1] // 2)
+                self.maze[wall_coordinates] = 2
+            neighbors.remove((neighbor, direction))
+            neighbors.extend(get_neighbors(self, neighbor))
+            neighbors = list(set(neighbors))
+        # We set the entry and the exit
+        self.maze[1][0], self.maze[self.maze.shape[0] - 2][self.maze.shape[1]-1] = (2, 2)
+        self.algorithm = "Prim's algorithm"
         return self
 
     def get_breakable_walls(self) -> list[tuple[int, int]]:
@@ -252,3 +298,21 @@ def was_visited(self: Maze, row: int, column: int, visited: list[tuple[int, int]
     if (row, column) in visited:
         return True
     return False
+
+
+def get_neighbors(self: Maze,
+                  cell: tuple[int, int]) -> list[tuple[tuple[int, int], tuple[int, int]]]:
+    neighbors: list[tuple[tuple[int, int], tuple[int, int]]] = []
+    # North, East, South, West
+    directions = [(-2, 0), (0, 2), (2, 0), (0, -2)]
+    for direction in directions:
+        neighbor = cell[0] + direction[0], cell[1] + direction[1]
+        if not 1 <= neighbor[0] < self.maze.shape[0] or not 1 <= neighbor[1] < self.maze.shape[1]:
+            continue
+        if self.maze[neighbor] not in (0, 2):
+            neighbors.append((neighbor, direction))
+    return neighbors
+
+
+x = Maze(31).prim()
+print(x)
