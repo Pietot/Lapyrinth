@@ -24,13 +24,18 @@ and solving them with different pathfinders """
 # End : 14/04/2024 at 17h42 FR
 # Changelogs : Added Depth First Search Algorithm
 
-# v1.3 :
+# v1.4 :
 # Start : 15/04/2024 at 14h00 FR
 # End : 15/04/2024 at 23h12 FR
-# Changelogs :
+# Changelogs : Added Prim's Algorithm
+
+# v1.5 :
+# Start : 16/04/2024 at 23h15 FR
+# End : 17/04/2024 at 18h00 FR
+# Changelogs : Added Hunt and Kill Algorithm
 
 
-from typing import Any, Generator
+from typing import Any, Generator, Literal
 
 import sys
 
@@ -61,7 +66,7 @@ class Maze:
     def __repr__(self) -> str:
         return np.array2string(self.maze, separator=' ')
 
-    def __iter__(self) -> Generator[tuple[tuple[int, ...], np.uint], None, None]:
+    def __iter__(self) -> Generator[tuple[tuple[int, ...], np.uint16], None, None]:
         for index, value in np.ndenumerate(self.maze):
             yield index, value
 
@@ -149,21 +154,20 @@ class Maze:
         """
         if visited is None:
             visited = []
-        if current_cell == (0, 0):
-            current_cell = (rdm.randrange(1, self.maze.shape[0] - 2, 2),
-                            rdm.randrange(1, self.maze.shape[1] - 2, 2))
+        current_cell = (current_cell if current_cell != (0, 0)
+                        else get_random_cell((self.maze.shape[0], self.maze.shape[1])))
         visited.append(current_cell)
         # North, East, South, West
         directions = [(-2, 0), (0, 2), (2, 0), (0, -2)]
         rdm.shuffle(directions)
-        for direction in directions:
-            next_cell_row = current_cell[0] + direction[0]
-            next_cell_column = current_cell[1] + direction[1]
-            if not was_visited(self, next_cell_row, next_cell_column, visited):
-                wall_coordinates = (current_cell[0] + direction[0] // 2,
-                                    current_cell[1] + direction[1] // 2)
+        for row, column in directions:
+            next_cell = (current_cell[0] + row,
+                         current_cell[1] + column)
+            if not was_visited(self, (next_cell), visited):
+                wall_coordinates = (current_cell[0] + row // 2,
+                                    current_cell[1] + column // 2)
                 self.maze[wall_coordinates] = 2
-                self.depth_first_search((next_cell_row, next_cell_column), visited)
+                self.depth_first_search(next_cell, visited)
         # We set the entry and the exit
         self.maze[1][0], self.maze[self.maze.shape[0] - 2][self.maze.shape[1]-1] = (2, 2)
         self.algorithm = "Depth First Search algorithm"
@@ -179,17 +183,16 @@ class Maze:
         Finally it removes the neighbors from the list
 
         Args:
-            start (tuple[int, int], optional): 
-                The starting cell coordinates. 
+            start (tuple[int, int], optional):
+                The starting cell coordinates.
                 Defaults to (0, 0), meaning a random starting cell will be chosen within the maze.
 
         Returns:
             Maze: The generated maze after applying Prim's algorithm.
         """
         neighbors: list[tuple[tuple[int, int], tuple[int, int]]] = []
-        if start == (0, 0):
-            start = (rdm.randrange(1, self.maze.shape[0] - 2, 2),
-                     rdm.randrange(1, self.maze.shape[1] - 2, 2))
+        start = start if start != (0, 0) else get_random_cell(
+            (self.maze.shape[0], self.maze.shape[1]))
         self.maze[start] = 2
         neighbors.extend(get_neighbors(self, start))
         while neighbors:
@@ -206,6 +209,55 @@ class Maze:
         # We set the entry and the exit
         self.maze[1][0], self.maze[self.maze.shape[0] - 2][self.maze.shape[1]-1] = (2, 2)
         self.algorithm = "Prim's algorithm"
+        return self
+
+    def hunt_and_kill(self, start: tuple[int, int] = (0, 0)):
+        """ Applies Hunt and Kill algorithm to generate a maze.
+
+        It starts at a random cell and carves a path to a random unvisited neighbor ("kill" phase).
+        If there are no unvisited neighbors,
+        it scans the grid for an unvisited cell that is adjacent to a visited one ("hunt" phase).
+        The process ends when the "hunt" phase fails to find any suitable cells.
+
+        Args:
+            start (tuple[int, int], optional):
+            The starting cell for the algorithm.
+            Defaults to (0, 0), which means a random cell will be chosen.
+
+        Returns:
+            self: The generated maze after applying Hunt and Kill algorithm.
+        """
+        start = start if start != (0, 0) else get_random_cell(
+            (self.maze.shape[0], self.maze.shape[1]))
+
+        def hunt() -> None:
+            for index, value in self:
+                if int(value) not in (0, 1, 2):
+                    neighbor, direction = get_connection(self, (index[0], index[1]))
+                    if neighbor == (0, 0):
+                        continue
+                    self.maze[neighbor] = 2
+                    wall_coordinates = (neighbor[0] - direction[0] // 2,
+                                        neighbor[1] - direction[1] // 2)
+                    self.maze[wall_coordinates] = 2
+                    self.hunt_and_kill((index[0], index[1]))
+
+        def kill(cell: tuple[int, int]) -> Any | Literal['False']:
+            self.maze[cell] = 2
+            neighbors = get_neighbors(self, cell)
+            if not neighbors:
+                return hunt()
+            neighbor, direction = rdm.choice(neighbors)
+            self.maze[neighbor] = 2
+            wall_coordinates = (neighbor[0] - direction[0] // 2,
+                                neighbor[1] - direction[1] // 2)
+            self.maze[wall_coordinates] = 2
+            return kill(neighbor)
+
+        kill(start)
+        # We set the entry and the exit
+        self.maze[1][0], self.maze[self.maze.shape[0] - 2][self.maze.shape[1]-1] = (2, 2)
+        self.algorithm = "Hunt and Kill algorithm"
         return self
 
     def get_breakable_walls(self) -> list[tuple[int, int]]:
@@ -279,23 +331,22 @@ def verify_shape(shape: Any | tuple[Any, ...], raise_error: bool) -> tuple[int, 
     return 5, 5
 
 
-def was_visited(self: Maze, row: int, column: int, visited: list[tuple[int, int]]) -> bool:
+def was_visited(self: Maze, cell: tuple[int, int], visited: list[tuple[int, int]]) -> bool:
     """ Check if a cell has been visited.
 
     Args:
         self (Maze): The maze object.
-        row (int): The row index of the cell.
-        column (int): The column index of the cell.
+        cell (tuple[int, int]): The indexes of the cell.
         visited (list[tuple[int, int]]): A list of visited cells.
 
     Returns:
         bool: True if the cell has been visited, False otherwise.
     """
-    if not 0 <= row < self.maze.shape[0] or not 0 <= column < self.maze.shape[1]:
+    if not 0 <= cell[0] < self.maze.shape[0] or not 0 <= cell[1] < self.maze.shape[1]:
         return True
-    if self.maze[row][column] == 0:
+    if self.maze[cell[0]][cell[1]] == 0:
         return True
-    if (row, column) in visited:
+    if (cell[0], cell[1]) in visited:
         return True
     return False
 
@@ -323,3 +374,45 @@ def get_neighbors(self: Maze,
         if self.maze[neighbor] not in (0, 2):
             neighbors.append((neighbor, direction))
     return neighbors
+
+
+def get_random_cell(shape: tuple[int, int]) -> tuple[int, int]:
+    """ This function generates a random cell within a given shape.
+
+    Args:
+        shape (tuple[int, int]): A tuple representing the dimensions of the shape.
+        The first integer is the height and the second integer is the width.
+
+    Returns:
+        tuple[int, int]: A tuple representing the coordinates of the randomly generated cell.
+    """
+    return (rdm.randrange(1, shape[0] - 2, 2),
+            rdm.randrange(1, shape[1] - 2, 2))
+
+
+def get_connection(self: Maze, index: tuple[int, int]) -> tuple[tuple[int, int], tuple[int, int]]:
+    """ This method is used to get a connections of an unvisited cell to a visited cell in the maze.
+
+    Args:
+        self (Maze): An instance of the Maze class.
+        index (tuple[int, int]): A tuple containing the coordinates of the cell in the maze.
+
+    Returns:
+        tuple[tuple[int, int], tuple[int, int]]:
+        A tuple containing two tuples. The first tuple is the coordinates of the visited cell.
+        The second tuple is the direction of the visited cell relative to the unvisited cell.
+        If no neighbor is connected, returns ((0, 0), (0, 0)).
+    """
+    neighbors: list[tuple[tuple[int, int], tuple[int, int]]] = []
+    # North, East, South, West
+    directions = [(-2, 0), (0, 2), (2, 0), (0, -2)]
+    for row, column in directions:
+        neighbor = (index[0] + row,
+                    index[1] + column)
+        if not 0 <= neighbor[0] < self.maze.shape[0] or not 0 <= neighbor[1] < self.maze.shape[1]:
+            continue
+        if self.maze[neighbor] == 2:
+            neighbors.append((neighbor, (row, column)))
+    if not neighbors:
+        return (0, 0), (0, 0)
+    return rdm.choice(neighbors)
