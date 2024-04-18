@@ -34,8 +34,13 @@ and solving them with different pathfinders """
 # End : 17/04/2024 at 18h00 FR
 # Changelogs : Added Hunt and Kill Algorithm
 
+# v1.4 :
+# Start : 18/04/2024 at 12h00 FR
+# End : /04/2024 at h FR
+# Changelogs : Added Eller's Algorithm
 
-from typing import Any, Generator, Literal
+
+from typing import Any, Generator
 
 import sys
 
@@ -211,7 +216,7 @@ class Maze:
         self.algorithm = "Prim's algorithm"
         return self
 
-    def hunt_and_kill(self, start: tuple[int, int] = (0, 0)):
+    def hunt_and_kill(self, start: tuple[int, int] = (0, 0)) -> 'Maze':
         """ Applies Hunt and Kill algorithm to generate a maze.
 
         It starts at a random cell and carves a path to a random unvisited neighbor ("kill" phase).
@@ -242,7 +247,7 @@ class Maze:
                     self.maze[wall_coordinates] = 2
                     self.hunt_and_kill((index[0], index[1]))
 
-        def kill(cell: tuple[int, int]) -> Any | Literal['False']:
+        def kill(cell: tuple[int, int]) -> None:
             self.maze[cell] = 2
             neighbors = get_neighbors(self, cell)
             if not neighbors:
@@ -260,6 +265,22 @@ class Maze:
         self.algorithm = "Hunt and Kill algorithm"
         return self
 
+    def eller(self, probabilty: float | None = None) -> 'Maze':
+        probabilty = (min(0.01, max(1, probabilty))if probabilty
+                      else round(rdm.uniform(0.01, 1), 2))
+        for index, value in self:
+            value = int(value)
+            if value in (0, 1) or rdm.random() > probabilty:
+                continue
+            if index[1] == self.maze.shape[1] - 2:
+                values = value, self.maze[index[1]-2]
+                wall_coordinates = (index[0], index[1]-1)
+                self.destroy_wall(wall_coordinates, values)
+            else:
+                values = value, self.maze[index[1]+2]
+                wall_coordinates = (index[0], index[1]+1)
+                self.destroy_wall(wall_coordinates, values)
+        return self
     def get_breakable_walls(self) -> list[tuple[int, int]]:
         """ Gets all breakable walls coordinates
 
@@ -416,3 +437,6 @@ def get_connection(self: Maze, index: tuple[int, int]) -> tuple[tuple[int, int],
     if not neighbors:
         return (0, 0), (0, 0)
     return rdm.choice(neighbors)
+
+
+print(Maze(11).eller())
