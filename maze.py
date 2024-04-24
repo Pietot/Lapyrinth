@@ -34,7 +34,12 @@ and solving them with different pathfinders """
 # End : 17/04/2024 at 18h00 FR
 # Changelogs : Added Hunt and Kill Algorithm
 
-# v1.4 :
+# v1.6 :
+# Start : 24/04/2024 at 20h30 FR
+# End : /04/2024 at h FR
+# Changelogs : Binary Tree Algorithm
+
+# v1.7 :
 # Start : 18/04/2024 at 12h00 FR
 # End : /04/2024 at h FR
 # Changelogs : Added Eller's Algorithm
@@ -60,8 +65,9 @@ class Maze:
         self.maze = np.zeros(shape, dtype=np.uint)
         self.algorithm: None | str = None
         self.is_complexe = False
+        self.is_empty = False
+        self.have_value = False
         self.sculpt_grid()
-        self.is_full_of_wall = False
 
     def __str__(self) -> str:
         maze = [['# ' if value in (0, 1) else '  ' for value in row]
@@ -79,7 +85,6 @@ class Maze:
         """ Creates the grid , 0 is for pillars,
             1 for breakable walls and other for paths
         """
-        tile_value = 3
         for index, _ in self:
             # If we are at the edges
             if (index[0] in (0, self.maze.shape[0] - 1)
@@ -87,12 +92,32 @@ class Maze:
                 continue
             # If coordinates are odd
             if (index[0] % 2, index[1] % 2) == (1, 1):
-                self.maze[index] = tile_value
-                tile_value += 1
+                self.maze[index] = 3
             # If wall are not intersections
             elif (index[0] % 2, index[1] % 2) != (0, 0):
                 self.maze[index] = 1
         self.was_scuplted = True
+        return self
+
+    def set_value(self) -> 'Maze':
+        value = 3
+        for index, cell_value in self:
+            if cell_value == 3:
+                self.maze[index] = value
+                value += 1
+        return self
+
+    def remove_walls(self) -> 'Maze':
+        """ Remove all walls inside the maze
+
+        Returns:
+            Maze: The Maze object
+        """
+        for index, _ in self:
+            # If we are not at the edges
+            if not (index[0] in (0, self.maze.shape[0] - 1)
+                    or index[1] in (0, self.maze.shape[1] - 1)):
+                self.maze[index] = 2
         return self
 
     def kruskal(self, breakable_walls: list[tuple[int, int]] | None = None) -> 'Maze':
@@ -114,11 +139,15 @@ class Maze:
         Returns:
             Maze: The generated maze after applying Kruskal's algorithm.
         """
+        if not self.have_value:
+            self.set_value()
+            self.have_value = True
         if breakable_walls is None:
             breakable_walls = self.get_breakable_walls()
         if breakable_walls == []:
             # We set the entry and the exit
-            self.maze[1][0], self.maze[self.maze.shape[0] - 2][self.maze.shape[1]-1] = (2, 2)
+            self.maze[1][0], self.maze[self.maze.shape[0] -
+                                       2][self.maze.shape[1]-1] = (2, 2)
             self.algorithm = "Kruskal's algorithm"
             return self
         coordinates = breakable_walls[0]
@@ -174,7 +203,8 @@ class Maze:
                 self.maze[wall_coordinates] = 2
                 self.depth_first_search(next_cell, visited)
         # We set the entry and the exit
-        self.maze[1][0], self.maze[self.maze.shape[0] - 2][self.maze.shape[1]-1] = (2, 2)
+        self.maze[1][0], self.maze[self.maze.shape[0] -
+                                   2][self.maze.shape[1]-1] = (2, 2)
         self.algorithm = "Depth First Search algorithm"
         return self
 
@@ -195,6 +225,9 @@ class Maze:
         Returns:
             Maze: The generated maze after applying Prim's algorithm.
         """
+        if not self.have_value:
+            self.set_value()
+            self.have_value = True
         neighbors: list[tuple[tuple[int, int], tuple[int, int]]] = []
         start = start if start != (0, 0) else get_random_cell(
             (self.maze.shape[0], self.maze.shape[1]))
@@ -212,7 +245,8 @@ class Maze:
             neighbors.extend(get_neighbors(self, neighbor))
             neighbors = list(set(neighbors))
         # We set the entry and the exit
-        self.maze[1][0], self.maze[self.maze.shape[0] - 2][self.maze.shape[1]-1] = (2, 2)
+        self.maze[1][0], self.maze[self.maze.shape[0] -
+                                   2][self.maze.shape[1]-1] = (2, 2)
         self.algorithm = "Prim's algorithm"
         return self
 
@@ -232,13 +266,17 @@ class Maze:
         Returns:
             self: The generated maze after applying Hunt and Kill algorithm.
         """
+        if not self.have_value:
+            self.set_value()
+            self.have_value = True
         start = start if start != (0, 0) else get_random_cell(
             (self.maze.shape[0], self.maze.shape[1]))
 
         def hunt() -> None:
-            for index, value in self:
-                if int(value) not in (0, 1, 2):
-                    neighbor, direction = get_connection(self, (index[0], index[1]))
+            for index, cell_value in self:
+                if int(cell_value) not in (0, 1, 2):
+                    neighbor, direction = get_connection(
+                        self, (index[0], index[1]))
                     if neighbor == (0, 0):
                         continue
                     self.maze[neighbor] = 2
@@ -261,7 +299,8 @@ class Maze:
 
         kill(start)
         # We set the entry and the exit
-        self.maze[1][0], self.maze[self.maze.shape[0] - 2][self.maze.shape[1]-1] = (2, 2)
+        self.maze[1][0], self.maze[self.maze.shape[0] -
+                                   2][self.maze.shape[1]-1] = (2, 2)
         self.algorithm = "Hunt and Kill algorithm"
         return self
 
@@ -281,6 +320,34 @@ class Maze:
                 wall_coordinates = (index[0], index[1]+1)
                 self.destroy_wall(wall_coordinates, values)
         return self
+
+    def binary_tree(self, biais: tuple[tuple[int, int], tuple[int, int]] | None = None) -> 'Maze':
+
+        biais = ((-2, 0), (0, -2))
+        for index, cell_value in self:
+            if int(cell_value) in (0, 1):
+                continue
+            # If coordinates are odd
+            if (index[0] % 2, index[1] % 2) not in ((1, 1), (0, 0)):
+                continue
+            self.maze[index] = 2
+            neighbors = get_neighbors(self, (index[0], index[1]), biais)
+            if neighbors:
+                neighbor, direction = rdm.choice(neighbors)
+                self.maze[neighbor] = 2
+                wall_coordinates = (neighbor[0] - direction[0] // 2,
+                                    neighbor[1] - direction[1] // 2)
+                self.maze[wall_coordinates] = 2
+            elif index[1] != self.maze.shape[1] - 2:
+                wall_coordinates = (index[0], index[1]+1)
+                self.maze[wall_coordinates] = 2
+
+        # We set the entry and the exit
+        self.maze[1][0], self.maze[self.maze.shape[0] -
+                                   2][self.maze.shape[1]-1] = (2, 2)
+        self.algorithm = "Binary Tree Algorithm"
+        return self
+
     def get_breakable_walls(self) -> list[tuple[int, int]]:
         """ Gets all breakable walls coordinates
 
@@ -288,8 +355,8 @@ class Maze:
             list[tuple[int, int]]: List of all breakable walls coordinates
         """
         coordinates: list[tuple[int, int]] = []
-        for index, value in self:
-            if value == 1 or isinstance(value, tuple) and value[0] == 1:
+        for index, cell_value in self:
+            if cell_value == 1 or isinstance(cell_value, tuple) and cell_value[0] == 1:
                 coordinates.append((index[0], index[1]))
         rdm.shuffle(coordinates)
         return coordinates
@@ -303,8 +370,8 @@ class Maze:
         """
         # Force the probability to be between 0 and 1
         probability = max(0, min(1, probability))
-        for index, value in self:
-            if value == 1 and 0 < rdm.uniform(0, 1) <= probability:
+        for index, cell_value in self:
+            if cell_value == 1 and 0 < rdm.uniform(0, 1) <= probability:
                 self.maze[index] = 2
         self.is_complexe = True
         return self
@@ -318,8 +385,8 @@ class Maze:
         """
         selected_value = rdm.choice(values)
         value_to_replace = values[0] if selected_value == values[1] else values[1]
-        for index, value in self:
-            if value == value_to_replace:
+        for index, cell_value in self:
+            if cell_value == value_to_replace:
                 self.maze[index] = selected_value
         self.maze[wall_coordinate[0], wall_coordinate[1]] = selected_value
         return self
@@ -344,7 +411,8 @@ def verify_shape(shape: Any | tuple[Any, ...], raise_error: bool) -> tuple[int, 
         if len(shape) == 2 and all(isinstance(i, int) for i in shape if i > 5 and i % 2 == 1):
             return shape
         if raise_error:
-            raise ValueError("Shape must be a tuple of 2 integer greater than 5 and odd")
+            raise ValueError(
+                "Shape must be a tuple of 2 integer greater than 5 and odd")
         return ((shape[0] - 1) if shape[0] % 2 == 0 else shape[0],
                 (shape[1] - 1) if shape[1] % 2 == 0 else shape[1])
     if raise_error:
@@ -373,7 +441,10 @@ def was_visited(self: Maze, cell: tuple[int, int], visited: list[tuple[int, int]
 
 
 def get_neighbors(self: Maze,
-                  cell: tuple[int, int]) -> list[tuple[tuple[int, int], tuple[int, int]]]:
+                  cell: tuple[int, int],
+                  directions: tuple[tuple[int, int],
+                                    ...] | None = None) -> list[tuple[tuple[int, int],
+                                                                      tuple[int, int]]]:
     """Returns a list of neighboring cells that are accessible from the given cell.
 
     Args:
@@ -387,7 +458,7 @@ def get_neighbors(self: Maze,
     """
     neighbors: list[tuple[tuple[int, int], tuple[int, int]]] = []
     # North, East, South, West
-    directions = [(-2, 0), (0, 2), (2, 0), (0, -2)]
+    directions = directions if directions else ((-2, 0), (0, 2), (2, 0), (0, -2))
     for direction in directions:
         neighbor = cell[0] + direction[0], cell[1] + direction[1]
         if not 1 <= neighbor[0] < self.maze.shape[0] or not 1 <= neighbor[1] < self.maze.shape[1]:
@@ -439,4 +510,18 @@ def get_connection(self: Maze, index: tuple[int, int]) -> tuple[tuple[int, int],
     return rdm.choice(neighbors)
 
 
-print(Maze(11).eller())
+"""x = Maze(11)
+print(x.kruskal())
+print()
+x = Maze(11)
+print(x.prim())
+print()
+x = Maze(11)
+print(x.depth_first_search())
+print()
+x = Maze(11)
+print(x.hunt_and_kill())
+print()"""
+x = Maze(15)
+print(x.binary_tree())
+print()
