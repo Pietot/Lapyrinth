@@ -36,6 +36,11 @@ def hunt_and_kill_time(iteration: int, size: int, queue: Queue):
     time = round(timeit.timeit(lambda: Maze(size).hunt_and_kill(),
                                number=iteration, globals=globals()), 5)
     queue.put(("Hunt and Kill", size, time))
+    
+def binary_tree_time(iteration: int, size: int, queue: Queue):
+    time = round(timeit.timeit(lambda: Maze(size).binary_tree(),
+                               number=iteration, globals=globals()), 5)
+    queue.put(("Binary Tree", size, time))
 
 
 def memory_usage(pid):
@@ -73,55 +78,24 @@ def hunt_and_kill_memory(size: int, queue: Queue):
     maze.hunt_and_kill()
     mem = memory_usage(os.getpid()) - mem
     queue.put((size, mem))
-
-
-def memory_complexity() -> None:
-    max_size = 105
-    memory = {}
-    for size in tqdm(range(5, max_size + 1, 10)):
-        queues = []
-        processes = []
-        for func in [kruskal_memory, prim_memory, depth_first_search_memory, hunt_and_kill_memory]:
-            queue = Queue()
-            queues.append(queue)
-            p = Process(target=func, args=(size, queue))
-            processes.append(p)
-            p.start()
-
-        for p in processes:
-            p.join()
-
-        for i, queue in enumerate(queues):
-            algo = ['Kruskal', 'Prim', 'Depth First Search', 'Hunt and Kill'][i]
-            size, mem = queue.get()
-            if algo not in memory:
-                memory[algo] = {}
-            memory[algo][size] = mem/1000
-
-    with open('memory_complexity.csv', 'w', newline='', encoding='utf-8') as csvfile:
-        writer = csv.writer(csvfile)
-
-        # Write the header row
-        writer.writerow(['Size', 'Kruskal', 'Prim', 'Depth First Search', 'Hunt and Kill'])
-
-        # Write the data rows
-        for size in memory['Kruskal'].keys():
-            writer.writerow([size,
-                            memory['Kruskal'][size],
-                            memory['Prim'][size],
-                            memory['Depth First Search'][size],
-                            memory['Hunt and Kill'][size]])
+    
+def binary_tree_memory(size: int, queue: Queue):
+    maze = Maze(size)
+    mem = memory_usage(os.getpid())
+    maze.binary_tree()
+    mem = memory_usage(os.getpid()) - mem
+    queue.put((size, mem))
 
 
 def time_complexity() -> None:
-    """_summary_
+    """ Benchmarking the time complexity of the different algorithms used to generate the maze.
     """
     max_size = 105
     execution_time = {}
     for size in tqdm(range(5, max_size + 1, 10)):
         queues = []
         processes = []
-        for func in [kruskal_time, prim_time, depth_first_search_time, hunt_and_kill_time]:
+        for func in [kruskal_time, prim_time, depth_first_search_time, hunt_and_kill_time, binary_tree_time]:
             queue = Queue()
             queues.append(queue)
             p = Process(target=func, args=(1, size, queue))
@@ -135,13 +109,13 @@ def time_complexity() -> None:
             algo, size, time = queue.get()
             if algo not in execution_time:
                 execution_time[algo] = {}
-            execution_time[algo][size] = str(time).replace('.', ',')
+            execution_time[algo][size] = time
 
     with open('time_complexity.csv', 'w', newline='', encoding='utf-8') as csvfile:
         writer = csv.writer(csvfile)
 
         # Write the header row
-        writer.writerow(['Size', 'Kruskal', 'Prim', 'Depth First Search', 'Hunt and Kill'])
+        writer.writerow(['Size', 'Kruskal', 'Prim', 'Depth First Search', 'Hunt and Kill', 'Binary Tree'])
 
         # Write the data rows
         for size in execution_time['Kruskal'].keys():
@@ -149,7 +123,49 @@ def time_complexity() -> None:
                             execution_time['Kruskal'][size],
                             execution_time['Prim'][size],
                             execution_time['Depth First Search'][size],
-                            execution_time['Hunt and Kill'][size]])
+                            execution_time['Hunt and Kill'][size],
+                            execution_time['Binary Tree'][size]])
+
+
+def memory_complexity() -> None:
+    """ Benchmarking the memory complexity of the different algorithms used to generate the maze.
+    """
+    max_size = 105
+    memory = {}
+    for size in tqdm(range(5, max_size + 1, 10)):
+        queues = []
+        processes = []
+        for func in [kruskal_memory, prim_memory, depth_first_search_memory, hunt_and_kill_memory, binary_tree_memory]:
+            queue = Queue()
+            queues.append(queue)
+            p = Process(target=func, args=(size, queue))
+            processes.append(p)
+            p.start()
+
+        for p in processes:
+            p.join()
+
+        for i, queue in enumerate(queues):
+            algo = ['Kruskal', 'Prim', 'Depth First Search', 'Hunt and Kill', 'Binary Tree'][i]
+            size, mem = queue.get()
+            if algo not in memory:
+                memory[algo] = {}
+            memory[algo][size] = mem/1000
+
+    with open('memory_complexity.csv', 'w', newline='', encoding='utf-8') as csvfile:
+        writer = csv.writer(csvfile)
+
+        # Write the header row
+        writer.writerow(['Size', 'Kruskal', 'Prim', 'Depth First Search', 'Hunt and Kill', 'Binary Tree'])
+
+        # Write the data rows
+        for size in memory['Kruskal'].keys():
+            writer.writerow([size,
+                            memory['Kruskal'][size],
+                            memory['Prim'][size],
+                            memory['Depth First Search'][size],
+                            memory['Hunt and Kill'][size],
+                            memory['Binary Tree'][size]])
 
 
 if __name__ == "__main__":
