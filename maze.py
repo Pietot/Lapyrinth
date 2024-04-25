@@ -36,8 +36,8 @@ and solving them with different pathfinders """
 
 # v1.6 :
 # Start : 24/04/2024 at 20h30 FR
-# End : /04/2024 at h FR
-# Changelogs : Binary Tree Algorithm
+# End : 25/04/2024 at 11h45 FR
+# Changelogs : Added Binary Tree Algorithm
 
 # v1.7 :
 # Start : 18/04/2024 at 12h00 FR
@@ -100,6 +100,11 @@ class Maze:
         return self
 
     def set_value(self) -> 'Maze':
+        """ Set a unique value to each cell
+
+        Returns:
+            Maze: The Maze object
+        """
         value = 3
         for index, cell_value in self:
             if cell_value == 3:
@@ -321,25 +326,43 @@ class Maze:
                 self.destroy_wall(wall_coordinates, values)
         return self
 
-    def binary_tree(self, biais: tuple[tuple[int, int], tuple[int, int]] | None = None) -> 'Maze':
+    def binary_tree(self) -> 'Maze':
+        """ Applies the Binary Tree algorithm to generate a maze.
 
+        It starts by iterating over the maze and checking if the cell is a path.
+        Then looks for neighbors corresponding to the biais.
+        For example, here the biais is ((-2, 0), (0, -2)) for nortwest.
+        So it will look for the neighbors at (-2, 0) and (0, -2).
+        After choosing randomly a neighbor, it will destroy the wall between the two cells.
+
+        For difficulty reasons, the biais is arbitrary set to Nortwest beacause others biais
+        are very easy to solve. If you want to choose the bais randomly (or not),
+        you can use the following code:
+
+        def binary_tree(self, biais: tuple[tuple[int, int],
+                                           tuple[int, int]] | None = None) -> 'Maze':
+            # Nortwest, Northeast, Southwest, Southeast
+            biais_choices = ((-2, 0), (0, -2),
+                    ((-2, 0), (0, 2)),
+                    ((2, 0), (0, -2)),
+                    ((2, 0), (0, 2)))
+            biais = rdm.choice(biais_choices)
+
+        Returns:
+            Maze: The generated maze after applying Binary Tree algorithm.
+        """
+        # Northwest
         biais = ((-2, 0), (0, -2))
         for index, cell_value in self:
-            if int(cell_value) in (0, 1):
-                continue
             # If coordinates are odd
-            if (index[0] % 2, index[1] % 2) not in ((1, 1), (0, 0)):
+            if ((index[0] % 2, index[1] % 2) not in ((1, 1), (0, 0))
+                    or int(cell_value) in (0, 1)):
                 continue
-            self.maze[index] = 2
-            neighbors = get_neighbors(self, (index[0], index[1]), biais)
+            neighbors = get_neighbors(self, (index[0], index[1]), biais, return_visited=True)
             if neighbors:
                 neighbor, direction = rdm.choice(neighbors)
-                self.maze[neighbor] = 2
                 wall_coordinates = (neighbor[0] - direction[0] // 2,
                                     neighbor[1] - direction[1] // 2)
-                self.maze[wall_coordinates] = 2
-            elif index[1] != self.maze.shape[1] - 2:
-                wall_coordinates = (index[0], index[1]+1)
                 self.maze[wall_coordinates] = 2
 
         # We set the entry and the exit
@@ -442,9 +465,8 @@ def was_visited(self: Maze, cell: tuple[int, int], visited: list[tuple[int, int]
 
 def get_neighbors(self: Maze,
                   cell: tuple[int, int],
-                  directions: tuple[tuple[int, int],
-                                    ...] | None = None) -> list[tuple[tuple[int, int],
-                                                                      tuple[int, int]]]:
+                  directions: tuple[tuple[int, int], ...] | None = None,
+                  return_visited: bool = False) -> list[tuple[tuple[int, int], tuple[int, int]]]:
     """Returns a list of neighboring cells that are accessible from the given cell.
 
     Args:
@@ -461,10 +483,9 @@ def get_neighbors(self: Maze,
     directions = directions if directions else ((-2, 0), (0, 2), (2, 0), (0, -2))
     for direction in directions:
         neighbor = cell[0] + direction[0], cell[1] + direction[1]
-        if not 1 <= neighbor[0] < self.maze.shape[0] or not 1 <= neighbor[1] < self.maze.shape[1]:
-            continue
-        if self.maze[neighbor] not in (0, 2):
-            neighbors.append((neighbor, direction))
+        if 1 <= neighbor[0] < self.maze.shape[0] and 1 <= neighbor[1] < self.maze.shape[1]:
+            if return_visited or self.maze[neighbor] != 2:
+                neighbors.append((neighbor, direction))
     return neighbors
 
 
@@ -508,20 +529,3 @@ def get_connection(self: Maze, index: tuple[int, int]) -> tuple[tuple[int, int],
     if not neighbors:
         return (0, 0), (0, 0)
     return rdm.choice(neighbors)
-
-
-"""x = Maze(11)
-print(x.kruskal())
-print()
-x = Maze(11)
-print(x.prim())
-print()
-x = Maze(11)
-print(x.depth_first_search())
-print()
-x = Maze(11)
-print(x.hunt_and_kill())
-print()"""
-x = Maze(15)
-print(x.binary_tree())
-print()
