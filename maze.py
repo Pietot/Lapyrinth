@@ -46,6 +46,7 @@ and solving them with different pathfinders """
 
 
 from typing import Any, Generator
+from PIL import Image, ImageDraw
 
 import sys
 
@@ -53,7 +54,7 @@ import random as rdm
 import numpy as np
 
 
-sys.setrecursionlimit(10000)
+sys.setrecursionlimit(100000)
 
 
 class Maze:
@@ -358,7 +359,8 @@ class Maze:
             if ((index[0] % 2, index[1] % 2) not in ((1, 1), (0, 0))
                     or int(cell_value) in (0, 1)):
                 continue
-            neighbors = get_neighbors(self, (index[0], index[1]), biais, return_visited=True)
+            neighbors = get_neighbors(
+                self, (index[0], index[1]), biais, return_visited=True)
             if neighbors:
                 neighbor, direction = rdm.choice(neighbors)
                 wall_coordinates = (neighbor[0] - direction[0] // 2,
@@ -413,6 +415,34 @@ class Maze:
                 self.maze[index] = selected_value
         self.maze[wall_coordinate[0], wall_coordinate[1]] = selected_value
         return self
+
+    def generate_image(self) -> None:
+        """ Generate a maze image from a maze object. """
+        size = self.maze.shape
+        filename = f'Maze_{size[0]}x{size[1]}_{self.algorithm}.png'
+        cell_size = 50
+        wall_color = (0, 0, 0)
+        start = (1, 0)
+        end = (size[0] - 2, size[1] - 1)
+
+        image = Image.new(
+            "RGB", (size[0]*cell_size, size[1]*cell_size), (255, 255, 255))
+        draw = ImageDraw.Draw(image)
+
+        for index, cell_value in self:
+            x1 = index[1] * cell_size
+            y1 = index[0] * cell_size
+            x2 = (index[1] + 1) * cell_size
+            y2 = (index[0] + 1) * cell_size
+
+            if index == start:
+                draw.rectangle((x1, y1+1, x2, y2), fill=(0, 255, 0))
+            elif index == end:
+                draw.rectangle((x1, y1, x2, y2), fill=(255, 0, 0))
+            elif int(cell_value) in (0, 1):
+                draw.rectangle((x1, y1, x2, y2), fill=wall_color)
+
+        image.save(filename)
 
 
 def verify_shape(shape: Any | tuple[Any, ...], raise_error: bool) -> tuple[int, int]:
@@ -480,7 +510,8 @@ def get_neighbors(self: Maze,
     """
     neighbors: list[tuple[tuple[int, int], tuple[int, int]]] = []
     # North, East, South, West
-    directions = directions if directions else ((-2, 0), (0, 2), (2, 0), (0, -2))
+    directions = directions if directions else (
+        (-2, 0), (0, 2), (2, 0), (0, -2))
     for direction in directions:
         neighbor = cell[0] + direction[0], cell[1] + direction[1]
         if 1 <= neighbor[0] < self.maze.shape[0] and 1 <= neighbor[1] < self.maze.shape[1]:
