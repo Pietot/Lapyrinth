@@ -40,18 +40,24 @@ and solving them with different pathfinders """
 # Changelogs : Added Binary Tree Algorithm
 
 # v1.7 :
+# Start : 21/04/2024 at 11h30 FR
+# End : /04/2024 at h FR
+# Changelogs : Added Recursive Division Algorithm
+
+# v1.8 :
 # Start : 18/04/2024 at 12h00 FR
 # End : /04/2024 at h FR
 # Changelogs : Added Eller's Algorithm
 
 
 from typing import Any, Generator
-from PIL import Image, ImageDraw
 
 import sys
 
 import random as rdm
 import numpy as np
+
+from PIL import Image, ImageDraw
 
 
 sys.setrecursionlimit(100000)
@@ -325,6 +331,47 @@ class Maze:
                 values = value, self.maze[index[1]+2]
                 wall_coordinates = (index[0], index[1]+1)
                 self.destroy_wall(wall_coordinates, values)
+        return self
+
+    def recursive_division(self, start: tuple[int, int] = (1, 1),
+                           end: tuple[int, int] | None = None) -> 'Maze':
+        def divide_vertically(width: int, height: int) -> int:
+            if width == height:
+                return rdm.getrandbits(1)
+            return width > height
+
+        def divide(start: tuple[int, int], end: tuple[int, int], entry: int | None = None) -> None:
+            height = end[0] - start[0]
+            width = end[1] - start[1]
+            if height <= 1 or width <= 1:
+                return
+            if divide_vertically(width, height):
+                wall_column_index = rdm.choice(
+                    [i for i in range(start[1], end[1]+1) if i not in (start[1], entry, end[1])])
+                self.maze[start[0]:end[0] + 1, wall_column_index] = 0
+                entry = rdm.randint(start[0], end[0])
+                self.maze[entry][wall_column_index] = 2
+                divide(start, (end[0], wall_column_index - 1))
+                divide((start[0], wall_column_index + 1), end)
+            else:
+                wall_row_index = rdm.choice(
+                    [i for i in range(start[0], end[0]+1) if i not in (start[0], entry, end[0])])
+                self.maze[wall_row_index, start[1]:end[1] + 1] = 0
+                entry = rdm.randint(start[1], end[1])
+                self.maze[wall_row_index][entry] = 2
+                divide(start, (wall_row_index - 1, end[1]), entry)
+                divide((wall_row_index + 1, start[1]), end, entry)
+        if end is None:
+            end = (self.maze.shape[0]-2, self.maze.shape[1]-2)
+        if not self.is_empty:
+            self.remove_walls()
+            self.is_empty = True
+        divide(start, end)
+
+        # We set the entry and the exit
+        self.maze[1][0], self.maze[self.maze.shape[0] -
+                                   2][self.maze.shape[1]-1] = (2, 2)
+        self.algorithm = "Recursive division Algorithm"
         return self
 
     def binary_tree(self) -> 'Maze':
