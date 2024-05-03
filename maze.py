@@ -41,7 +41,7 @@ and solving them with different pathfinders """
 
 # v1.7 :
 # Start : 21/04/2024 at 11h30 FR
-# End : /04/2024 at h FR
+# End : 04/05/2024 at 01h00 FR
 # Changelogs : Added Recursive Division Algorithm
 
 # v1.8 :
@@ -335,12 +335,27 @@ class Maze:
 
     def recursive_division(self, start: tuple[int, int] = (1, 1),
                            end: tuple[int, int] | None = None) -> 'Maze':
-        def divide_vertically(width: int, height: int) -> int:
-            if width == height:
-                return rdm.getrandbits(1)
-            return width > height
+        """ Applies the Recursive division algorithm to generate a maze.
 
-        def divide(start: tuple[int, int], end: tuple[int, int], ban: tuple[int, int] = (0, 0)) -> None:
+        It starts by dividing the maze into two parts, either horizontally or vertically.
+        Then it creates a wall in the middle of the division.
+        After that, it creates a carve into the wall.
+        This process continues recursively until the maze is fully divided.
+
+        Args:
+            start (tuple[int, int], optional): The starting coordinates of the block to divide.
+                Defaults to (1, 1).
+            end (tuple[int, int] | None, optional): The ending coordinates of the block to divide.
+                Defaults to None.
+
+        Returns:
+            Maze: The generated maze after applying Recursive division algorithm.
+        """
+        def divide_vertically(width: int, height: int) -> int:
+            return width > height if width != height else rdm.getrandbits(1)
+
+        def divide(start: tuple[int, int], end: tuple[int, int],
+                   ban: tuple[int, int] = (0, 0)) -> None:
             height = end[0] - start[0]
             width = end[1] - start[1]
             if height <= 1 or width <= 1:
@@ -348,12 +363,10 @@ class Maze:
             if divide_vertically(width, height):
                 wall_column_index = [i for i in range(
                     start[1], end[1]+1) if i not in (start[1], ban[1], end[1]) and i % 2 == 0]
-                if not wall_column_index:
-                    print("No wall column index found")
-                    return
                 wall_column_index = rdm.choice(wall_column_index)
                 self.maze[start[0]:end[0] + 1, wall_column_index] = 0
-                entry = rdm.randint(start[0], end[0])
+                entries = [i for i in range(start[0], end[0]+1) if i % 2 == 1]
+                entry = rdm.choice(entries)
                 entry_coordinate = (entry, wall_column_index)
                 self.maze[entry][wall_column_index] = 2
                 divide(start, (end[0], wall_column_index - 1), entry_coordinate)
@@ -361,12 +374,10 @@ class Maze:
             else:
                 wall_row_index = [i for i in range(
                     start[0], end[0]+1) if i not in (start[0], ban[0], end[0]) and i % 2 == 0]
-                if not wall_row_index:
-                    print("No wall row index found")
-                    return
                 wall_row_index = rdm.choice(wall_row_index)
                 self.maze[wall_row_index, start[1]:end[1] + 1] = 0
-                entry = rdm.randint(start[1], end[1])
+                entries = [i for i in range(start[1], end[1]+1) if i % 2 == 1]
+                entry = rdm.choice(entries)
                 entry_coordinate = (wall_row_index, entry)
                 self.maze[wall_row_index][entry] = 2
                 divide(start, (wall_row_index - 1, end[1]), entry_coordinate)
