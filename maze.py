@@ -340,34 +340,43 @@ class Maze:
                 return rdm.getrandbits(1)
             return width > height
 
-        def divide(start: tuple[int, int], end: tuple[int, int], entry: int | None = None) -> None:
+        def divide(start: tuple[int, int], end: tuple[int, int], ban: tuple[int, int] = (0, 0)) -> None:
             height = end[0] - start[0]
             width = end[1] - start[1]
             if height <= 1 or width <= 1:
                 return
             if divide_vertically(width, height):
-                wall_column_index = rdm.choice(
-                    [i for i in range(start[1], end[1]+1) if i not in (start[1], entry, end[1])])
+                wall_column_index = [i for i in range(
+                    start[1], end[1]+1) if i not in (start[1], ban[1], end[1]) and i % 2 == 0]
+                if not wall_column_index:
+                    print("No wall column index found")
+                    return
+                wall_column_index = rdm.choice(wall_column_index)
                 self.maze[start[0]:end[0] + 1, wall_column_index] = 0
                 entry = rdm.randint(start[0], end[0])
+                entry_coordinate = (entry, wall_column_index)
                 self.maze[entry][wall_column_index] = 2
-                divide(start, (end[0], wall_column_index - 1))
-                divide((start[0], wall_column_index + 1), end)
+                divide(start, (end[0], wall_column_index - 1), entry_coordinate)
+                divide((start[0], wall_column_index + 1), end, entry_coordinate)
             else:
-                wall_row_index = rdm.choice(
-                    [i for i in range(start[0], end[0]+1) if i not in (start[0], entry, end[0])])
+                wall_row_index = [i for i in range(
+                    start[0], end[0]+1) if i not in (start[0], ban[0], end[0]) and i % 2 == 0]
+                if not wall_row_index:
+                    print("No wall row index found")
+                    return
+                wall_row_index = rdm.choice(wall_row_index)
                 self.maze[wall_row_index, start[1]:end[1] + 1] = 0
                 entry = rdm.randint(start[1], end[1])
+                entry_coordinate = (wall_row_index, entry)
                 self.maze[wall_row_index][entry] = 2
-                divide(start, (wall_row_index - 1, end[1]), entry)
-                divide((wall_row_index + 1, start[1]), end, entry)
+                divide(start, (wall_row_index - 1, end[1]), entry_coordinate)
+                divide((wall_row_index + 1, start[1]), end, entry_coordinate)
         if end is None:
             end = (self.maze.shape[0]-2, self.maze.shape[1]-2)
         if not self.is_empty:
             self.remove_walls()
             self.is_empty = True
         divide(start, end)
-
         # We set the entry and the exit
         self.maze[1][0], self.maze[self.maze.shape[0] -
                                    2][self.maze.shape[1]-1] = (2, 2)
@@ -463,10 +472,10 @@ class Maze:
         self.maze[wall_coordinate[0], wall_coordinate[1]] = selected_value
         return self
 
-    def generate_image(self) -> None:
+    def generate_image(self, filename: str | None = None) -> None:
         """ Generate a maze image from a maze object. """
         size = self.maze.shape
-        filename = f'Maze_{size[0]}x{size[1]}_{self.algorithm}.png'
+        filename = filename if filename else f'Maze_{size[0]}x{size[1]}_{self.algorithm}.png'
         cell_size = 50
         wall_color = (0, 0, 0)
         start = (1, 0)
