@@ -41,6 +41,11 @@ def binary_tree_time(iteration: int, size: int, queue: Queue):
     time = round(timeit.timeit(lambda: Maze(size).binary_tree(),
                                number=iteration, globals=globals()), 5)
     queue.put(("Binary Tree", size, time))
+    
+def recursive_division_time(iteration: int, size: int, queue: Queue):
+    time = round(timeit.timeit(lambda: Maze(size).recursive_division(),
+                               number=iteration, globals=globals()), 5)
+    queue.put(("Recursive Division", size, time))
 
 
 def memory_usage(pid):
@@ -85,6 +90,13 @@ def binary_tree_memory(size: int, queue: Queue):
     maze.binary_tree()
     mem = memory_usage(os.getpid()) - mem
     queue.put((size, mem))
+    
+def recursive_division_memory(size: int, queue: Queue):
+    maze = Maze(size)
+    mem = memory_usage(os.getpid())
+    maze.recursive_division()
+    mem = memory_usage(os.getpid()) - mem
+    queue.put((size, mem))
 
 
 def time_complexity() -> None:
@@ -95,7 +107,7 @@ def time_complexity() -> None:
     for size in tqdm(range(5, max_size + 1, 10)):
         queues = []
         processes = []
-        for func in [kruskal_time, prim_time, depth_first_search_time, hunt_and_kill_time, binary_tree_time]:
+        for func in [kruskal_time, prim_time, depth_first_search_time, hunt_and_kill_time, binary_tree_time, recursive_division_time]:
             queue = Queue()
             queues.append(queue)
             p = Process(target=func, args=(1, size, queue))
@@ -115,7 +127,7 @@ def time_complexity() -> None:
         writer = csv.writer(csvfile)
 
         # Write the header row
-        writer.writerow(['Size', 'Kruskal', 'Prim', 'Depth First Search', 'Hunt and Kill', 'Binary Tree'])
+        writer.writerow(['Size', 'Kruskal', 'Prim', 'Depth First Search', 'Hunt and Kill', 'Binary Tree', 'Recursive Division'])
 
         # Write the data rows
         for size in execution_time['Kruskal'].keys():
@@ -124,7 +136,8 @@ def time_complexity() -> None:
                             execution_time['Prim'][size],
                             execution_time['Depth First Search'][size],
                             execution_time['Hunt and Kill'][size],
-                            execution_time['Binary Tree'][size]])
+                            execution_time['Binary Tree'][size],
+                            execution_time['Recursive Division'][size]])
 
 
 def memory_complexity() -> None:
@@ -135,7 +148,7 @@ def memory_complexity() -> None:
     for size in tqdm(range(5, max_size + 1, 10)):
         queues = []
         processes = []
-        for func in [kruskal_memory, prim_memory, depth_first_search_memory, hunt_and_kill_memory, binary_tree_memory]:
+        for func in [kruskal_memory, prim_memory, depth_first_search_memory, hunt_and_kill_memory, binary_tree_memory, recursive_division_memory]:
             queue = Queue()
             queues.append(queue)
             p = Process(target=func, args=(size, queue))
@@ -146,7 +159,7 @@ def memory_complexity() -> None:
             p.join()
 
         for i, queue in enumerate(queues):
-            algo = ['Kruskal', 'Prim', 'Depth First Search', 'Hunt and Kill', 'Binary Tree'][i]
+            algo = ['Kruskal', 'Prim', 'Depth First Search', 'Hunt and Kill', 'Binary Tree', 'Recursive Division'][i]
             size, mem = queue.get()
             if algo not in memory:
                 memory[algo] = {}
@@ -156,7 +169,7 @@ def memory_complexity() -> None:
         writer = csv.writer(csvfile)
 
         # Write the header row
-        writer.writerow(['Size', 'Kruskal', 'Prim', 'Depth First Search', 'Hunt and Kill', 'Binary Tree'])
+        writer.writerow(['Size', 'Kruskal', 'Prim', 'Depth First Search', 'Hunt and Kill', 'Binary Tree', 'Recursive Division'])
 
         # Write the data rows
         for size in memory['Kruskal'].keys():
@@ -165,7 +178,8 @@ def memory_complexity() -> None:
                             memory['Prim'][size],
                             memory['Depth First Search'][size],
                             memory['Hunt and Kill'][size],
-                            memory['Binary Tree'][size]])
+                            memory['Binary Tree'][size],
+                            memory['Recursive Division'][size]])
 
 
 if __name__ == "__main__":
