@@ -67,8 +67,8 @@ class Maze:
     """ The Maze class
     """
 
-    def __init__(self, shape: Any | int | tuple[int, int] = 5, raise_error: bool = True) -> None:
-        shape = verify_shape(shape, raise_error)
+    def __init__(self, nb_cells: Any | int = 3) -> None:
+        shape = cell_to_shape(nb_cells)
         self.maze = np.zeros(shape, dtype=np.uint)
         self.algorithm: None | str = None
         self.is_empty = False
@@ -452,7 +452,7 @@ class Maze:
         image.save(filename)
 
 
-def verify_shape(shape: Any | tuple[Any, ...], raise_error: bool) -> tuple[int, int]:
+def cell_to_shape(nb_cells: int | Any) -> tuple[int, int]:
     """ Verifies if shape of the maze if an int greater than 5 and odd
         or a tuple of 2 int greater than 5 and odd
 
@@ -461,23 +461,12 @@ def verify_shape(shape: Any | tuple[Any, ...], raise_error: bool) -> tuple[int, 
         raise_error (bool):
             If the shape is invalid, raise an error if True, else return a valid or default shape.
     """
-    if isinstance(shape, int):
-        if not (shape < 5 or shape % 2 == 0):
-            return shape, shape
-        if raise_error:
-            raise ValueError("Shape must be greater than 5 and odd")
-        return shape-1, shape-1
-    if isinstance(shape, tuple):
-        if len(shape) == 2 and all(isinstance(i, int) for i in shape if i > 5 and i % 2 == 1):
-            return shape
-        if raise_error:
-            raise ValueError(
-                "Shape must be a tuple of 2 integer greater than 5 and odd")
-        return ((shape[0] - 1) if shape[0] % 2 == 0 else shape[0],
-                (shape[1] - 1) if shape[1] % 2 == 0 else shape[1])
-    if raise_error:
-        raise ValueError("Shape must be an int or a tuple[int, int]")
-    return 5, 5
+    if not isinstance(nb_cells, int):
+        raise TypeError("Number of cells must be an int equal or greater than 3")
+    if nb_cells < 3:
+        raise ValueError("Number of cells must be equal or greater than 3")
+    cells_to_shape = nb_cells*2 + 1, nb_cells*2 + 1
+    return cells_to_shape
 
 
 def get_breakable_walls(self: Maze) -> list[tuple[int, int]]:
