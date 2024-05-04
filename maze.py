@@ -71,7 +71,6 @@ class Maze:
         shape = verify_shape(shape, raise_error)
         self.maze = np.zeros(shape, dtype=np.uint)
         self.algorithm: None | str = None
-        self.is_complexe = False
         self.is_empty = False
         self.have_value = False
         self.sculpt_grid()
@@ -88,7 +87,7 @@ class Maze:
         for index, value in np.ndenumerate(self.maze):
             yield index, value
 
-    def sculpt_grid(self) -> 'Maze':
+    def sculpt_grid(self) -> None:
         """ Creates the grid , 0 is for pillars,
             1 for breakable walls and other for paths
         """
@@ -104,22 +103,17 @@ class Maze:
             elif (index[0] % 2, index[1] % 2) != (0, 0):
                 self.maze[index] = 1
         self.was_scuplted = True
-        return self
 
-    def set_value(self) -> 'Maze':
+    def set_value(self) -> None:
         """ Set a unique value to each cell
-
-        Returns:
-            Maze: The Maze object
         """
         value = 3
         for index, cell_value in self:
             if cell_value == 3:
                 self.maze[index] = value
                 value += 1
-        return self
 
-    def remove_walls(self) -> 'Maze':
+    def remove_walls(self) -> None:
         """ Remove all walls inside the maze
 
         Returns:
@@ -130,9 +124,8 @@ class Maze:
             if not (index[0] in (0, self.maze.shape[0] - 1)
                     or index[1] in (0, self.maze.shape[1] - 1)):
                 self.maze[index] = 2
-        return self
 
-    def kruskal(self, breakable_walls: list[tuple[int, int]] | None = None) -> 'Maze':
+    def kruskal(self, breakable_walls: list[tuple[int, int]] | None = None) -> None:
         """ Applies Kruskal's recursive algorithm to generate a maze.
 
         It starts by initializing each non-wall cell as unique value.
@@ -147,21 +140,18 @@ class Maze:
         Args:
             breakable_walls (None | list[tuple[int, int]], optional):
                 A list of coordinates of all breakable walls. Defaults to None.
-
-        Returns:
-            Maze: The generated maze after applying Kruskal's algorithm.
         """
         if not self.have_value:
             self.set_value()
             self.have_value = True
         if breakable_walls is None:
-            breakable_walls = self.get_breakable_walls()
+            breakable_walls = get_breakable_walls(self)
         if breakable_walls == []:
             # We set the entry and the exit
             self.maze[1][0], self.maze[self.maze.shape[0] -
                                        2][self.maze.shape[1]-1] = (2, 2)
             self.algorithm = "Kruskal's algorithm"
-            return self
+            return None
         coordinates = breakable_walls[0]
         if coordinates[0] % 2 == 0:
             upper_value = self.maze[coordinates[0]-1, coordinates[1]]
@@ -179,7 +169,7 @@ class Maze:
         return self.kruskal(breakable_walls)
 
     def depth_first_search(self, current_cell: tuple[int, int] = (0, 0),
-                           visited: list[tuple[int, int]] | None = None) -> 'Maze':
+                           visited: list[tuple[int, int]] | None = None) -> None:
         """ Applies the Depth First Search algorithm to generate a maze.
 
         It starts by initializing an empty list and choosing a random cell to start.
@@ -194,9 +184,6 @@ class Maze:
                 The current cell being visited. Defaults to (0, 0).
             visited (list[tuple[int, int]] | None, optional):
                 A list of cells that have already been visited by the algorithm. Defaults to None.
-
-        Returns:
-            Maze: The generated maze after applying DFS algorithm.
         """
         if visited is None:
             visited = []
@@ -218,9 +205,8 @@ class Maze:
         self.maze[1][0], self.maze[self.maze.shape[0] -
                                    2][self.maze.shape[1]-1] = (2, 2)
         self.algorithm = "Depth First Search algorithm"
-        return self
 
-    def prim(self, start: tuple[int, int] = (0, 0)) -> 'Maze':
+    def prim(self, start: tuple[int, int] = (0, 0)) -> None:
         """Applies Prim's algorithm to generate a maze.
 
         It starts by selecting a starting cell, either specified in parameter or chosen randomly.
@@ -233,9 +219,6 @@ class Maze:
             start (tuple[int, int], optional):
                 The starting cell coordinates.
                 Defaults to (0, 0), meaning a random starting cell will be chosen within the maze.
-
-        Returns:
-            Maze: The generated maze after applying Prim's algorithm.
         """
         if not self.have_value:
             self.set_value()
@@ -260,9 +243,8 @@ class Maze:
         self.maze[1][0], self.maze[self.maze.shape[0] -
                                    2][self.maze.shape[1]-1] = (2, 2)
         self.algorithm = "Prim's algorithm"
-        return self
 
-    def hunt_and_kill(self, start: tuple[int, int] = (0, 0)) -> 'Maze':
+    def hunt_and_kill(self, start: tuple[int, int] = (0, 0)) -> None:
         """ Applies Hunt and Kill algorithm to generate a maze.
 
         It starts at a random cell and carves a path to a random unvisited neighbor ("kill" phase).
@@ -274,9 +256,6 @@ class Maze:
             start (tuple[int, int], optional):
             The starting cell for the algorithm.
             Defaults to (0, 0), which means a random cell will be chosen.
-
-        Returns:
-            self: The generated maze after applying Hunt and Kill algorithm.
         """
         if not self.have_value:
             self.set_value()
@@ -314,9 +293,8 @@ class Maze:
         self.maze[1][0], self.maze[self.maze.shape[0] -
                                    2][self.maze.shape[1]-1] = (2, 2)
         self.algorithm = "Hunt and Kill algorithm"
-        return self
 
-    def eller(self, probabilty: float | None = None) -> 'Maze':
+    def eller(self, probabilty: float | None = None) -> None:
         probabilty = (min(0.01, max(1, probabilty))if probabilty
                       else round(rdm.uniform(0.01, 1), 2))
         for index, value in self:
@@ -331,10 +309,9 @@ class Maze:
                 values = value, self.maze[index[1]+2]
                 wall_coordinates = (index[0], index[1]+1)
                 self.destroy_wall(wall_coordinates, values)
-        return self
 
     def recursive_division(self, start: tuple[int, int] = (1, 1),
-                           end: tuple[int, int] | None = None) -> 'Maze':
+                           end: tuple[int, int] | None = None) -> None:
         """ Applies the Recursive division algorithm to generate a maze.
 
         It starts by dividing the maze into two parts, either horizontally or vertically.
@@ -347,9 +324,6 @@ class Maze:
                 Defaults to (1, 1).
             end (tuple[int, int] | None, optional): The ending coordinates of the block to divide.
                 Defaults to None.
-
-        Returns:
-            Maze: The generated maze after applying Recursive division algorithm.
         """
         def divide_vertically(width: int, height: int) -> int:
             return width > height if width != height else rdm.getrandbits(1)
@@ -392,9 +366,8 @@ class Maze:
         self.maze[1][0], self.maze[self.maze.shape[0] -
                                    2][self.maze.shape[1]-1] = (2, 2)
         self.algorithm = "Recursive division Algorithm"
-        return self
 
-    def binary_tree(self) -> 'Maze':
+    def binary_tree(self) -> None:
         """ Applies the Binary Tree algorithm to generate a maze.
 
         It starts by iterating over the maze and checking if the cell is a path.
@@ -415,9 +388,6 @@ class Maze:
                     ((2, 0), (0, -2)),
                     ((2, 0), (0, 2)))
             biais = rdm.choice(biais_choices)
-
-        Returns:
-            Maze: The generated maze after applying Binary Tree algorithm.
         """
         # Northwest
         biais = ((-2, 0), (0, -2))
@@ -438,37 +408,8 @@ class Maze:
         self.maze[1][0], self.maze[self.maze.shape[0] -
                                    2][self.maze.shape[1]-1] = (2, 2)
         self.algorithm = "Binary Tree Algorithm"
-        return self
 
-    def get_breakable_walls(self) -> list[tuple[int, int]]:
-        """ Gets all breakable walls coordinates
-
-        Returns:
-            list[tuple[int, int]]: List of all breakable walls coordinates
-        """
-        coordinates: list[tuple[int, int]] = []
-        for index, cell_value in self:
-            if cell_value == 1 or isinstance(cell_value, tuple) and cell_value[0] == 1:
-                coordinates.append((index[0], index[1]))
-        rdm.shuffle(coordinates)
-        return coordinates
-
-    def make_complex_maze(self, probability: int | float = 0.2) -> 'Maze':
-        """ Makes the maze complex by removing some walls randomly
-
-        Args:
-            probability (int | float, optional):
-            The probability of removing a wall. Defaults to 0.2.
-        """
-        # Force the probability to be between 0 and 1
-        probability = max(0, min(1, probability))
-        for index, cell_value in self:
-            if cell_value == 1 and 0 < rdm.uniform(0, 1) <= probability:
-                self.maze[index] = 2
-        self.is_complexe = True
-        return self
-
-    def destroy_wall(self, wall_coordinate: tuple[int, int], values: tuple[int, int]) -> 'Maze':
+    def destroy_wall(self, wall_coordinate: tuple[int, int], values: tuple[int, int]) -> None:
         """ Destroys a wall and merging the values
 
         Args:
@@ -481,7 +422,6 @@ class Maze:
             if cell_value == value_to_replace:
                 self.maze[index] = selected_value
         self.maze[wall_coordinate[0], wall_coordinate[1]] = selected_value
-        return self
 
     def generate_image(self, filename: str | None = None) -> None:
         """ Generate a maze image from a maze object. """
@@ -538,6 +478,20 @@ def verify_shape(shape: Any | tuple[Any, ...], raise_error: bool) -> tuple[int, 
     if raise_error:
         raise ValueError("Shape must be an int or a tuple[int, int]")
     return 5, 5
+
+
+def get_breakable_walls(self: Maze) -> list[tuple[int, int]]:
+    """ Gets all breakable walls coordinates
+
+    Returns:
+        list[tuple[int, int]]: List of all breakable walls coordinates
+    """
+    coordinates: list[tuple[int, int]] = []
+    for index, cell_value in self:
+        if cell_value == 1 or isinstance(cell_value, tuple) and cell_value[0] == 1:
+            coordinates.append((index[0], index[1]))
+    rdm.shuffle(coordinates)
+    return coordinates
 
 
 def was_visited(self: Maze, cell: tuple[int, int], visited: list[tuple[int, int]]) -> bool:
