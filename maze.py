@@ -50,7 +50,7 @@ and solving them with different pathfinders """
 # Changelogs : Added Eller's Algorithm
 
 
-from typing import Any, Generator
+from typing import Generator
 
 import sys
 
@@ -67,8 +67,9 @@ class Maze:
     """ The Maze class
     """
 
-    def __init__(self, nb_cells: Any | int = 3) -> None:
-        shape = cell_to_shape(nb_cells)
+    def __init__(self, *nb_cells_by_sides: int) -> None:
+        nb_cells_by_sides = nb_cells_by_sides if nb_cells_by_sides else (5, 5)
+        shape = cells_to_shape(*nb_cells_by_sides)
         self.maze = np.zeros(shape, dtype=np.uint)
         self.algorithm: None | str = None
         self.is_empty = False
@@ -452,21 +453,22 @@ class Maze:
         image.save(filename)
 
 
-def cell_to_shape(nb_cells: int | Any) -> tuple[int, int]:
-    """ Verifies if shape of the maze if an int greater than 5 and odd
-        or a tuple of 2 int greater than 5 and odd
+def cells_to_shape(*nb_cells_by_side: int) -> tuple[int, int]:
+    """ Convert the number of cells of each dimension (height, width) to the shape of the maze.
 
-    Args:
-        shape (Any | tuple[Any, ...]): Shape of the maze.
-        raise_error (bool):
-            If the shape is invalid, raise an error if True, else return a valid or default shape.
+    Raises:
+        ValueError: nb_cells_by_side must be an one or two int greater or equal to 2
+
+    Returns:
+        tuple[int, int]: The shape of the maze
     """
-    if not isinstance(nb_cells, int):
-        raise TypeError("Number of cells must be an int equal or greater than 3")
-    if nb_cells < 3:
-        raise ValueError("Number of cells must be equal or greater than 3")
-    cells_to_shape = nb_cells*2 + 1, nb_cells*2 + 1
-    return cells_to_shape
+    if len(nb_cells_by_side) == 1 and nb_cells_by_side[0] >= 2:
+        shape = (nb_cells_by_side[0]*2 + 1, nb_cells_by_side[0]*2 + 1)
+        return shape
+    if len(nb_cells_by_side) == 2 and all(cells >= 2 for cells in nb_cells_by_side):
+        shape = (nb_cells_by_side[0]*2 + 1, nb_cells_by_side[1]*2 + 1)
+        return shape
+    raise ValueError("nb_cells_by_side must be an one or two int greater or equal to 2")
 
 
 def get_breakable_walls(self: Maze) -> list[tuple[int, int]]:
