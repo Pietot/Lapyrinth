@@ -45,8 +45,13 @@ and solving them with different pathfinders """
 # Changelogs : Added Recursive Division Algorithm
 
 # v1.8 :
+# Start : 06/05/2024 at 00h45 FR
+# End : 6/05/2024 at 15h45 FR
+# Changelogs : Added Sidewinder Algorithm
+
+# v1.9 :
 # Start : 18/04/2024 at 12h00 FR
-# End : /04/2024 at h FR
+# End : /05/2024 at h FR
 # Changelogs : Added Eller's Algorithm
 
 
@@ -266,7 +271,7 @@ class Maze:
 
         def hunt() -> None:
             for index, cell_value in self:
-                if int(cell_value) not in (0, 1, 2):
+                if int(cell_value) > 2:
                     neighbor, direction = get_connection(
                         self, (index[0], index[1]))
                     if neighbor == (0, 0):
@@ -299,15 +304,14 @@ class Maze:
         probabilty = (min(0.01, max(1, probabilty))if probabilty
                       else round(rdm.uniform(0.01, 1), 2))
         for index, value in self:
-            value = int(value)
-            if value in (0, 1) or rdm.random() > probabilty:
+            if index[0] % 2 == 0 or index[1] % 2 == 0 or rdm.random() > probabilty:
                 continue
             if index[1] == self.maze.shape[1] - 2:
-                values = value, self.maze[index[1]-2]
+                values = int(value), self.maze[index[1]-2]
                 wall_coordinates = (index[0], index[1]-1)
                 self.destroy_wall(wall_coordinates, values)
             else:
-                values = value, self.maze[index[1]+2]
+                values = int(value), self.maze[index[1]+2]
                 wall_coordinates = (index[0], index[1]+1)
                 self.destroy_wall(wall_coordinates, values)
 
@@ -366,7 +370,7 @@ class Maze:
         # We set the entry and the exit
         self.maze[1][0], self.maze[self.maze.shape[0] -
                                    2][self.maze.shape[1]-1] = (2, 2)
-        self.algorithm = "Recursive division Algorithm"
+        self.algorithm = "Recursive division algorithm"
 
     def binary_tree(self) -> None:
         """ Applies the Binary Tree algorithm to generate a maze.
@@ -392,23 +396,63 @@ class Maze:
         """
         # Northwest
         biais = ((-2, 0), (0, -2))
-        for index, cell_value in self:
-            # If coordinates are odd
-            if ((index[0] % 2, index[1] % 2) not in ((1, 1), (0, 0))
-                    or int(cell_value) in (0, 1)):
+        for index, _ in self:
+            # If the cell is a wall
+            if index[0] % 2 == 0 or index[1] % 2 == 0:
                 continue
             neighbors = get_neighbors(
-                self, (index[0], index[1]), biais, return_visited=True)
+                self, (index[0], index[1]), biais)
             if neighbors:
                 neighbor, direction = rdm.choice(neighbors)
                 wall_coordinates = (neighbor[0] - direction[0] // 2,
                                     neighbor[1] - direction[1] // 2)
                 self.maze[wall_coordinates] = 2
-
         # We set the entry and the exit
         self.maze[1][0], self.maze[self.maze.shape[0] -
                                    2][self.maze.shape[1]-1] = (2, 2)
-        self.algorithm = "Binary Tree Algorithm"
+        self.algorithm = "Binary Tree algorithm"
+
+    def sidewinder(self, probability: float = 0.5) -> None:
+        """ Applies the Sidewinder algorithm to generate a maze.
+
+        It starts by carving the second row.
+        Then it iterates over the maze.
+        If we are in the second row in a wall, we continue.
+        Else, we add the cell to a list.
+        Then if the probability we set is True or if we are at the last cell of the row,
+        we choose a random cell from the list and destroy the wall to the North.
+        Else, we destroy the wall to the East.
+
+        Args:
+            probability (float, optional): The probability to carve an entry to the North.
+            The higher the value is, the more the maze will have a column shape.
+            The lower the value is, the more the maze will have a row shape.
+            Defaults to 0.5.
+        """
+        probability = min(1, max(0, probability))
+        east_direction = (0, 1)
+        north_direction = (-1, 0)
+        set_cells: list[tuple[int, int]] = []
+        self.maze[1][1:-1] = 2
+        for index, _ in self:
+            # If we are in the second row or if the cell is a wall
+            if index[0] == 1 or index[0] % 2 == 0 or index[1] % 2 == 0:
+                continue
+            set_cells.append((index[0], index[1]))
+            if rdm.random() <= probability or index[1] == self.maze.shape[1] - 2:
+                chosen_cell = rdm.choice(set_cells)
+                wall_coordinates = (chosen_cell[0] + north_direction[0],
+                                    chosen_cell[1] + north_direction[1])
+                self.maze[wall_coordinates] = 2
+                set_cells.clear()
+            else:
+                wall_coordinates = (index[0] + east_direction[0],
+                                    index[1] + east_direction[1])
+                self.maze[wall_coordinates] = 2
+        # We set the entry and the exit
+        self.maze[1][0], self.maze[self.maze.shape[0] -
+                                   2][self.maze.shape[1]-1] = (2, 2)
+        self.algorithm = "Sidewinder algorithm"
 
     def destroy_wall(self, wall_coordinate: tuple[int, int], values: tuple[int, int]) -> None:
         """ Destroys a wall and merging the values
@@ -507,13 +551,16 @@ def was_visited(self: Maze, cell: tuple[int, int], visited: list[tuple[int, int]
 
 def get_neighbors(self: Maze,
                   cell: tuple[int, int],
-                  directions: tuple[tuple[int, int], ...] | None = None,
-                  return_visited: bool = False) -> list[tuple[tuple[int, int], tuple[int, int]]]:
+                  directions: tuple[tuple[int, int],
+                                    ...] | None = None) -> list[tuple[tuple[int,
+                                                                            int], tuple[int, int]]]:
     """Returns a list of neighboring cells that are accessible from the given cell.
 
     Args:
         self (Maze): The maze object.
         cell (tuple[int, int]): The coordinates of the cell.
+        directions (tuple[tuple[int, int], ...], optional): The directions to check.
+        Defaults to None.
 
     Returns:
         list[tuple[tuple[int, int], tuple[int, int]]]:
@@ -527,7 +574,7 @@ def get_neighbors(self: Maze,
     for direction in directions:
         neighbor = cell[0] + direction[0], cell[1] + direction[1]
         if 1 <= neighbor[0] < self.maze.shape[0] and 1 <= neighbor[1] < self.maze.shape[1]:
-            if return_visited or self.maze[neighbor] != 2:
+            if self.maze[neighbor] != 2:
                 neighbors.append((neighbor, direction))
     return neighbors
 
