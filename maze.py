@@ -22,37 +22,42 @@ and solving them with different pathfinders """
 # v1.3 :
 # Start : 13/04/2024
 # End : 14/04/2024 at 17h42 FR
-# Changelogs : Added Depth First Search Algorithm
+# Changelogs : Added Depth First Search algorithm
 
 # v1.4 :
 # Start : 15/04/2024 at 14h00 FR
 # End : 15/04/2024 at 23h12 FR
-# Changelogs : Added Prim's Algorithm
+# Changelogs : Added Prim's algorithm
 
 # v1.5 :
 # Start : 16/04/2024 at 23h15 FR
 # End : 17/04/2024 at 18h00 FR
-# Changelogs : Added Hunt and Kill Algorithm
+# Changelogs : Added Hunt and Kill algorithm
 
 # v1.6 :
 # Start : 24/04/2024 at 20h30 FR
 # End : 25/04/2024 at 11h45 FR
-# Changelogs : Added Binary Tree Algorithm
+# Changelogs : Added Binary Tree algorithm
 
 # v1.7 :
 # Start : 21/04/2024 at 11h30 FR
 # End : 04/05/2024 at 01h00 FR
-# Changelogs : Added Recursive Division Algorithm
+# Changelogs : Added Recursive Division algorithm
 
 # v1.8 :
 # Start : 06/05/2024 at 00h45 FR
 # End : 6/05/2024 at 15h45 FR
-# Changelogs : Added Sidewinder Algorithm
+# Changelogs : Added Sidewinder algorithm
 
 # v1.9 :
+# Start : 06/05/2024 at 21h45 FR
+# End : 07/05/2024 at 16h30 FR
+# Changelogs : Added Growing Tree algorithm
+
+# v1.10 :
 # Start : 18/04/2024 at 12h00 FR
 # End : /05/2024 at h FR
-# Changelogs : Added Eller's Algorithm
+# Changelogs : Added Eller's algorithm
 
 
 from typing import Generator
@@ -174,7 +179,7 @@ class Maze:
         self.destroy_wall(coordinates, values)
         return self.kruskal(breakable_walls)
 
-    def depth_first_search(self, current_cell: tuple[int, int] = (0, 0),
+    def depth_first_search(self, current_cell: tuple[int, int] | None = None,
                            visited: list[tuple[int, int]] | None = None) -> None:
         """ Applies the Depth First Search algorithm to generate a maze.
 
@@ -186,15 +191,15 @@ class Maze:
         and repeats the process until all cells have been visited.
 
         Args:
-            current_cell (tuple[int, int], optional):
-                The current cell being visited. Defaults to (0, 0).
+            current_cell (tuple[int, int] | None, optional):
+                The current cell being visited. Defaults to None.
             visited (list[tuple[int, int]] | None, optional):
                 A list of cells that have already been visited by the algorithm. Defaults to None.
         """
         if visited is None:
             visited = []
-        current_cell = (current_cell if current_cell != (0, 0)
-                        else get_random_cell((self.maze.shape[0], self.maze.shape[1])))
+        current_cell = current_cell if current_cell else get_random_cell(
+            (self.maze.shape[0], self.maze.shape[1]))
         visited.append(current_cell)
         # North, East, South, West
         directions = [(-2, 0), (0, 2), (2, 0), (0, -2)]
@@ -212,7 +217,7 @@ class Maze:
                                    2][self.maze.shape[1]-1] = (2, 2)
         self.algorithm = "Depth First Search algorithm"
 
-    def prim(self, start: tuple[int, int] = (0, 0)) -> None:
+    def prim(self, start: tuple[int, int] | None = None) -> None:
         """Applies Prim's algorithm to generate a maze.
 
         It starts by selecting a starting cell, either specified in parameter or chosen randomly.
@@ -222,15 +227,15 @@ class Maze:
         Finally it removes the neighbors from the list
 
         Args:
-            start (tuple[int, int], optional):
+            start (tuple[int, int] | None, optional):
                 The starting cell coordinates.
-                Defaults to (0, 0), meaning a random starting cell will be chosen within the maze.
+                Defaults to None, meaning a random starting cell will be chosen within the maze.
         """
         if not self.have_value:
             self.set_value()
             self.have_value = True
         neighbors: list[tuple[tuple[int, int], tuple[int, int]]] = []
-        start = start if start != (0, 0) else get_random_cell(
+        start = start if start else get_random_cell(
             (self.maze.shape[0], self.maze.shape[1]))
         self.maze[start] = 2
         neighbors.extend(get_neighbors(self, start))
@@ -250,7 +255,7 @@ class Maze:
                                    2][self.maze.shape[1]-1] = (2, 2)
         self.algorithm = "Prim's algorithm"
 
-    def hunt_and_kill(self, start: tuple[int, int] = (0, 0)) -> None:
+    def hunt_and_kill(self, start: tuple[int, int] | None = None) -> None:
         """ Applies Hunt and Kill algorithm to generate a maze.
 
         It starts at a random cell and carves a path to a random unvisited neighbor ("kill" phase).
@@ -259,14 +264,14 @@ class Maze:
         The process ends when the "hunt" phase fails to find any suitable cells.
 
         Args:
-            start (tuple[int, int], optional):
+            start (tuple[int, int] | None, optional):
             The starting cell for the algorithm.
-            Defaults to (0, 0), which means a random cell will be chosen.
+            Defaults to None, which means a random cell will be chosen.
         """
         if not self.have_value:
             self.set_value()
             self.have_value = True
-        start = start if start != (0, 0) else get_random_cell(
+        start = start if start else get_random_cell(
             (self.maze.shape[0], self.maze.shape[1]))
 
         def hunt() -> None:
@@ -454,6 +459,44 @@ class Maze:
                                    2][self.maze.shape[1]-1] = (2, 2)
         self.algorithm = "Sidewinder algorithm"
 
+    def growing_tree(self, start: tuple[int, int] | None = None,
+                     cells: list[tuple[int, int]] | None = None,
+                     mode: str = 'newest',
+                     probability: float | None = None) -> None:
+        """ Applies the Growing Tree algorithm to generate a maze.
+
+        It starts by choosing a random cell to start.
+        Then it adds the cell to a list of cells to explore.
+        While there are cells to explore, it selects one depending on the mode.
+        If the mode is 'last', it will choose the last cell added to the list.
+        If the mode is 'random', it will choose a random cell from the list.
+        If the mode is 'newest', it will choose the newest cell added to the list.
+        If the mode is 'oldest', it will choose the oldest cell added to the list.
+        You can also chose 2 modes at the same time by separating them with a comma
+        and setting a probability for the first mode.
+        """
+        start = start if start else get_random_cell((self.maze.shape[0], self.maze.shape[1]))
+        cells = cells if cells else [start]
+        self.maze[start] = 2
+        probability = probability if probability is not None else 1.0
+        probability = min(1, max(0, probability))
+        while cells:
+            chosen_cell = get_cell(cells, mode, probability)
+            neighbors = get_neighbors(self, chosen_cell)
+            if neighbors:
+                chosen_neighbor, direction = rdm.choice(neighbors)
+                wall_coordinates = (chosen_cell[0] + direction[0] // 2,
+                                    chosen_cell[1] + direction[1] // 2)
+                self.maze[wall_coordinates] = 2
+                self.maze[chosen_neighbor] = 2
+                cells.append(chosen_neighbor)
+            else:
+                cells.remove(chosen_cell)
+        # We set the entry and the exit
+        self.maze[1][0], self.maze[self.maze.shape[0] -
+                                   2][self.maze.shape[1]-1] = (2, 2)
+        self.algorithm = f"Sidewinder algorithm ({mode})"
+
     def destroy_wall(self, wall_coordinate: tuple[int, int], values: tuple[int, int]) -> None:
         """ Destroys a wall and merging the values
 
@@ -619,3 +662,59 @@ def get_connection(self: Maze, index: tuple[int, int]) -> tuple[tuple[int, int],
     if not neighbors:
         return (0, 0), (0, 0)
     return rdm.choice(neighbors)
+
+
+def get_cell(cells: list[tuple[int, int]], mode: str, probability: float) -> tuple[int, int]:
+    """ Choose a cell from a list depending on the selection mode.
+
+    Args:
+        cells (list[tuple[int, int]]): A list of cells to choose from.
+        mode (str): The selection mode.
+        probability (float): The probability to choose the first mode for 2 modes.
+
+    Raises:
+        ValueError: If the mod set doesn't exist.
+
+    Returns:
+        tuple[int, int]: The chosen cell.
+    """
+    match mode:
+        case 'newest':
+            return cells[-1]
+        case 'middle':
+            return cells[len(cells) // 2]
+        case 'oldest':
+            return cells[0]
+        case 'random':
+            return rdm.choice(cells)
+        case 'new/mid':
+            if rdm.random() <= probability:
+                return cells[-1]
+            return cells[len(cells) // 2]
+        case 'new/old':
+            if rdm.random() <= probability:
+                return cells[-1]
+            return cells[0]
+        case 'new/rand':
+            if rdm.random() <= probability:
+                return cells[-1]
+            return rdm.choice(cells)
+        case 'mid/old':
+            if rdm.random() <= probability:
+                return cells[len(cells) // 2]
+            return cells[0]
+        case 'mid/rand':
+            if rdm.random() <= probability:
+                return cells[len(cells) // 2]
+            return rdm.choice(cells)
+        case 'old/rand':
+            if rdm.random() <= probability:
+                return cells[0]
+            return rdm.choice(cells)
+        case _:
+            raise ValueError("Invalid mode")
+
+
+x = Maze(5)
+x.growing_tree((1, 1), mode='new/mid', probability=0.5)
+print(x)
