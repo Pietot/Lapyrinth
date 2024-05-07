@@ -60,6 +60,7 @@ and solving them with different pathfinders """
 # Changelogs : Added Eller's algorithm
 
 
+import timeit
 from typing import Generator
 
 import sys
@@ -179,39 +180,36 @@ class Maze:
         self.destroy_wall(coordinates, values)
         return self.kruskal(breakable_walls)
 
-    def depth_first_search(self, current_cell: tuple[int, int] | None = None,
-                           visited: list[tuple[int, int]] | None = None) -> None:
+    def depth_first_search(self, current_cell: tuple[int, int] | None = None) -> None:
         """ Applies the Depth First Search algorithm to generate a maze.
 
-        It starts by initializing an empty list and choosing a random cell to start.
-        If the neighbor cell has not been visited (or can't be visited),
+        It starts choosing a random cell to start and marking it as visited.
+        Then it lists all the neighbors of the current cell and shuffles them.
+        It loops over the unvisited neighbors.
+        If the neighbor cell has not been visited,
         the wall between the two cells is destroyed and the neighbor cell becomes the current cell.
         This process continues until the current cell has no unvisited neighbors.
-        The algorithm backtracks to the previous cell
+        Then the algorithm backtracks to the previous cell
         and repeats the process until all cells have been visited.
 
         Args:
             current_cell (tuple[int, int] | None, optional):
                 The current cell being visited. Defaults to None.
-            visited (list[tuple[int, int]] | None, optional):
-                A list of cells that have already been visited by the algorithm. Defaults to None.
         """
-        if visited is None:
-            visited = []
         current_cell = current_cell if current_cell else get_random_cell(
             (self.maze.shape[0], self.maze.shape[1]))
-        visited.append(current_cell)
-        # North, East, South, West
-        directions = [(-2, 0), (0, 2), (2, 0), (0, -2)]
-        rdm.shuffle(directions)
-        for row, column in directions:
-            next_cell = (current_cell[0] + row,
-                         current_cell[1] + column)
-            if not was_visited(self, (next_cell), visited):
-                wall_coordinates = (current_cell[0] + row // 2,
-                                    current_cell[1] + column // 2)
-                self.maze[wall_coordinates] = 2
-                self.depth_first_search(next_cell, visited)
+        self.maze[current_cell] = 2
+        neighbors = get_neighbors(self, current_cell)
+        if not neighbors:
+            return
+        rdm.shuffle(neighbors)
+        for chosen_neighbor, direction in neighbors:
+            if self.maze[chosen_neighbor] == 2:
+                continue
+            wall_coordinates = (current_cell[0] + direction[0] // 2,
+                                current_cell[1] + direction[1] // 2)
+            self.maze[wall_coordinates] = 2
+            self.depth_first_search(chosen_neighbor)
         # We set the entry and the exit
         self.maze[1][0], self.maze[self.maze.shape[0] -
                                    2][self.maze.shape[1]-1] = (2, 2)
@@ -408,9 +406,9 @@ class Maze:
             neighbors = get_neighbors(
                 self, (index[0], index[1]), biais)
             if neighbors:
-                neighbor, direction = rdm.choice(neighbors)
-                wall_coordinates = (neighbor[0] - direction[0] // 2,
-                                    neighbor[1] - direction[1] // 2)
+                _, direction = rdm.choice(neighbors)
+                wall_coordinates = (index[0] + direction[0] // 2,
+                                    index[1] + direction[1] // 2)
                 self.maze[wall_coordinates] = 2
         # We set the entry and the exit
         self.maze[1][0], self.maze[self.maze.shape[0] -
@@ -572,26 +570,6 @@ def get_breakable_walls(self: Maze) -> list[tuple[int, int]]:
     return coordinates
 
 
-def was_visited(self: Maze, cell: tuple[int, int], visited: list[tuple[int, int]]) -> bool:
-    """ Check if a cell has been visited.
-
-    Args:
-        self (Maze): The maze object.
-        cell (tuple[int, int]): The indexes of the cell.
-        visited (list[tuple[int, int]]): A list of visited cells.
-
-    Returns:
-        bool: True if the cell has been visited, False otherwise.
-    """
-    if not 0 <= cell[0] < self.maze.shape[0] or not 0 <= cell[1] < self.maze.shape[1]:
-        return True
-    if self.maze[cell[0]][cell[1]] == 0:
-        return True
-    if (cell[0], cell[1]) in visited:
-        return True
-    return False
-
-
 def get_neighbors(self: Maze,
                   cell: tuple[int, int],
                   directions: tuple[tuple[int, int],
@@ -715,6 +693,5 @@ def get_cell(cells: list[tuple[int, int]], mode: str, probability: float) -> tup
             raise ValueError("Invalid mode")
 
 
-x = Maze(5)
-x.growing_tree((1, 1), mode='new/mid', probability=0.5)
-print(x)
+x = Maze(40)
+print(timeit.timeit(lambda: x.depth_first_search2(), number=100))
