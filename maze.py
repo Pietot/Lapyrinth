@@ -60,7 +60,6 @@ and solving them with different pathfinders """
 # Changelogs : Added Eller's algorithm
 
 
-import timeit
 from typing import Generator
 
 import sys
@@ -125,6 +124,11 @@ class Maze:
                 self.maze[index] = value
                 value += 1
 
+    def set_entry_exit(self) -> None:
+        """ Set the entry and the exit of the maze
+        """
+        self.maze[1][0], self.maze[self.maze.shape[0] - 2][self.maze.shape[1] - 1] = (2, 2)
+
     def remove_walls(self) -> None:
         """ Remove all walls inside the maze
 
@@ -158,10 +162,9 @@ class Maze:
             self.have_value = True
         if breakable_walls is None:
             breakable_walls = get_breakable_walls(self)
-        if breakable_walls == []:
-            # We set the entry and the exit
-            self.maze[1][0], self.maze[self.maze.shape[0] -
-                                       2][self.maze.shape[1]-1] = (2, 2)
+            rdm.shuffle(breakable_walls)
+        if not breakable_walls:
+            self.set_entry_exit()
             self.algorithm = "Kruskal's algorithm"
             return None
         coordinates = breakable_walls[0]
@@ -210,9 +213,7 @@ class Maze:
                                 current_cell[1] + direction[1] // 2)
             self.maze[wall_coordinates] = 2
             self.depth_first_search(chosen_neighbor)
-        # We set the entry and the exit
-        self.maze[1][0], self.maze[self.maze.shape[0] -
-                                   2][self.maze.shape[1]-1] = (2, 2)
+        self.set_entry_exit()
         self.algorithm = "Depth First Search algorithm"
 
     def prim(self, start: tuple[int, int] | None = None) -> None:
@@ -248,9 +249,7 @@ class Maze:
             neighbors.remove((neighbor, direction))
             neighbors.extend(get_neighbors(self, neighbor))
             neighbors = list(set(neighbors))
-        # We set the entry and the exit
-        self.maze[1][0], self.maze[self.maze.shape[0] -
-                                   2][self.maze.shape[1]-1] = (2, 2)
+        self.set_entry_exit()
         self.algorithm = "Prim's algorithm"
 
     def hunt_and_kill(self, start: tuple[int, int] | None = None) -> None:
@@ -298,9 +297,7 @@ class Maze:
             return kill(neighbor)
 
         kill(start)
-        # We set the entry and the exit
-        self.maze[1][0], self.maze[self.maze.shape[0] -
-                                   2][self.maze.shape[1]-1] = (2, 2)
+        self.set_entry_exit()
         self.algorithm = "Hunt and Kill algorithm"
 
     def eller(self, probabilty: float | None = None) -> None:
@@ -370,9 +367,7 @@ class Maze:
             self.remove_walls()
             self.is_empty = True
         divide(start, end)
-        # We set the entry and the exit
-        self.maze[1][0], self.maze[self.maze.shape[0] -
-                                   2][self.maze.shape[1]-1] = (2, 2)
+        self.set_entry_exit()
         self.algorithm = "Recursive division algorithm"
 
     def binary_tree(self) -> None:
@@ -410,9 +405,7 @@ class Maze:
                 wall_coordinates = (index[0] + direction[0] // 2,
                                     index[1] + direction[1] // 2)
                 self.maze[wall_coordinates] = 2
-        # We set the entry and the exit
-        self.maze[1][0], self.maze[self.maze.shape[0] -
-                                   2][self.maze.shape[1]-1] = (2, 2)
+        self.set_entry_exit()
         self.algorithm = "Binary Tree algorithm"
 
     def sidewinder(self, probability: float = 0.5) -> None:
@@ -452,9 +445,7 @@ class Maze:
                 wall_coordinates = (index[0] + east_direction[0],
                                     index[1] + east_direction[1])
                 self.maze[wall_coordinates] = 2
-        # We set the entry and the exit
-        self.maze[1][0], self.maze[self.maze.shape[0] -
-                                   2][self.maze.shape[1]-1] = (2, 2)
+        self.set_entry_exit()
         self.algorithm = "Sidewinder algorithm"
 
     def growing_tree(self, start: tuple[int, int] | None = None,
@@ -476,7 +467,7 @@ class Maze:
         start = start if start else get_random_cell((self.maze.shape[0], self.maze.shape[1]))
         cells = cells if cells else [start]
         self.maze[start] = 2
-        probability = probability if probability is not None else 1.0
+        probability = round(probability, 2) if probability is not None else 1.0
         probability = min(1, max(0, probability))
         while cells:
             chosen_cell = get_cell(cells, mode, probability)
@@ -490,10 +481,12 @@ class Maze:
                 cells.append(chosen_neighbor)
             else:
                 cells.remove(chosen_cell)
-        # We set the entry and the exit
-        self.maze[1][0], self.maze[self.maze.shape[0] -
-                                   2][self.maze.shape[1]-1] = (2, 2)
-        self.algorithm = f"Sidewinder algorithm ({mode})"
+        self.set_entry_exit()
+        if probability != 1.0:
+            split = str(probability) + "/" + str(1 - probability)
+        else:
+            split = ''
+        self.algorithm = f"Sidewinder algorithm ({mode}{split})"
 
     def destroy_wall(self, wall_coordinate: tuple[int, int], values: tuple[int, int]) -> None:
         """ Destroys a wall and merging the values
@@ -566,7 +559,6 @@ def get_breakable_walls(self: Maze) -> list[tuple[int, int]]:
     for index, cell_value in self:
         if cell_value == 1 or isinstance(cell_value, tuple) and cell_value[0] == 1:
             coordinates.append((index[0], index[1]))
-    rdm.shuffle(coordinates)
     return coordinates
 
 
@@ -691,7 +683,3 @@ def get_cell(cells: list[tuple[int, int]], mode: str, probability: float) -> tup
             return rdm.choice(cells)
         case _:
             raise ValueError("Invalid mode")
-
-
-x = Maze(40)
-print(timeit.timeit(lambda: x.depth_first_search2(), number=100))
