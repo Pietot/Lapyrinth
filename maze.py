@@ -95,6 +95,7 @@ class Maze:
         return np.array2string(self.maze, separator=' ')
 
     def __iter__(self) -> Generator[tuple[tuple[int, ...], np.uint16], None, None]:
+        # OPTIMISER CETTE BOUCLE EN BOUCLANT QUE SUR LES CELLUES
         for index, value in np.ndenumerate(self.maze):
             yield index, value
 
@@ -231,9 +232,6 @@ class Maze:
                 The starting cell coordinates.\n
                 Defaults to None, meaning a random starting cell will be chosen within the maze.
         """
-        if not self.have_value:
-            self.set_value()
-            self.have_value = True
         neighbors: list[tuple[tuple[int, int], tuple[int, int]]] = []
         start = start if start else get_random_cell(
             (self.maze.shape[0], self.maze.shape[1]))
@@ -266,14 +264,13 @@ class Maze:
             The starting cell for the algorithm.\n
             Defaults to None, which means a random cell will be chosen.
         """
-        if not self.have_value:
-            self.set_value()
-            self.have_value = True
         start = start if start else get_random_cell(
             (self.maze.shape[0], self.maze.shape[1]))
 
         def hunt() -> None:
             for index, cell_value in self:
+                if index[0] % 2 == 0 or index[1] % 2 == 0:
+                    continue
                 if int(cell_value) > 2:
                     neighbor, direction = get_connection(
                         self, (index[0], index[1]))
@@ -301,17 +298,46 @@ class Maze:
         self.set_entry_exit()
         self.algorithm = "Hunt and Kill algorithm"
 
-    def eller(self, probability: float = 0.5) -> None:
-        probability = min(1.0, max(0.0, probability))
-        for index, value in self:
-            if index[0] == self.maze.shape[0] - 2:
-                break
-            if index[0] % 2 == 0 or index[1] % 2 == 0 or index[1] == self.maze.shape[1] - 2:
+    def eller(self, probability_carve_horizontaly: float = 0.5,
+              probabilty_carve_vertically: float = 0.5) -> None:
+        if not self.have_value:
+            self.set_value()
+            self.have_value = True
+        probability_carve_horizontaly = min(1.0, max(0.0, probability_carve_horizontaly))
+        probabilty_carve_vertically = min(1.0, max(0.0, probabilty_carve_vertically))
+        for row_index, row in enumerate(self.maze):
+            if row_index % 2 == 0 or row_index == 0:
                 continue
-            if index[1] != self.maze[index[0]][index[1] + 2] - 2:
-                values = int(value), self.maze[index[1]-2]
-                wall_coordinates = (index[0], index[1]-1)
-                self.merge_values(wall_coordinates, values)
+            if row_index == self.maze.shape[0] - 3:
+                break
+            for value_index, _ in enumerate(row):
+                if value_index % 2 == 0 or value_index < 2:
+                    continue
+                if row_index == self.maze.shape[0] - 3:
+                    break
+                values = row[value_index-1], row[value_index+1]
+                if values[0] != values[1] and rdm.random() <= probability_carve_horizontaly:
+                    self.merge_values((row_index, value_index), values)
+            carves = 0
+            for value_index, value in enumerate(row):
+                if value_index % 2 == 0 or value_index == 0:
+                    continue
+                if value_index == self.maze.shape[0] - 4:
+                    break
+                values = value, row[value_index+2]
+                if ((values[0] != values[1] and not carves)
+                        or (rdm.random() <= probabilty_carve_vertically)):
+                    wall_coordinates = (row_index-1, value_index-1)
+                    self.merge_values((wall_coordinates), values)
+                    carves += 1
+        last_row_index = len(self.maze) - 2
+        last_row = self.maze[last_row_index]
+        for value_index in range(1, len(last_row) - 1, 2):
+            values = last_row[value_index - 1], last_row[value_index + 1]
+            if values[0] != values[1]:
+                self.merge_values((last_row_index - 1, value_index - 1), values)
+        self.set_entry_exit()
+        self.algorithm = "Eller's algorithm"
 
     def recursive_division(self, start: tuple[int, int] = (1, 1),
                            end: tuple[int, int] | None = None) -> None:
@@ -496,8 +522,8 @@ class Maze:
             wall_coordinate (tuple[int, int]): The wall coordinates
             values (tuple[int, int]): The values to merge
         """
-        selected_value = min(values)
-        value_to_replace = max(values)
+        selected_value = values[0]
+        value_to_replace = values[1]
         self.maze[self.maze == value_to_replace] = selected_value
         self.maze[wall_coordinate[0], wall_coordinate[1]] = selected_value
 
