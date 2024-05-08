@@ -100,7 +100,7 @@ class Maze:
 
     def sculpt_grid(self) -> None:
         """ Creates the grid:\n
-        
+
         0 is for pillars, 1 for breakable walls and other for paths
         """
         for index, _ in self:
@@ -181,7 +181,7 @@ class Maze:
         # If the values are the same, we don't destroy the wall or we will create a loop
         if values[0] == values[1]:
             return self.kruskal(breakable_walls)
-        self.destroy_wall(coordinates, values)
+        self.merge_values(coordinates, values)
         return self.kruskal(breakable_walls)
 
     def depth_first_search(self, current_cell: tuple[int, int] | None = None) -> None:
@@ -301,20 +301,17 @@ class Maze:
         self.set_entry_exit()
         self.algorithm = "Hunt and Kill algorithm"
 
-    def eller(self, probabilty: float | None = None) -> None:
-        probabilty = (min(0.01, max(1, probabilty))if probabilty
-                      else round(rdm.uniform(0.01, 1), 2))
+    def eller(self, probability: float = 0.5) -> None:
+        probability = min(1.0, max(0.0, probability))
         for index, value in self:
-            if index[0] % 2 == 0 or index[1] % 2 == 0 or rdm.random() > probabilty:
+            if index[0] == self.maze.shape[0] - 2:
+                break
+            if index[0] % 2 == 0 or index[1] % 2 == 0 or index[1] == self.maze.shape[1] - 2:
                 continue
-            if index[1] == self.maze.shape[1] - 2:
+            if index[1] != self.maze[index[0]][index[1] + 2] - 2:
                 values = int(value), self.maze[index[1]-2]
                 wall_coordinates = (index[0], index[1]-1)
-                self.destroy_wall(wall_coordinates, values)
-            else:
-                values = int(value), self.maze[index[1]+2]
-                wall_coordinates = (index[0], index[1]+1)
-                self.destroy_wall(wall_coordinates, values)
+                self.merge_values(wall_coordinates, values)
 
     def recursive_division(self, start: tuple[int, int] = (1, 1),
                            end: tuple[int, int] | None = None) -> None:
@@ -426,7 +423,7 @@ class Maze:
             The lower the value is, the more the maze will have a row shape.\n
             Defaults to 0.5.
         """
-        probability = min(1, max(0, probability))
+        probability = min(1.0, max(0.0, probability))
         east_direction = (0, 1)
         north_direction = (-1, 0)
         set_cells: list[tuple[int, int]] = []
@@ -470,8 +467,8 @@ class Maze:
         start = start if start else get_random_cell((self.maze.shape[0], self.maze.shape[1]))
         cells = cells if cells else [start]
         self.maze[start] = 2
-        probability = round(probability, 2) if probability is not None else 1.0
-        probability = min(1, max(0, probability))
+        probability = probability if probability is not None else 1.0
+        probability = min(1.0, max(0.0, probability))
         while cells:
             chosen_cell = get_cell(cells, mode, probability)
             neighbors = get_neighbors(self, chosen_cell)
@@ -486,23 +483,22 @@ class Maze:
                 cells.remove(chosen_cell)
         self.set_entry_exit()
         if probability != 1.0:
+            probability = round(probability, 2)
             split = str(probability) + "/" + str(1 - probability)
         else:
             split = ''
         self.algorithm = f"Sidewinder algorithm ({mode}{split})"
 
-    def destroy_wall(self, wall_coordinate: tuple[int, int], values: tuple[int, int]) -> None:
+    def merge_values(self, wall_coordinate: tuple[int, int], values: tuple[int, int]) -> None:
         """ Destroys a wall and merging the values
 
         Args:
             wall_coordinate (tuple[int, int]): The wall coordinates
             values (tuple[int, int]): The values to merge
         """
-        selected_value = rdm.choice(values)
-        value_to_replace = values[0] if selected_value == values[1] else values[1]
-        for index, cell_value in self:
-            if cell_value == value_to_replace:
-                self.maze[index] = selected_value
+        selected_value = min(values)
+        value_to_replace = max(values)
+        self.maze[self.maze == value_to_replace] = selected_value
         self.maze[wall_coordinate[0], wall_coordinate[1]] = selected_value
 
     def generate_image(self, filename: str | None = None) -> None:
