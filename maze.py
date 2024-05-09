@@ -125,11 +125,7 @@ class Maze:
         Returns:
             Maze: The Maze object
         """
-        for index, _ in self:
-            # If we are not at the edges
-            if not (index[0] in (0, self.maze.shape[0] - 1)
-                    or index[1] in (0, self.maze.shape[1] - 1)):
-                self.maze[index] = 2
+        self.maze[1:-1, 1:-1] = 3
 
     def kruskal(self, breakable_walls: list[list[int]] | None = None) -> None:
         """ Applies Kruskal's recursive algorithm to generate a maze.
@@ -692,7 +688,8 @@ def get_cell(cells: list[tuple[int, int]], mode: str, probability: float) -> tup
                 chosen_cell = cells[len(cells) // 2]
             if prob <= 0.75:
                 chosen_cell = cells[0]
-            chosen_cell = rdm.choice(cells)
+            else:
+                chosen_cell = rdm.choice(cells)
         case 'new/mid':
             if rdm.random() <= probability:
                 chosen_cell = cells[-1]
