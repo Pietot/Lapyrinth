@@ -56,7 +56,7 @@ and solving them with different pathfinders """
 
 # v1.10 :
 # Start : 18/04/2024 at 12h00 FR
-# End : /05/2024 at h FR
+# End : 09/05/2024 at 02h20 FR
 # Changelogs : Added Eller's algorithm
 
 
@@ -300,42 +300,59 @@ class Maze:
 
     def eller(self, probability_carve_horizontaly: float = 0.5,
               probabilty_carve_vertically: float = 0.5) -> None:
+        """ Applies Eller's algorithm to generate a maze.
+
+        It starts by initializing each non-wall cell as unique value.\n
+        For each row, it randomly joins adjacent cells, but only if they are not in the same set.\n
+        Then it randomly joins cells to the South, but at least one per set.\n
+        This process continues until the last row is reached.\n
+        For the last row, it joins all adjacent cells that are not in the same set.\n
+
+        Args:
+            probability_carve_horizontaly (float, optional): The probability to carve a wall
+            and merge two different number.\n
+                Defaults to 0.5.
+            probabilty_carve_vertically (float, optional): The probability to carve
+            and extend the value of a set to the South.
+                Defaults to 0.5.
+        """
         if not self.have_value:
             self.set_value()
             self.have_value = True
         probability_carve_horizontaly = min(1.0, max(0.0, probability_carve_horizontaly))
         probabilty_carve_vertically = min(1.0, max(0.0, probabilty_carve_vertically))
-        for row_index, row in enumerate(self.maze):
-            if row_index % 2 == 0 or row_index == 0:
-                continue
-            if row_index == self.maze.shape[0] - 3:
-                break
-            for value_index, _ in enumerate(row):
-                if value_index % 2 == 0 or value_index < 2:
-                    continue
-                if row_index == self.maze.shape[0] - 3:
-                    break
-                values = row[value_index-1], row[value_index+1]
+        for row_index, row in enumerate(self.maze[1:-1:2]):
+            # Set the row to unique sets
+            for value_index, _ in enumerate(row[2:-1:2]):
+                values = row[value_index*2+1], row[value_index*2+3]
+                if row_index == len(self.maze[1:-1:2]) - 1:
+                    if values[0] != values[1]:
+                        self.merge_values((row_index*2+1, value_index*2+2), values)
                 if values[0] != values[1] and rdm.random() <= probability_carve_horizontaly:
-                    self.merge_values((row_index, value_index), values)
+                    self.merge_values((row_index*2+1, value_index*2+2), values)
+            if row_index == len(self.maze[1:-1:2]) - 1:
+                break
+            # Randomly determine the vertical connections, at least one per set
             carves = 0
-            for value_index, value in enumerate(row):
-                if value_index % 2 == 0 or value_index == 0:
-                    continue
-                if value_index == self.maze.shape[0] - 4:
-                    break
-                values = value, row[value_index+2]
+            for value_index, _ in enumerate(row[1:-1:2]):
+                if value_index == len(row[1:-1:2]) - 1:
+                    values = row[value_index*2+1], row[value_index*2-1]
+                else:
+                    values = row[value_index*2+1], row[value_index*2+3]
                 if ((values[0] != values[1] and not carves)
-                        or (rdm.random() <= probabilty_carve_vertically)):
-                    wall_coordinates = (row_index-1, value_index-1)
-                    self.merge_values((wall_coordinates), values)
+                        or (values[0] == values[1]
+                            and not carves and value_index == len(row[1:-1:2]) - 1)):
+                    wall_coordinates = (row_index*2+2, value_index*2+1)
+                    merge_values = (values[0], self.maze[row_index*2+3][value_index*2+1])
+                    self.merge_values((wall_coordinates), merge_values)
                     carves += 1
-        last_row_index = len(self.maze) - 2
-        last_row = self.maze[last_row_index]
-        for value_index in range(1, len(last_row) - 1, 2):
-            values = last_row[value_index - 1], last_row[value_index + 1]
-            if values[0] != values[1]:
-                self.merge_values((last_row_index - 1, value_index - 1), values)
+                elif rdm.random() <= probabilty_carve_vertically:
+                    wall_coordinates = (row_index*2+2, value_index*2+1)
+                    merge_values = (values[0], self.maze[row_index*2+3][value_index*2+1])
+                    self.merge_values((wall_coordinates), merge_values)
+                    carves += 1
+                if values[0] != values[1]:
+                    carves = 0
         self.set_entry_exit()
         self.algorithm = "Eller's algorithm"
 
@@ -549,7 +566,7 @@ class Maze:
             if index == start:
                 draw.rectangle((x1, y1+1, x2, y2), fill=(0, 255, 0))
             elif index == end:
-                draw.rectangle((x1, y1, x2, y2), fill=(255, 0, 0))
+                draw.rectangle((x1, y1+1, x2, y2), fill=(255, 0, 0))
             elif int(cell_value) in (0, 1):
                 draw.rectangle((x1, y1, x2, y2), fill=wall_color)
 
