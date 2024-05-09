@@ -74,7 +74,8 @@ sys.setrecursionlimit(100000)
 
 
 class Maze:
-    """ The Maze class
+    """ The Maze class\n
+        0 is for pillars, 1 for breakable walls, 2 for visited cells and other for unvisited cells
     """
 
     def __init__(self, *nb_cells_by_sides: int) -> None:
@@ -95,29 +96,19 @@ class Maze:
         return np.array2string(self.maze, separator=' ')
 
     def __iter__(self) -> Generator[tuple[tuple[int, ...], np.uint16], None, None]:
-        # OPTIMISER CETTE BOUCLE EN BOUCLANT QUE SUR LES CELLUES
-        for index, value in np.ndenumerate(self.maze):
-            yield index, value
+        # The slice is using to avoid walls/edges. We only want to iterate over the cells.
+        for index, value in np.ndenumerate(self.maze[1:-1:2, 1:-1:2]):
+            yield (index[0]*2+1, index[1]*2+1), value
 
     def sculpt_grid(self) -> None:
-        """ Creates the grid:\n
-
-        0 is for pillars, 1 for breakable walls and other for paths
+        """ Creates the grid
         """
-        for index, _ in self:
-            # If we are at the edges
-            if (index[0] in (0, self.maze.shape[0] - 1)
-                    or index[1] in (0, self.maze.shape[1] - 1)):
-                continue
-            # If coordinates are odd
-            if (index[0] % 2, index[1] % 2) == (1, 1):
-                self.maze[index] = 3
-            # If wall are not intersections
-            elif (index[0] % 2, index[1] % 2) != (0, 0):
-                self.maze[index] = 1
+        self.maze[1:-1:2, 2:-1:2] = 1
+        self.maze[2:-1:2, 1:-1:2] = 1
+        self.maze[1:-1:2, 1:-1:2] = 3
         self.was_scuplted = True
 
-    def set_value(self) -> None:
+    def set_values(self) -> None:
         """ Set a unique value to each cell
         """
         value = 3
@@ -160,7 +151,7 @@ class Maze:
                 A list of coordinates of all breakable walls. Defaults to None.
         """
         if not self.have_value:
-            self.set_value()
+            self.set_values()
             self.have_value = True
         if breakable_walls is None:
             breakable_walls = get_breakable_walls(self)
@@ -317,7 +308,7 @@ class Maze:
                 Defaults to 0.5.
         """
         if not self.have_value:
-            self.set_value()
+            self.set_values()
             self.have_value = True
         probability_carve_horizontally = min(1.0, max(0.0, probability_carve_horizontally))
         probability_carve_vertically = min(1.0, max(0.0, probability_carve_vertically))
