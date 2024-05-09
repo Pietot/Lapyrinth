@@ -134,7 +134,7 @@ class Maze:
                     or index[1] in (0, self.maze.shape[1] - 1)):
                 self.maze[index] = 2
 
-    def kruskal(self, breakable_walls: list[tuple[int, int]] | None = None) -> None:
+    def kruskal(self, breakable_walls: list[list[int]] | None = None) -> None:
         """ Applies Kruskal's recursive algorithm to generate a maze.
 
         It starts by initializing each non-wall cell as unique value.\n
@@ -147,7 +147,7 @@ class Maze:
         where each cell is connected to every other cell via a unique path without forming loops.
 
         Args:
-            breakable_walls (None | list[tuple[int, int]], optional):
+            breakable_walls (None | list[list[int]], optional):
                 A list of coordinates of all breakable walls. Defaults to None.
         """
         if not self.have_value:
@@ -522,11 +522,12 @@ class Maze:
             split = ''
         self.algorithm = f"Sidewinder algorithm ({mode}{split})"
 
-    def merge_values(self, wall_coordinate: tuple[int, int], values: tuple[int, int]) -> None:
+    def merge_values(self, wall_coordinate: tuple[int, int] | list[int],
+                     values: tuple[int, int]) -> None:
         """ Destroys a wall and merging the values
 
         Args:
-            wall_coordinate (tuple[int, int]): The wall coordinates
+            wall_coordinate (tuple[int, int] | list[int]): The wall coordinates
             values (tuple[int, int]): The values to merge
         """
         selected_value = values[0]
@@ -581,17 +582,13 @@ def cells_to_shape(*nb_cells_by_side: int) -> tuple[int, int]:
     raise ValueError("nb_cells_by_side must be an one or two int greater or equal to 2")
 
 
-def get_breakable_walls(self: Maze) -> list[tuple[int, int]]:
+def get_breakable_walls(self: Maze) -> list[list[int]]:
     """ Gets all breakable walls coordinates
 
     Returns:
-        list[tuple[int, int]]: List of all breakable walls coordinates
+        list[list[int, int]]: List of all breakable walls coordinates
     """
-    coordinates: list[tuple[int, int]] = []
-    for index, cell_value in self:
-        if cell_value == 1 or isinstance(cell_value, tuple) and cell_value[0] == 1:
-            coordinates.append((index[0], index[1]))
-    return coordinates
+    return np.argwhere(self.maze == 1).tolist()
 
 
 def get_neighbors(self: Maze,
