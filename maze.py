@@ -111,11 +111,8 @@ class Maze:
     def set_values(self) -> None:
         """ Set a unique value to each cell
         """
-        value = 3
-        for index, cell_value in self:
-            if cell_value == 3:
-                self.maze[index] = value
-                value += 1
+        indices = np.where(self.maze == 3)
+        self.maze[indices] = np.arange(3, 3 + len(indices[0]))
 
     def set_entry_exit(self) -> None:
         """ Set the entry and the exit of the maze
