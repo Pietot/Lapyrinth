@@ -14,84 +14,88 @@ from tqdm import tqdm
 from maze import Maze
 
 
-def kruskal_time(size: int, queue: Queue):
+def kruskal_time(size: int, queue: Queue) -> None:
     time = round(timeit.timeit(lambda: Maze(size).kruskal(),
                                number=1, globals=globals()), 5)
     queue.put(("Kruskal", size, time))
 
 
-def prim_time(size: int, queue: Queue):
+def prim_time(size: int, queue: Queue) -> None:
     time = round(timeit.timeit(lambda: Maze(size).prim(),
                                number=1, globals=globals()), 5)
     queue.put(("Prim", size, time))
 
 
-def depth_first_search_time(size: int, queue: Queue):
+def depth_first_search_time(size: int, queue: Queue) -> None:
     time = round(timeit.timeit(lambda: Maze(size).depth_first_search(),
                                number=1, globals=globals()), 5)
     queue.put(("Depth First Search", size, time))
 
 
-def hunt_and_kill_time(size: int, queue: Queue):
+def hunt_and_kill_time(size: int, queue: Queue) -> None:
     time = round(timeit.timeit(lambda: Maze(size).hunt_and_kill(),
                                number=1, globals=globals()), 5)
     queue.put(("Hunt and Kill", size, time))
 
 
-def recursive_division_time(size: int, queue: Queue):
+def recursive_division_time(size: int, queue: Queue) -> None:
     time = round(timeit.timeit(lambda: Maze(size).recursive_division(),
                                number=1, globals=globals()), 5)
     queue.put(("Recursive Division", size, time))
 
 
-def binary_tree_time(size: int, queue: Queue):
+def binary_tree_time(size: int, queue: Queue) -> None:
     time = round(timeit.timeit(lambda: Maze(size).binary_tree(),
                                number=1, globals=globals()), 5)
     queue.put(("Binary Tree", size, time))
 
 
-def sidewinder_time(size: int, queue: Queue):
+def sidewinder_time(size: int, queue: Queue) -> None:
     time = round(timeit.timeit(lambda: Maze(size).sidewinder(),
                                number=1, globals=globals()), 5)
     queue.put(("Sidewinder", size, time))
 
 
-def growing_tree_new_time(size: int, queue: Queue):
+def growing_tree_new_time(size: int, queue: Queue) -> None:
     time = round(timeit.timeit(lambda: Maze(size).growing_tree(mode='newest'),
                                number=1, globals=globals()), 5)
     queue.put(("Growing Tree (Newest)", size, time))
 
 
-def growing_tree_mid_time(size: int, queue: Queue):
+def growing_tree_mid_time(size: int, queue: Queue) -> None:
     time = round(timeit.timeit(lambda: Maze(size).growing_tree(mode='middle'),
                                number=1, globals=globals()), 5)
     queue.put(("Growing Tree (Middle)", size, time))
 
 
-def growing_tree_old_time(size: int, queue: Queue):
+def growing_tree_old_time(size: int, queue: Queue) -> None:
     time = round(timeit.timeit(lambda: Maze(size).growing_tree(mode='oldest'),
                                number=1, globals=globals()), 5)
     queue.put(("Growing Tree (Oldest)", size, time))
 
 
-def growing_tree_rand_time(size: int, queue: Queue):
+def growing_tree_rand_time(size: int, queue: Queue) -> None:
     time = round(timeit.timeit(lambda: Maze(size).growing_tree(mode='random'),
                                number=1, globals=globals()), 5)
     queue.put(("Growing Tree (Random)", size, time))
 
 
-def growing_tree_mixed_time(size: int, queue: Queue):
+def growing_tree_mixed_time(size: int, queue: Queue) -> None:
     time = round(timeit.timeit(lambda: Maze(size).growing_tree(mode='mixed'),
                                number=1, globals=globals()), 5)
     queue.put(("Growing Tree (Mixed)", size, time))
 
+def aldous_broder_time(size: int, queue: Queue) -> None:
+    time = round(timeit.timeit(lambda: Maze(size).aldous_broder(),
+                               number=1, globals=globals()), 5)
+    queue.put(("Aldous Broder", size, time))
 
 def memory_usage(pid):
     process = psutil.Process(pid)
     return process.memory_info().rss
 
 
-def kruskal_memory(size: int, queue: Queue):
+def kruskal_memory(size: int, queue: Queue) -> None:
     maze = Maze(size)
     mem = memory_usage(os.getpid())
     maze.kruskal()
@@ -99,7 +103,7 @@ def kruskal_memory(size: int, queue: Queue):
     queue.put(("Kruskal", size, mem))
 
 
-def prim_memory(size: int, queue: Queue):
+def prim_memory(size: int, queue: Queue) -> None:
     maze = Maze(size)
     mem = memory_usage(os.getpid())
     maze.prim()
@@ -107,7 +111,7 @@ def prim_memory(size: int, queue: Queue):
     queue.put(("Prim", size, mem))
 
 
-def depth_first_search_memory(size: int, queue: Queue):
+def depth_first_search_memory(size: int, queue: Queue) -> None:
     maze = Maze(size)
     mem = memory_usage(os.getpid())
     maze.depth_first_search()
@@ -115,7 +119,7 @@ def depth_first_search_memory(size: int, queue: Queue):
     queue.put(("Depth First Search", size, mem))
 
 
-def hunt_and_kill_memory(size: int, queue: Queue):
+def hunt_and_kill_memory(size: int, queue: Queue) -> None:
     maze = Maze(size)
     mem = memory_usage(os.getpid())
     maze.hunt_and_kill()
@@ -123,7 +127,7 @@ def hunt_and_kill_memory(size: int, queue: Queue):
     queue.put(("Hunt and Kill", size, mem))
 
 
-def recursive_division_memory(size: int, queue: Queue):
+def recursive_division_memory(size: int, queue: Queue) -> None:
     maze = Maze(size)
     mem = memory_usage(os.getpid())
     maze.recursive_division()
@@ -131,7 +135,7 @@ def recursive_division_memory(size: int, queue: Queue):
     queue.put(("Recursive Division", size, mem))
 
 
-def binary_tree_memory(size: int, queue: Queue):
+def binary_tree_memory(size: int, queue: Queue) -> None:
     maze = Maze(size)
     mem = memory_usage(os.getpid())
     maze.binary_tree()
@@ -139,7 +143,7 @@ def binary_tree_memory(size: int, queue: Queue):
     queue.put(("Binary Tree", size, mem))
 
 
-def sidewinder_memory(size: int, queue: Queue):
+def sidewinder_memory(size: int, queue: Queue) -> None:
     maze = Maze(size)
     mem = memory_usage(os.getpid())
     maze.sidewinder()
@@ -147,7 +151,7 @@ def sidewinder_memory(size: int, queue: Queue):
     queue.put(("Sidewinder", size, mem))
 
 
-def growing_tree_new_memory(size: int, queue: Queue):
+def growing_tree_new_memory(size: int, queue: Queue) -> None:
     maze = Maze(size)
     mem = memory_usage(os.getpid())
     maze.growing_tree(mode='newest')
@@ -155,7 +159,7 @@ def growing_tree_new_memory(size: int, queue: Queue):
     queue.put(("Growing Tree (Newest)", size, mem))
 
 
-def growing_tree_mid_memory(size: int, queue: Queue):
+def growing_tree_mid_memory(size: int, queue: Queue) -> None:
     maze = Maze(size)
     mem = memory_usage(os.getpid())
     maze.growing_tree(mode='middle')
@@ -163,7 +167,7 @@ def growing_tree_mid_memory(size: int, queue: Queue):
     queue.put(("Growing Tree (Middle)", size, mem))
 
 
-def growing_tree_old_memory(size: int, queue: Queue):
+def growing_tree_old_memory(size: int, queue: Queue) -> None:
     maze = Maze(size)
     mem = memory_usage(os.getpid())
     maze.growing_tree(mode='oldest')
@@ -171,7 +175,7 @@ def growing_tree_old_memory(size: int, queue: Queue):
     queue.put(("Growing Tree (Oldest)", size, mem))
 
 
-def growing_tree_rand_memory(size: int, queue: Queue):
+def growing_tree_rand_memory(size: int, queue: Queue) -> None:
     maze = Maze(size)
     mem = memory_usage(os.getpid())
     maze.growing_tree(mode='random')
@@ -179,12 +183,19 @@ def growing_tree_rand_memory(size: int, queue: Queue):
     queue.put(("Growing Tree (Random)", size, mem))
 
 
-def growing_tree_mixed_memory(size: int, queue: Queue):
+def growing_tree_mixed_memory(size: int, queue: Queue) -> None:
     maze = Maze(size)
     mem = memory_usage(os.getpid())
     maze.growing_tree(mode='mixed')
     mem = memory_usage(os.getpid()) - mem
     queue.put(("Growing Tree (Mixed)", size, mem))
+
+def aldous_broder_memory(size: int, queue: Queue) -> None:
+    maze = Maze(size)
+    mem = memory_usage(os.getpid())
+    maze.aldous_broder()
+    mem = memory_usage(os.getpid()) - mem
+    queue.put(("Aldous Broder", size, mem))
 
 
 def time_complexity() -> None:
@@ -198,7 +209,7 @@ def time_complexity() -> None:
         for func in [kruskal_time, prim_time, depth_first_search_time, hunt_and_kill_time,
                      binary_tree_time, recursive_division_time, sidewinder_time,
                      growing_tree_new_time, growing_tree_mid_time, growing_tree_old_time,
-                     growing_tree_rand_time, growing_tree_mixed_time]:
+                     growing_tree_rand_time, growing_tree_mixed_time, aldous_broder_time]:
             queue = Queue()
             queues.append(queue)
             p = Process(target=func, args=(size, queue))
@@ -221,7 +232,7 @@ def time_complexity() -> None:
         writer.writerow(['Size', 'Kruskal', 'Prim', 'Depth First Search',
                         'Hunt and Kill', 'Binary Tree', 'Recursive Division', 'Sidewinder',
                          'Growing Tree (Newest)', 'Growing Tree (Middle)', 'Growing Tree (Oldest)',
-                         'Growing Tree (Random)', 'Growing Tree (Mixed)'])
+                         'Growing Tree (Random)', 'Growing Tree (Mixed)', 'Aldous Broder'])
 
         # Write the data rows
         for size in execution_time['Kruskal'].keys():
@@ -237,7 +248,8 @@ def time_complexity() -> None:
                             execution_time['Growing Tree (Middle)'][size],
                             execution_time['Growing Tree (Oldest)'][size],
                             execution_time['Growing Tree (Random)'][size],
-                            execution_time['Growing Tree (Mixed)'][size]])
+                            execution_time['Growing Tree (Mixed)'][size],
+                            execution_time['Aldous Broder'][size]])
 
 
 def memory_complexity() -> None:
@@ -251,7 +263,7 @@ def memory_complexity() -> None:
         for func in [kruskal_memory, prim_memory, depth_first_search_memory, hunt_and_kill_memory,
                      binary_tree_memory, recursive_division_memory, sidewinder_memory,
                      growing_tree_new_memory, growing_tree_mid_memory, growing_tree_old_memory,
-                     growing_tree_rand_memory, growing_tree_mixed_memory]:
+                     growing_tree_rand_memory, growing_tree_mixed_memory, aldous_broder_memory]:
             queue = Queue()
             queues.append(queue)
             p = Process(target=func, args=(size, queue))
@@ -274,7 +286,7 @@ def memory_complexity() -> None:
         writer.writerow(['Size', 'Kruskal', 'Prim', 'Depth First Search',
                         'Hunt and Kill', 'Binary Tree', 'Recursive Division', 'Sidewinder',
                          'Growing Tree (Newest)', 'Growing Tree (Middle)', 'Growing Tree (Oldest)',
-                         'Growing Tree (Random)', 'Growing Tree (Mixed)'])
+                         'Growing Tree (Random)', 'Growing Tree (Mixed)', 'Aldous Broder'])
 
         # Write the data rows
         for size in memory['Kruskal'].keys():
@@ -290,13 +302,14 @@ def memory_complexity() -> None:
                             memory['Growing Tree (Middle)'][size],
                             memory['Growing Tree (Oldest)'][size],
                             memory['Growing Tree (Random)'][size],
-                            memory['Growing Tree (Mixed)'][size]])
+                            memory['Growing Tree (Mixed)'][size],
+                            memory['Aldous Broder'][size]])
 
 
 if __name__ == "__main__":
     tc = Process(target=time_complexity)
-    mc = Process(target=memory_complexity)
+    # mc = Process(target=memory_complexity)
     tc.start()
-    mc.start()
+    # mc.start()
     tc.join()
-    mc.join()
+    # mc.join()
