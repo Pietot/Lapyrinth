@@ -59,6 +59,11 @@ and solving them with different pathfinders """
 # End : 09/05/2024 at 02h20 FR
 # Changelogs : Added Eller's algorithm
 
+# v1.11 :
+# Start : 12/05/2024 at 22h00 FR
+# End : 12/05/2024 at 22h40 FR
+# Changelogs : Added Aldous-Broder algorithm
+
 
 from typing import Generator
 
@@ -513,7 +518,40 @@ class Maze:
             split = str(probability) + "/" + str(1 - probability)
         else:
             split = ''
-        self.algorithm = f"Sidewinder algorithm ({mode}{split})"
+        self.algorithm = f"Growing Tree algorithm ({mode}{split})"
+
+    def aldous_broder(self, start: tuple[int, int] | None = None) -> None:
+        """ Applies the Aldous-Broder algorithm to generate a maze.
+        
+        It starts by choosing a random cell to start and mark it as visited.\n
+        While visited cells are less than the total number of cells\n
+        It randomly selects a neighbor of the current cell.\n
+        Then if the neighbor has not been visited, the wall between the two cells is destroyed
+        Finally the neighbor is marked as visited.\n
+        
+        This process continues until all cells have been visited.
+
+        Args:
+            start (tuple[int, int] | None, optional): The starting cell for the algorithm.
+                Defaults to None.
+        """
+        current_cell = start if start else get_random_cell((self.maze.shape[0], self.maze.shape[1]))
+        height, width = self.maze.shape
+        number_cell = (height//2) * (width//2)
+        visited_cell = 1
+        self.maze[current_cell] = 2
+        while visited_cell < number_cell:
+            rdm_neighbor, rdm_direction = rdm.choice(get_neighbors(self, current_cell,
+                                                                   return_visited=True))
+            if self.maze[rdm_neighbor] != 2:
+                self.maze[rdm_neighbor] = 2
+                wall_coordinates = (current_cell[0] + rdm_direction[0] // 2,
+                                    current_cell[1] + rdm_direction[1] // 2)
+                self.maze[wall_coordinates] = 2
+                visited_cell += 1
+            current_cell = rdm_neighbor
+        self.set_entry_exit()
+        self.algorithm = "Aldous-Broder algorithm"
 
     def merge_values(self, wall_coordinate: tuple[int, int] | list[int],
                      values: tuple[int, int]) -> None:
@@ -586,9 +624,9 @@ def get_breakable_walls(self: Maze) -> list[list[int]]:
 
 def get_neighbors(self: Maze,
                   cell: tuple[int, int],
-                  directions: tuple[tuple[int, int],
-                                    ...] | None = None) -> list[tuple[tuple[int,
-                                                                            int], tuple[int, int]]]:
+                  directions: tuple[tuple[int, int], ...] | None = None,
+                  return_visited: bool = False) -> list[tuple[tuple[int,
+                                                                    int], tuple[int, int]]]:
     """Returns a list of neighboring cells that are accessible from the given cell.
 
     Args:
@@ -596,6 +634,8 @@ def get_neighbors(self: Maze,
         cell (tuple[int, int]): The coordinates of the cell.
         directions (tuple[tuple[int, int], ...], optional): The directions to check.
         Defaults to None.
+        return_visited (bool): If we want to return visited neighbors
+        Defaults to False
 
     Returns:
         list[tuple[tuple[int, int], tuple[int, int]]]:
@@ -609,7 +649,7 @@ def get_neighbors(self: Maze,
     for direction in directions:
         neighbor = cell[0] + direction[0], cell[1] + direction[1]
         if 1 <= neighbor[0] < self.maze.shape[0] and 1 <= neighbor[1] < self.maze.shape[1]:
-            if self.maze[neighbor] != 2:
+            if return_visited or self.maze[neighbor] != 2:
                 neighbors.append((neighbor, direction))
     return neighbors
 
