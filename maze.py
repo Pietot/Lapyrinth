@@ -64,6 +64,11 @@ and solving them with different pathfinders """
 # End : 12/05/2024 at 22h40 FR
 # Changelogs : Added Aldous-Broder algorithm
 
+# v1.12 :
+# Start : 13/05/2024 at 10h45 FR
+# End : /05/2024 at h FR
+# Changelogs : Added Wilson's algorithm
+
 
 from typing import Generator
 
@@ -522,13 +527,13 @@ class Maze:
 
     def aldous_broder(self, start: tuple[int, int] | None = None) -> None:
         """ Applies the Aldous-Broder algorithm to generate a maze.
-        
+
         It starts by choosing a random cell to start and mark it as visited.\n
         While visited cells are less than the total number of cells\n
         It randomly selects a neighbor of the current cell.\n
         Then if the neighbor has not been visited, the wall between the two cells is destroyed
         Finally the neighbor is marked as visited.\n
-        
+
         This process continues until all cells have been visited.
 
         Args:
@@ -552,6 +557,31 @@ class Maze:
             current_cell = rdm_neighbor
         self.set_entry_exit()
         self.algorithm = "Aldous-Broder algorithm"
+
+    def wilson(self, start: tuple[int, int] | None = None,
+               end: tuple[int, int] | None = None) -> None:
+        start = start if start else get_random_cell((self.maze.shape[0], self.maze.shape[1]))
+        end = end if end else get_random_cell((self.maze.shape[0], self.maze.shape[1]))
+        self.maze[start] = 2
+        self.maze[end] = 2
+        cells_directions: dict[tuple[int, int], tuple[int, int]] = {}
+        current_cell = start
+        while True:
+            rdm_neighbor, rdm_direction = rdm.choice(get_neighbors(self, current_cell,
+                                                                   return_visited=True))
+            cells_directions[current_cell] = rdm_direction
+            if rdm_neighbor == end:
+                current_cell = start
+                while current_cell != end:
+                    current_cell = tuple(sum(value) for value in zip(current_cell,
+                                                                     cells_directions[current_cell]))
+                    wall_coordinates = (current_cell[0] - rdm_direction[0] // 2,
+                                        current_cell[1] - rdm_direction[1] // 2)
+                    self.maze[current_cell] = 2
+                    self.maze[wall_coordinates] = 2
+                break
+            current_cell = rdm_neighbor
+        print(cells_directions)
 
     def merge_values(self, wall_coordinate: tuple[int, int] | list[int],
                      values: tuple[int, int]) -> None:
@@ -757,3 +787,7 @@ def get_cell(cells: list[tuple[int, int]], mode: str, probability: float) -> tup
         case _:
             raise ValueError("Invalid mode")
     return chosen_cell
+
+x = Maze(5)
+x.wilson()
+print(x)
