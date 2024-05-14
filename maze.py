@@ -66,7 +66,7 @@ and solving them with different pathfinders """
 
 # v1.12 :
 # Start : 13/05/2024 at 10h45 FR
-# End : /05/2024 at h FR
+# End : 14/05/2024 at 12h50 FR
 # Changelogs : Added Wilson's algorithm
 
 
@@ -127,7 +127,8 @@ class Maze:
     def set_entry_exit(self) -> None:
         """ Set the entry and the exit of the maze
         """
-        self.maze[1][0], self.maze[self.maze.shape[0] - 2][self.maze.shape[1] - 1] = (2, 2)
+        self.maze[1][0], self.maze[self.maze.shape[0] -
+                                   2][self.maze.shape[1] - 1] = (2, 2)
 
     def remove_walls(self) -> None:
         """ Remove all walls inside the maze
@@ -558,30 +559,39 @@ class Maze:
         self.set_entry_exit()
         self.algorithm = "Aldous-Broder algorithm"
 
-    def wilson(self, start: tuple[int, int] | None = None,
-               end: tuple[int, int] | None = None) -> None:
-        start = start if start else get_random_cell((self.maze.shape[0], self.maze.shape[1]))
-        end = end if end else get_random_cell((self.maze.shape[0], self.maze.shape[1]))
-        self.maze[start] = 2
+    def wilson(self) -> None:
+        """ Applies the Wilson's algorithm to generate a maze."""
+        end = get_random_cell((self.maze.shape[0], self.maze.shape[1]))
         self.maze[end] = 2
-        cells_directions: dict[tuple[int, int], tuple[int, int]] = {}
-        current_cell = start
-        while True:
-            rdm_neighbor, rdm_direction = rdm.choice(get_neighbors(self, current_cell,
-                                                                   return_visited=True))
-            cells_directions[current_cell] = rdm_direction
-            if rdm_neighbor == end:
-                current_cell = start
-                while current_cell != end:
-                    current_cell = tuple(sum(value) for value in zip(current_cell,
-                                                                     cells_directions[current_cell]))
-                    wall_coordinates = (current_cell[0] - rdm_direction[0] // 2,
-                                        current_cell[1] - rdm_direction[1] // 2)
-                    self.maze[current_cell] = 2
+        while np.any(self.maze > 2):
+            unvisited_cells = get_unvisited_cells(self)
+            start = rdm.choice(unvisited_cells)
+            start = (start[0], start[1])
+            path = [start]
+            while self.maze[tuple(path[-1])] != 2:
+                current_cell = path[-1]
+                neighbors = get_neighbors(
+                    self, current_cell, return_visited=True)
+                neighbor, _ = rdm.choice(neighbors)
+                if len(path) > 1 and neighbor == path[-2]:
+                    path.pop()
+                elif neighbor in path:
+                    index = path.index(neighbor)
+                    path = path[:index+1]
+                else:
+                    path.append((neighbor))
+            for index in path:
+                if index == start:
+                    self.maze[index] = 2
+                else:
+                    self.maze[index] = 2
+                    direction = (index[0] - path[path.index(index) - 1][0],
+                                        index[1] - path[path.index(index) - 1][1])
+                    wall_coordinates = (index[0] - direction[0] // 2,
+                                        index[1] - direction[1] // 2)
                     self.maze[wall_coordinates] = 2
-                break
-            current_cell = rdm_neighbor
-        print(cells_directions)
+        self.set_entry_exit()
+        self.algorithm = "Wilson's algorithm"
 
     def merge_values(self, wall_coordinate: tuple[int, int] | list[int],
                      values: tuple[int, int]) -> None:
@@ -650,6 +660,15 @@ def get_breakable_walls(self: Maze) -> list[list[int]]:
         list[list[int, int]]: List of all breakable walls coordinates
     """
     return np.argwhere(self.maze == 1).tolist()
+
+
+def get_unvisited_cells(self: Maze) -> list[list[int]]:
+    """ Gets all unvisited cells coordinates
+
+    Returns:
+        list[tuple[int, int]]: List of all unvisited cells coordinates
+    """
+    return np.argwhere(self.maze > 2).tolist()
 
 
 def get_neighbors(self: Maze,
@@ -788,6 +807,3 @@ def get_cell(cells: list[tuple[int, int]], mode: str, probability: float) -> tup
             raise ValueError("Invalid mode")
     return chosen_cell
 
-x = Maze(5)
-x.wilson()
-print(x)
