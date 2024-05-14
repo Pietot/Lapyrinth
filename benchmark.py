@@ -89,6 +89,11 @@ def aldous_broder_time(size: int, queue: Queue) -> None:
     time = round(timeit.timeit(lambda: Maze(size).aldous_broder(),
                                number=1, globals=globals()), 5)
     queue.put(("Aldous Broder", size, time))
+    
+def wilson_time(size: int, queue: Queue) -> None:
+    time = round(timeit.timeit(lambda: Maze(size).wilson(),
+                               number=1, globals=globals()), 5)
+    queue.put(("Wilson", size, time))
 
 def memory_usage(pid):
     process = psutil.Process(pid)
@@ -197,6 +202,13 @@ def aldous_broder_memory(size: int, queue: Queue) -> None:
     mem = memory_usage(os.getpid()) - mem
     queue.put(("Aldous Broder", size, mem))
 
+def wilson_memory(size: int, queue: Queue) -> None:
+    maze = Maze(size)
+    mem = memory_usage(os.getpid())
+    maze.wilson()
+    mem = memory_usage(os.getpid()) - mem
+    queue.put(("Wilson", size, mem))
+
 
 def time_complexity() -> None:
     """ Benchmarking the time complexity of the different algorithms used to generate the maze.
@@ -209,7 +221,8 @@ def time_complexity() -> None:
         for func in [kruskal_time, prim_time, depth_first_search_time, hunt_and_kill_time,
                      binary_tree_time, recursive_division_time, sidewinder_time,
                      growing_tree_new_time, growing_tree_mid_time, growing_tree_old_time,
-                     growing_tree_rand_time, growing_tree_mixed_time, aldous_broder_time]:
+                     growing_tree_rand_time, growing_tree_mixed_time, aldous_broder_time,
+                     wilson_time]:
             queue = Queue()
             queues.append(queue)
             p = Process(target=func, args=(size, queue))
@@ -232,7 +245,8 @@ def time_complexity() -> None:
         writer.writerow(['Size', 'Kruskal', 'Prim', 'Depth First Search',
                         'Hunt and Kill', 'Binary Tree', 'Recursive Division', 'Sidewinder',
                          'Growing Tree (Newest)', 'Growing Tree (Middle)', 'Growing Tree (Oldest)',
-                         'Growing Tree (Random)', 'Growing Tree (Mixed)', 'Aldous Broder'])
+                         'Growing Tree (Random)', 'Growing Tree (Mixed)', 'Aldous Broder',
+                         'Wilson'])
 
         # Write the data rows
         for size in execution_time['Kruskal'].keys():
@@ -249,7 +263,8 @@ def time_complexity() -> None:
                             execution_time['Growing Tree (Oldest)'][size],
                             execution_time['Growing Tree (Random)'][size],
                             execution_time['Growing Tree (Mixed)'][size],
-                            execution_time['Aldous Broder'][size]])
+                            execution_time['Aldous Broder'][size],
+                            execution_time['Wilson'][size]])
 
 
 def memory_complexity() -> None:
@@ -263,7 +278,8 @@ def memory_complexity() -> None:
         for func in [kruskal_memory, prim_memory, depth_first_search_memory, hunt_and_kill_memory,
                      binary_tree_memory, recursive_division_memory, sidewinder_memory,
                      growing_tree_new_memory, growing_tree_mid_memory, growing_tree_old_memory,
-                     growing_tree_rand_memory, growing_tree_mixed_memory, aldous_broder_memory]:
+                     growing_tree_rand_memory, growing_tree_mixed_memory, aldous_broder_memory,
+                     wilson_memory]:
             queue = Queue()
             queues.append(queue)
             p = Process(target=func, args=(size, queue))
@@ -286,7 +302,8 @@ def memory_complexity() -> None:
         writer.writerow(['Size', 'Kruskal', 'Prim', 'Depth First Search',
                         'Hunt and Kill', 'Binary Tree', 'Recursive Division', 'Sidewinder',
                          'Growing Tree (Newest)', 'Growing Tree (Middle)', 'Growing Tree (Oldest)',
-                         'Growing Tree (Random)', 'Growing Tree (Mixed)', 'Aldous Broder'])
+                         'Growing Tree (Random)', 'Growing Tree (Mixed)', 'Aldous Broder'
+                         'Wilson'])
 
         # Write the data rows
         for size in memory['Kruskal'].keys():
@@ -303,7 +320,8 @@ def memory_complexity() -> None:
                             memory['Growing Tree (Oldest)'][size],
                             memory['Growing Tree (Random)'][size],
                             memory['Growing Tree (Mixed)'][size],
-                            memory['Aldous Broder'][size]])
+                            memory['Aldous Broder'][size],
+                            memory['Wilson'][size]])
 
 
 if __name__ == "__main__":
