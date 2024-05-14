@@ -213,9 +213,9 @@ def wilson_memory(size: int, queue: Queue) -> None:
 def time_complexity() -> None:
     """ Benchmarking the time complexity of the different algorithms used to generate the maze.
     """
-    max_size = 50
+    max_size = 205
     execution_time = {}
-    for size in tqdm(range(5, max_size + 1, 10)):
+    for size in tqdm(range(5, max_size + 1, 25)):
         queues = []
         processes = []
         for func in [kruskal_time, prim_time, depth_first_search_time, hunt_and_kill_time,
@@ -270,9 +270,9 @@ def time_complexity() -> None:
 def memory_complexity() -> None:
     """ Benchmarking the memory complexity of the different algorithms used to generate the maze.
     """
-    max_size = 10
+    max_size = 205
     memory = {}
-    for size in tqdm(range(5, max_size + 1, 5)):
+    for size in tqdm(range(5, max_size + 1, 25)):
         queues = []
         processes = []
         for func in [kruskal_memory, prim_memory, depth_first_search_memory, hunt_and_kill_memory,
@@ -302,7 +302,7 @@ def memory_complexity() -> None:
         writer.writerow(['Size', 'Kruskal', 'Prim', 'Depth First Search',
                         'Hunt and Kill', 'Binary Tree', 'Recursive Division', 'Sidewinder',
                          'Growing Tree (Newest)', 'Growing Tree (Middle)', 'Growing Tree (Oldest)',
-                         'Growing Tree (Random)', 'Growing Tree (Mixed)', 'Aldous Broder'
+                         'Growing Tree (Random)', 'Growing Tree (Mixed)', 'Aldous Broder',
                          'Wilson'])
 
         # Write the data rows
@@ -326,8 +326,8 @@ def memory_complexity() -> None:
 
 if __name__ == "__main__":
     tc = Process(target=time_complexity)
-    # mc = Process(target=memory_complexity)
+    mc = Process(target=memory_complexity)
     tc.start()
-    # mc.start()
+    mc.start()
     tc.join()
-    # mc.join()
+    mc.join()
