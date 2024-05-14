@@ -264,8 +264,6 @@ class Maze:
 
         def hunt() -> None:
             for index, cell_value in self:
-                if index[0] % 2 == 0 or index[1] % 2 == 0:
-                    continue
                 if int(cell_value) > 2:
                     neighbor, direction = get_connection(
                         self, (index[0], index[1]))
