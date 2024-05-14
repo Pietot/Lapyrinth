@@ -586,7 +586,7 @@ class Maze:
                 else:
                     self.maze[index] = 2
                     direction = (index[0] - path[path.index(index) - 1][0],
-                                        index[1] - path[path.index(index) - 1][1])
+                                 index[1] - path[path.index(index) - 1][1])
                     wall_coordinates = (index[0] - direction[0] // 2,
                                         index[1] - direction[1] // 2)
                     self.maze[wall_coordinates] = 2
@@ -619,7 +619,7 @@ class Maze:
             "RGB", (size[0]*cell_size, size[1]*cell_size), (255, 255, 255))
         draw = ImageDraw.Draw(image)
 
-        for index, cell_value in self:
+        for index, cell_value in np.ndenumerate(self.maze):
             x1 = index[1] * cell_size
             y1 = index[0] * cell_size
             x2 = (index[1] + 1) * cell_size
@@ -806,4 +806,3 @@ def get_cell(cells: list[tuple[int, int]], mode: str, probability: float) -> tup
         case _:
             raise ValueError("Invalid mode")
     return chosen_cell
-
