@@ -482,10 +482,9 @@ class Maze:
         self.algorithm = "Sidewinder algorithm"
 
     def growing_tree(self, start: tuple[int, int] | None = None,
-                     cells: list[tuple[int, int]] | None = None,
                      mode: str = 'newest',
                      probability: float | None = None) -> None:
-        """ Applies the Growing Tree algorithm to generate a maze.
+        """Applies the Growing Tree algorithm to generate a maze.
 
         It starts by choosing a random cell to start.\n
         Then it adds the cell to a list of cells to explore.\n
@@ -498,9 +497,17 @@ class Maze:
         the oldest and a random cell.\n
         You can also chose 2 modes at the same time by separating them with a comma
         and setting a probability for the first mode.\n
+
+        Args:
+            start (tuple[int, int] | None, optional): The starting cell for the algorithm.\n
+                Defaults to None.
+            mode (str, optional): The mode for the selection of the cells. Defaults to 'newest'.
+            probability (float | None, optional): If two modes are set,
+            the probability of the first mode te be chosen.\n
+                Defaults to None.
         """
         start = start if start else get_random_cell((self.maze.shape[0], self.maze.shape[1]))
-        cells = cells if cells else [start]
+        cells = [start]
         self.maze[start] = 2
         probability = probability if probability is not None else 1.0
         probability = min(1.0, max(0.0, probability))
@@ -532,7 +539,6 @@ class Maze:
         It randomly selects a neighbor of the current cell.\n
         Then if the neighbor has not been visited, the wall between the two cells is destroyed
         Finally the neighbor is marked as visited.\n
-
         This process continues until all cells have been visited.
 
         Args:
@@ -558,7 +564,18 @@ class Maze:
         self.algorithm = "Aldous-Broder algorithm"
 
     def wilson(self) -> None:
-        """ Applies the Wilson's algorithm to generate a maze."""
+        """ Applies the Wilson's algorithm to generate a maze.
+
+        It starts by marking a random cell as visited.\n
+        Then, from a random cell, it performs a random walk until it reaches a visited cell.\n
+        During this walk, if the current cell is already in the path,
+        the loop is broken and the path is shortened.\n
+        If the current cell is not in the path, it is added to the path.\n
+        Once a visited cell is reached,
+        all cells in the path are marked as visited and the walls between them are removed.\n
+        This process is repeated until all cells have been visited.\n
+        
+        """
         end = get_random_cell((self.maze.shape[0], self.maze.shape[1]))
         self.maze[end] = 2
         while np.any(self.maze > 2):
@@ -607,7 +624,8 @@ class Maze:
     def generate_image(self, filename: str | None = None) -> None:
         """ Generate a maze image from a maze object. """
         size = self.maze.shape
-        filename = filename if filename else f'Maze_{size[0]}x{size[1]}_{self.algorithm}.png'
+        filename = (filename + '.png' if filename
+                    else f'Maze_{size[0]}x{size[1]}_{self.algorithm}.png')
         cell_size = 50
         wall_color = (0, 0, 0)
         start = (1, 0)
