@@ -95,6 +95,8 @@ class Maze:
         self.is_empty = False
         self.have_value = False
         self.sculpt_grid()
+        self.start = (1, 0)
+        self.end = (self.maze.shape[0] - 2, self.maze.shape[1] - 1)
 
     def __str__(self) -> str:
         maze = [['# ' if value in (0, 1) else '  ' for value in row]
@@ -126,8 +128,7 @@ class Maze:
     def set_start_end(self) -> None:
         """ Set the entry and the exit of the maze
         """
-        self.maze[1][0], self.maze[self.maze.shape[0] -
-                                   2][self.maze.shape[1] - 1] = (2, 2)
+        self.start, self.end = (2, 2)
 
     def remove_walls(self) -> None:
         """ Remove all walls inside the maze
@@ -627,8 +628,6 @@ class Maze:
                     else f'Maze_{size[0]}x{size[1]}_{self.algorithm}.png')
         cell_size = 50
         wall_color = (0, 0, 0)
-        start = (1, 0)
-        end = (size[0] - 2, size[1] - 1)
 
         image = Image.new(
             "RGB", (size[0]*cell_size, size[1]*cell_size), (255, 255, 255))
@@ -640,9 +639,9 @@ class Maze:
             x2 = (index[1] + 1) * cell_size
             y2 = (index[0] + 1) * cell_size
 
-            if index == start:
+            if index == self.start:
                 draw.rectangle((x1, y1+1, x2, y2), fill=(0, 255, 0))
-            elif index == end:
+            elif index == self.end:
                 draw.rectangle((x1, y1+1, x2, y2), fill=(255, 0, 0))
             elif int(cell_value) in (0, 1):
                 draw.rectangle((x1, y1, x2, y2), fill=wall_color)
