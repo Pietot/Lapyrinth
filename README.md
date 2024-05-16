@@ -15,7 +15,7 @@ This **Mazer Maker Solver** made entirely in Python is a program where you can g
 
 - 🟢 **[Latest version](https://github.com/Pietot/Maze-Maker-Solver/blob/main/maze.py)**
 
-## Feature
+## Features
 
 - Generate any maze of any size
 
@@ -38,7 +38,7 @@ print(maze)
 maze.generate_image() # optional
 ```
 
-That's it. See, it's very simple. You can go with all of these algorithm:
+That's it. See, it's very simple. You can go with all of these algorithms:
 
 - Kruskal
 
@@ -99,14 +99,14 @@ Well.. I already did it for you! So here you are:
 
 > **Note**: For the generation time, I deliberately excluded Aldous-Broder and Wilson algorithms because they are truly random (""luck"" based in other words), so they are very inconsistent on a generation to another.
 
-If you want the values of these graphs with Aldous-Broder and Wilson algoritms, watch this:
+If you want the values of these graphs with Aldous-Broder and Wilson algorithms, watch this:
 
 <img src="assets/time_complexity.png">
 <a href="assets/time_complexity.csv">Download csv here</a><br><br>
 <img src="assets/memory_complexity.png">
 <a href="assets/memory_complexity.csv">Download csv here</a><br><br>
 
-If you want to benchmark these two benchmarks yourself:
+If you want to benchmark these algorithms yourself:
 
 - Download the benchmark file <a href="https://github.com/Pietot/Maze-Maker-Solver/blob/main/benchmark_generation_algorithm.py">here</a> and put it in the same folder as <a href="https://github.com/Pietot/Maze-Maker-Solver/blob/main/maze.py">maze.py</a>
 
@@ -115,5 +115,5 @@ If you want to benchmark these two benchmarks yourself:
 
 - Run the script
 
-> **Note**: Keep in mind that the lower the step is, the more precision/values ​​you will have, but the longer the script will take, and vice versa if the step is high.<br>
+> **Note**: Keep in mind that the lower the step is, the more precision/values ​​you will have, but the longer the script will take, and vice versa if the step is high.<br><br>
 > These values can change depending on the version of Python and your PC
