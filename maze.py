@@ -128,7 +128,7 @@ class Maze:
     def set_start_end(self) -> None:
         """ Set the entry and the exit of the maze
         """
-        self.start, self.end = (2, 2)
+        self.maze[self.start],  self.maze[self.end] = (2, 2)
 
     def remove_walls(self) -> None:
         """ Remove all walls inside the maze
