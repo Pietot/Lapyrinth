@@ -1,5 +1,4 @@
-""" A program capable of creating mazes with many different algorithms
-and solving them with different pathfinders """
+""" A program capable of creating mazes with many different algorithms """
 
 
 # By Pietot
