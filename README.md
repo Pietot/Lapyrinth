@@ -116,4 +116,5 @@ If you want to benchmark these algorithms yourself:
 - Run the script
 
 > **Note**: Keep in mind that the lower the step is, the more precision/values ​​you will have, but the longer the script will take, and vice versa if the step is high.<br><br>
-> These values can change depending on the version of Python and your PC
+> These values can change depending on the version of Python and your PC<br><br>
+>For these benchmarks, I used Python 3.12.0 on a ryzen 5 3600, rtx 2060 with 2*8GB of RAM clocked at 3600Hz
