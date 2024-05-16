@@ -123,7 +123,7 @@ class Maze:
         indices = np.where(self.maze == 3)
         self.maze[indices] = np.arange(3, 3 + len(indices[0]))
 
-    def set_entry_exit(self) -> None:
+    def set_start_end(self) -> None:
         """ Set the entry and the exit of the maze
         """
         self.maze[1][0], self.maze[self.maze.shape[0] -
@@ -160,7 +160,7 @@ class Maze:
             breakable_walls = get_breakable_walls(self)
             rdm.shuffle(breakable_walls)
         if not breakable_walls:
-            self.set_entry_exit()
+            self.set_start_end()
             self.algorithm = "Kruskal's algorithm"
             return None
         coordinates = breakable_walls[0]
@@ -209,7 +209,7 @@ class Maze:
                                 current_cell[1] + direction[1] // 2)
             self.maze[wall_coordinates] = 2
             self.depth_first_search(chosen_neighbor)
-        self.set_entry_exit()
+        self.set_start_end()
         self.algorithm = "Depth First Search algorithm"
 
     def prim(self, start: tuple[int, int] | None = None) -> None:
@@ -242,7 +242,7 @@ class Maze:
             neighbors.remove((neighbor, direction))
             neighbors.extend(get_neighbors(self, neighbor))
             neighbors = list(set(neighbors))
-        self.set_entry_exit()
+        self.set_start_end()
         self.algorithm = "Prim's algorithm"
 
     def hunt_and_kill(self, start: tuple[int, int] | None = None) -> None:
@@ -287,7 +287,7 @@ class Maze:
             return kill(neighbor)
 
         kill(start)
-        self.set_entry_exit()
+        self.set_start_end()
         self.algorithm = "Hunt and Kill algorithm"
 
     def eller(self, probability_carve_horizontally: float = 0.5,
@@ -344,7 +344,7 @@ class Maze:
                     carves += 1
                 if values[0] != values[1]:
                     carves = 0
-        self.set_entry_exit()
+        self.set_start_end()
         self.algorithm = "Eller's algorithm"
 
     def recursive_division(self, start: tuple[int, int] = (1, 1),
@@ -399,7 +399,7 @@ class Maze:
             self.remove_walls()
             self.is_empty = True
         divide(start, end)
-        self.set_entry_exit()
+        self.set_start_end()
         self.algorithm = "Recursive division algorithm"
 
     def binary_tree(self) -> None:
@@ -437,7 +437,7 @@ class Maze:
                 wall_coordinates = (index[0] + direction[0] // 2,
                                     index[1] + direction[1] // 2)
                 self.maze[wall_coordinates] = 2
-        self.set_entry_exit()
+        self.set_start_end()
         self.algorithm = "Binary Tree algorithm"
 
     def sidewinder(self, probability: float = 0.5) -> None:
@@ -477,7 +477,7 @@ class Maze:
                 wall_coordinates = (index[0] + east_direction[0],
                                     index[1] + east_direction[1])
                 self.maze[wall_coordinates] = 2
-        self.set_entry_exit()
+        self.set_start_end()
         self.algorithm = "Sidewinder algorithm"
 
     def growing_tree(self, start: tuple[int, int] | None = None,
@@ -522,7 +522,7 @@ class Maze:
                 cells.append(chosen_neighbor)
             else:
                 cells.remove(chosen_cell)
-        self.set_entry_exit()
+        self.set_start_end()
         if probability != 1.0:
             probability = round(probability, 2)
             split = str(probability) + "/" + str(1 - probability)
@@ -559,7 +559,7 @@ class Maze:
                 self.maze[wall_coordinates] = 2
                 visited_cell += 1
             current_cell = rdm_neighbor
-        self.set_entry_exit()
+        self.set_start_end()
         self.algorithm = "Aldous-Broder algorithm"
 
     def wilson(self) -> None:
@@ -604,7 +604,7 @@ class Maze:
                     wall_coordinates = (index[0] - direction[0] // 2,
                                         index[1] - direction[1] // 2)
                     self.maze[wall_coordinates] = 2
-        self.set_entry_exit()
+        self.set_start_end()
         self.algorithm = "Wilson's algorithm"
 
     def merge_values(self, wall_coordinate: tuple[int, int] | list[int],
