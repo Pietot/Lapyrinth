@@ -1,4 +1,4 @@
-Here are idea/tips to improve maze.py:
+Here are ideas/tips to improve maze.py:
 
 Specific:
     Add Growing Forest algorithm, simplified prim, modified prim or True prim (I think i did True but i'm not sure) (https://www.astrolog.org/labyrnth/algrithm.htm)
