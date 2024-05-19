@@ -574,7 +574,6 @@ class Maze:
         Once a visited cell is reached,
         all cells in the path are marked as visited and the walls between them are removed.\n
         This process is repeated until all cells have been visited.\n
-        
         """
         end = get_random_cell((self.maze.shape[0], self.maze.shape[1]))
         self.maze[end] = 2
@@ -620,6 +619,19 @@ class Maze:
         value_to_replace = values[1]
         self.maze[self.maze == value_to_replace] = selected_value
         self.maze[wall_coordinate[0], wall_coordinate[1]] = selected_value
+
+    def make_complex_maze(self, probability: int | float = 0.2) -> None:
+        """ Make the maze more complex by removing some walls randomly
+
+        Args:
+            probability (int | float, optional): Probability of removing a wall. Defaults to 0.2.
+        """
+        breakable_walls_coordinates = np.argwhere(self.maze == 1)
+        # Force the probability to be between 0 and 1
+        probability = max(0, min(1, probability))
+        for coordinates in breakable_walls_coordinates:
+            if 0 < rdm.uniform(0, 1) <= probability:
+                self.maze[coordinates[0]][coordinates[1]] = 2
 
     def generate_image(self, filename: str | None = None) -> None:
         """ Generate a maze image from a maze object. """
