@@ -512,7 +512,7 @@ class Maze:
         probability = probability if probability is not None else 1.0
         probability = min(1.0, max(0.0, probability))
         while cells:
-            chosen_cell = get_cell(cells, mode, probability)
+            chosen_cell = select_cell_by_mode(cells, mode, probability)
             neighbors = get_neighbors(self, chosen_cell)
             if neighbors:
                 chosen_neighbor, direction = rdm.choice(neighbors)
@@ -760,7 +760,8 @@ def get_connection(self: Maze, index: tuple[int, int]) -> tuple[tuple[int, int],
     return rdm.choice(neighbors)
 
 
-def get_cell(cells: list[tuple[int, int]], mode: str, probability: float) -> tuple[int, int]:
+def select_cell_by_mode(cells: list[tuple[int, int]],
+                        mode: str, probability: float) -> tuple[int, int]:
     """ Choose a cell from a list depending on the selection mode.
 
     Args:
