@@ -1,4 +1,4 @@
-""" A program capable of solving mazes with different pathfinders """
+""" A program capable of solving mazes with different path-finding algorithms. """
 
 
 # By Pietot
@@ -8,11 +8,12 @@
 
 # v1.0 :
 # Start : 16/05/2024 at 13h30 FR
-# End : /05/2024 at h FR
+# End : 19/05/2024 at 23h15 FR
 # Changelogs : Added the left hand rule pathfinder
 
 
-import random as rdm
+import colorsys
+
 import numpy as np
 
 from PIL import Image, ImageDraw
@@ -31,31 +32,59 @@ def left_hand(self: Maze) -> list[tuple[int, int]]:
         (1, 0): (0, 1)
     }
     current_cell: tuple[int, int] = self.start
-    path: list[tuple[int, int]] = []
+    cell_with_direction: dict[tuple[int, int], tuple[int, int]] = {}
     direction = next(iter(direction_to_left))
+    cell_with_direction[current_cell] = direction
     while current_cell != self.end:
-        path.append(current_cell)
         left_cell_col = current_cell[1] + direction_to_left[direction][1]
         left_cell_row = current_cell[0] + direction_to_left[direction][0]
         if self.maze[left_cell_row][left_cell_col] not in (0, 1):
             direction = rotate_90_counterclockwise(direction)
+            cell_with_direction[current_cell] = direction
             current_cell = (left_cell_row, left_cell_col)
             continue
         front_cell_row = current_cell[0] + direction[0]
         front_cell_col = current_cell[1] + direction[1]
         if self.maze[front_cell_row][front_cell_col] in (0, 1):
             direction = rotate_90_clockwise(direction)
+            cell_with_direction[current_cell] = direction
+            front_cell_row = current_cell[0] + direction[0]
+            front_cell_col = current_cell[1] + direction[1]
         else:
+            cell_with_direction[current_cell] = direction
             current_cell = (front_cell_row, front_cell_col)
-    return list(dict.fromkeys(path))
+    path: list[tuple[int, int]] = []
+    current_cell = self.start
+    while current_cell != self.end:
+        path.append(current_cell)
+        current_cell = (current_cell[0] + cell_with_direction[current_cell][0],
+                        current_cell[1] + cell_with_direction[current_cell][1])
+    path.append(current_cell)
+    return path
 
 
 def rotate_90_clockwise(direction: tuple[int, int]) -> tuple[int, int]:
+    """ Rotate a direction 90 degrees clockwise.
+
+    Args:
+        direction (tuple[int, int]): The direction to rotate.
+
+    Returns:
+        tuple[int, int]: The rotated direction.
+    """
     row, column = direction
     return (column, -row)
 
 
 def rotate_90_counterclockwise(direction: tuple[int, int]) -> tuple[int, int]:
+    """ Rotate a direction 90 degrees counterclockwise.
+
+    Args:
+        direction (tuple[int, int]): The direction to rotate.
+
+    Returns:
+        tuple[int, int]: The rotated direction.
+    """
     row, column = direction
     return (-column, row)
 
@@ -67,26 +96,31 @@ def generate_path(self: Maze, path: list[tuple[int, int]],
     filename = (filename + '.png' if filename
                 else f'Maze_{size[0]}x{size[1]}_{self.algorithm}.png')
     cell_size = 50
-    wall_color = (0, 0, 0)
-    path_color = "cyan"
 
     image = Image.new(
         "RGB", (size[0]*cell_size, size[1]*cell_size), (255, 255, 255))
     draw = ImageDraw.Draw(image)
 
-    for index, cell_value in np.ndenumerate(self.maze):
-        x1 = index[1] * cell_size
-        y1 = index[0] * cell_size
-        x2 = (index[1] + 1) * cell_size
-        y2 = (index[0] + 1) * cell_size
+    path_length = len(path)
 
-        if index == self.start:
-            draw.rectangle((x1, y1, x2, y2), fill=(0, 255, 0))
-        elif index == self.end:
-            draw.rectangle((x1, y1, x2, y2), fill=(255, 0, 0))
-        elif int(cell_value) in (0, 1):
-            draw.rectangle((x1, y1, x2, y2), fill=wall_color)
-        elif index in path:
-            draw.rectangle((x1, y1, x2, y2), fill=path_color)
+    def get_color(step: int, total_steps: int) -> tuple[int, int, int]:
+        # Adjust hue to go from red (0) to yellow (1/6)
+        hue = 1/6 * (step / total_steps)
+        r, g, b = colorsys.hsv_to_rgb(hue, 1, 1)
+        return int(r * 255), int(g * 255), int(b * 255)
 
+    def draw_path() -> None:
+        for index, cell_value in np.ndenumerate(self.maze):
+            x1 = index[1] * cell_size
+            y1 = index[0] * cell_size
+            x2 = (index[1] + 1) * cell_size
+            y2 = (index[0] + 1) * cell_size
+
+            if int(cell_value) in (0, 1):
+                draw.rectangle((x1, y1, x2, y2), fill=(0, 0, 0))
+            elif index in path:
+                step = path.index(index)
+                path_color = get_color(step, path_length)
+                draw.rectangle((x1, y1, x2, y2), fill=path_color)
+    draw_path()
     image.save(filename)
