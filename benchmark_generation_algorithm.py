@@ -36,7 +36,8 @@ def hunt_and_kill_time(size: int, queue: Queue) -> None:
     time = round(timeit.timeit(lambda: Maze(size).hunt_and_kill(),
                                number=1, globals=globals()), 5)
     queue.put(("Hunt and Kill", size, time))
-    
+
+
 def eller_time(size: int, queue: Queue) -> None:
     time = round(timeit.timeit(lambda: Maze(size).eller(),
                                number=1, globals=globals()), 5)
@@ -90,15 +91,18 @@ def growing_tree_mixed_time(size: int, queue: Queue) -> None:
                                number=1, globals=globals()), 5)
     queue.put(("Growing Tree (Mixed)", size, time))
 
+
 def aldous_broder_time(size: int, queue: Queue) -> None:
     time = round(timeit.timeit(lambda: Maze(size).aldous_broder(),
                                number=1, globals=globals()), 5)
     queue.put(("Aldous Broder", size, time))
-    
+
+
 def wilson_time(size: int, queue: Queue) -> None:
     time = round(timeit.timeit(lambda: Maze(size).wilson(),
                                number=1, globals=globals()), 5)
     queue.put(("Wilson", size, time))
+
 
 def memory_usage(pid):
     process = psutil.Process(pid)
@@ -135,7 +139,8 @@ def hunt_and_kill_memory(size: int, queue: Queue) -> None:
     maze.hunt_and_kill()
     mem = memory_usage(os.getpid()) - mem
     queue.put(("Hunt and Kill", size, mem))
-    
+
+
 def eller_memory(size: int, queue: Queue) -> None:
     maze = Maze(size)
     mem = memory_usage(os.getpid())
@@ -207,12 +212,14 @@ def growing_tree_mixed_memory(size: int, queue: Queue) -> None:
     mem = memory_usage(os.getpid()) - mem
     queue.put(("Growing Tree (Mixed)", size, mem))
 
+
 def aldous_broder_memory(size: int, queue: Queue) -> None:
     maze = Maze(size)
     mem = memory_usage(os.getpid())
     maze.aldous_broder()
     mem = memory_usage(os.getpid()) - mem
     queue.put(("Aldous Broder", size, mem))
+
 
 def wilson_memory(size: int, queue: Queue) -> None:
     maze = Maze(size)
@@ -255,7 +262,7 @@ def time_complexity() -> None:
 
         # Write the header row
         writer.writerow(['Size', 'Kruskal', 'Prim', 'Depth First Search',
-                        'Hunt and Kill', 'Binary Tree', 'Eller','Recursive Division', 'Sidewinder',
+                        'Hunt and Kill', 'Binary Tree', 'Eller', 'Recursive Division', 'Sidewinder',
                          'Growing Tree (Newest)', 'Growing Tree (Middle)', 'Growing Tree (Oldest)',
                          'Growing Tree (Random)', 'Growing Tree (Mixed)', 'Aldous Broder',
                          'Wilson'])
