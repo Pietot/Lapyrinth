@@ -28,6 +28,21 @@ from maze import Maze
 import maze
 
 
+class UnsolvableMaze(Exception):
+    """ Exception class for unsolvable Mazes.
+
+    Args:
+        Exception:
+    """
+
+    def __init__(self, algorithm: str) -> None:
+        self.message = f"{algorithm} can't solve this maze"
+        super().__init__(self.message)
+
+    def __str__(self) -> str:
+        return self.message
+
+
 def left_hand(self: Maze) -> list[tuple[int, int]]:
     """ Solve the maze with the left hand rule.
 
@@ -38,6 +53,9 @@ def left_hand(self: Maze) -> list[tuple[int, int]]:
     Else, it will turn right and update the direction.\n
 
     To save the path, it will save the direction of the cell in a dictionary.
+
+    Returns:
+        list[tuple[int, int]]: The path from the start to the end of the maze.
     """
     direction_to_left: dict[tuple[int, int], tuple[int, int]] = {
         (0, 1): (-1, 0),
@@ -46,36 +64,45 @@ def left_hand(self: Maze) -> list[tuple[int, int]]:
         (1, 0): (0, 1)
     }
     current_cell: tuple[int, int] = self.start
-    cell_with_direction: dict[tuple[int, int], tuple[int, int]] = {}
+    cell_with_direction: dict[tuple[int, int], list[tuple[int, int]]] = {}
     direction = next(iter(direction_to_left))
-    cell_with_direction[current_cell] = direction
     while current_cell != self.end:
         left_cell_col = current_cell[1] + direction_to_left[direction][1]
         left_cell_row = current_cell[0] + direction_to_left[direction][0]
         if self.maze[left_cell_row][left_cell_col] > 1:
             direction = rotate_90_counterclockwise(direction)
-            cell_with_direction[current_cell] = direction
+            if cell_with_direction.get(current_cell):
+                if direction in cell_with_direction[current_cell]:
+                    raise UnsolvableMaze("Left Hand Rule")
+                cell_with_direction[current_cell].append(direction)
+            else:
+                cell_with_direction[current_cell] = [direction]
             current_cell = (left_cell_row, left_cell_col)
             continue
         front_cell_row = current_cell[0] + direction[0]
         front_cell_col = current_cell[1] + direction[1]
         if self.maze[front_cell_row][front_cell_col] > 1:
-            cell_with_direction[current_cell] = direction
+            if cell_with_direction.get(current_cell):
+                cell_with_direction[current_cell].append(direction)
+            else:
+                cell_with_direction[current_cell] = [direction]
             current_cell = (front_cell_row, front_cell_col)
         else:
             direction = rotate_90_clockwise(direction)
-            cell_with_direction[current_cell] = direction
-            front_cell_row = current_cell[0] + direction[0]
-            front_cell_col = current_cell[1] + direction[1]
+            if cell_with_direction.get(current_cell):
+                if direction in cell_with_direction[current_cell]:
+                    raise UnsolvableMaze("Left Hand Rule")
+                cell_with_direction[current_cell].append(direction)
+            else:
+                cell_with_direction[current_cell] = [direction]
     path: list[tuple[int, int]] = []
     current_cell = self.start
     while current_cell != self.end:
         path.append(current_cell)
-        current_cell = (current_cell[0] + cell_with_direction[current_cell][0],
-                        current_cell[1] + cell_with_direction[current_cell][1])
+        current_cell = (current_cell[0] + cell_with_direction[current_cell][-1][0],
+                        current_cell[1] + cell_with_direction[current_cell][-1][1])
     path.append(current_cell)
     return path
-
 
 def right_hand(self: Maze) -> list[tuple[int, int]]:
     """ Solve the maze with the right hand rule.
@@ -87,6 +114,9 @@ def right_hand(self: Maze) -> list[tuple[int, int]]:
     Else, it will turn left and update the direction.\n
 
     To save the path, it will save the direction of the cell in a dictionary.
+    
+    Returns:
+        list[tuple[int, int]]: The path from the start to the end of the maze.
     """
     direction_to_right: dict[tuple[int, int], tuple[int, int]] = {
         (0, 1): (1, 0),
@@ -95,33 +125,43 @@ def right_hand(self: Maze) -> list[tuple[int, int]]:
         (-1, 0): (0, 1)
     }
     current_cell: tuple[int, int] = self.start
-    cell_with_direction: dict[tuple[int, int], tuple[int, int]] = {}
+    cell_with_direction: dict[tuple[int, int], list[tuple[int, int]]] = {}
     direction = next(iter(direction_to_right))
-    cell_with_direction[current_cell] = direction
     while current_cell != self.end:
         left_cell_col = current_cell[1] + direction_to_right[direction][1]
         left_cell_row = current_cell[0] + direction_to_right[direction][0]
         if self.maze[left_cell_row][left_cell_col] > 1:
             direction = rotate_90_clockwise(direction)
-            cell_with_direction[current_cell] = direction
+            if cell_with_direction.get(current_cell):
+                if direction in cell_with_direction[current_cell]:
+                    raise UnsolvableMaze("Right Hand Rule")
+                cell_with_direction[current_cell].append(direction)
+            else:
+                cell_with_direction[current_cell] = [direction]
             current_cell = (left_cell_row, left_cell_col)
             continue
         front_cell_row = current_cell[0] + direction[0]
         front_cell_col = current_cell[1] + direction[1]
         if self.maze[front_cell_row][front_cell_col] > 1:
-            cell_with_direction[current_cell] = direction
+            if cell_with_direction.get(current_cell):
+                cell_with_direction[current_cell].append(direction)
+            else:
+                cell_with_direction[current_cell] = [direction]
             current_cell = (front_cell_row, front_cell_col)
         else:
             direction = rotate_90_counterclockwise(direction)
-            cell_with_direction[current_cell] = direction
-            front_cell_row = current_cell[0] + direction[0]
-            front_cell_col = current_cell[1] + direction[1]
+            if cell_with_direction.get(current_cell):
+                if direction in cell_with_direction[current_cell]:
+                    raise UnsolvableMaze("Right Hand Rule")
+                cell_with_direction[current_cell].append(direction)
+            else:
+                cell_with_direction[current_cell] = [direction]
     path: list[tuple[int, int]] = []
     current_cell = self.start
     while current_cell != self.end:
         path.append(current_cell)
-        current_cell = (current_cell[0] + cell_with_direction[current_cell][0],
-                        current_cell[1] + cell_with_direction[current_cell][1])
+        current_cell = (current_cell[0] + cell_with_direction[current_cell][-1][0],
+                        current_cell[1] + cell_with_direction[current_cell][-1][1])
     path.append(current_cell)
     return path
 
