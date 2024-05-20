@@ -36,6 +36,11 @@ def hunt_and_kill_time(size: int, queue: Queue) -> None:
     time = round(timeit.timeit(lambda: Maze(size).hunt_and_kill(),
                                number=1, globals=globals()), 5)
     queue.put(("Hunt and Kill", size, time))
+    
+def eller_time(size: int, queue: Queue) -> None:
+    time = round(timeit.timeit(lambda: Maze(size).eller(),
+                               number=1, globals=globals()), 5)
+    queue.put(("Eller", size, time))
 
 
 def recursive_division_time(size: int, queue: Queue) -> None:
@@ -130,6 +135,13 @@ def hunt_and_kill_memory(size: int, queue: Queue) -> None:
     maze.hunt_and_kill()
     mem = memory_usage(os.getpid()) - mem
     queue.put(("Hunt and Kill", size, mem))
+    
+def eller_memory(size: int, queue: Queue) -> None:
+    maze = Maze(size)
+    mem = memory_usage(os.getpid())
+    maze.eller()
+    mem = memory_usage(os.getpid()) - mem
+    queue.put(("Eller", size, mem))
 
 
 def recursive_division_memory(size: int, queue: Queue) -> None:
@@ -219,7 +231,7 @@ def time_complexity() -> None:
         queues = []
         processes = []
         for func in [kruskal_time, prim_time, depth_first_search_time, hunt_and_kill_time,
-                     binary_tree_time, recursive_division_time, sidewinder_time,
+                     binary_tree_time, recursive_division_time, eller_time, sidewinder_time,
                      growing_tree_new_time, growing_tree_mid_time, growing_tree_old_time,
                      growing_tree_rand_time, growing_tree_mixed_time, aldous_broder_time,
                      wilson_time]:
@@ -243,7 +255,7 @@ def time_complexity() -> None:
 
         # Write the header row
         writer.writerow(['Size', 'Kruskal', 'Prim', 'Depth First Search',
-                        'Hunt and Kill', 'Binary Tree', 'Recursive Division', 'Sidewinder',
+                        'Hunt and Kill', 'Binary Tree', 'Eller','Recursive Division', 'Sidewinder',
                          'Growing Tree (Newest)', 'Growing Tree (Middle)', 'Growing Tree (Oldest)',
                          'Growing Tree (Random)', 'Growing Tree (Mixed)', 'Aldous Broder',
                          'Wilson'])
@@ -256,6 +268,7 @@ def time_complexity() -> None:
                             execution_time['Depth First Search'][size],
                             execution_time['Hunt and Kill'][size],
                             execution_time['Binary Tree'][size],
+                            execution_time['Eller'][size],
                             execution_time['Recursive Division'][size],
                             execution_time['Sidewinder'][size],
                             execution_time['Growing Tree (Newest)'][size],
@@ -276,7 +289,7 @@ def memory_complexity() -> None:
         queues = []
         processes = []
         for func in [kruskal_memory, prim_memory, depth_first_search_memory, hunt_and_kill_memory,
-                     binary_tree_memory, recursive_division_memory, sidewinder_memory,
+                     binary_tree_memory, eller_memory, recursive_division_memory, sidewinder_memory,
                      growing_tree_new_memory, growing_tree_mid_memory, growing_tree_old_memory,
                      growing_tree_rand_memory, growing_tree_mixed_memory, aldous_broder_memory,
                      wilson_memory]:
@@ -300,7 +313,7 @@ def memory_complexity() -> None:
 
         # Write the header row
         writer.writerow(['Size', 'Kruskal', 'Prim', 'Depth First Search',
-                        'Hunt and Kill', 'Binary Tree', 'Recursive Division', 'Sidewinder',
+                        'Hunt and Kill', 'Binary Tree', 'Eller', 'Recursive Division', 'Sidewinder',
                          'Growing Tree (Newest)', 'Growing Tree (Middle)', 'Growing Tree (Oldest)',
                          'Growing Tree (Random)', 'Growing Tree (Mixed)', 'Aldous Broder',
                          'Wilson'])
@@ -313,6 +326,7 @@ def memory_complexity() -> None:
                             memory['Depth First Search'][size],
                             memory['Hunt and Kill'][size],
                             memory['Binary Tree'][size],
+                            memory['Eller'][size],
                             memory['Recursive Division'][size],
                             memory['Sidewinder'][size],
                             memory['Growing Tree (Newest)'][size],
