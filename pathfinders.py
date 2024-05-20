@@ -29,7 +29,16 @@ import maze
 
 
 def left_hand(self: Maze) -> list[tuple[int, int]]:
-    """ Solve the maze with the left hand rule """
+    """ Solve the maze with the left hand rule.
+
+    It start by knowing if the left cell relative to the current direction is a wall or not.\n
+    If it's not a wall, it will turn left, move forward and update the direction.\n
+    Else, it checks if the front cell is a wall or not.\n
+    If it's not a wall, it will move forward.\n
+    Else, it will turn right and update the direction.\n
+
+    To save the path, it will save the direction of the cell in a dictionary.
+    """
     direction_to_left: dict[tuple[int, int], tuple[int, int]] = {
         (0, 1): (-1, 0),
         (-1, 0): (0, -1),
@@ -43,21 +52,21 @@ def left_hand(self: Maze) -> list[tuple[int, int]]:
     while current_cell != self.end:
         left_cell_col = current_cell[1] + direction_to_left[direction][1]
         left_cell_row = current_cell[0] + direction_to_left[direction][0]
-        if self.maze[left_cell_row][left_cell_col] not in (0, 1):
+        if self.maze[left_cell_row][left_cell_col] > 1:
             direction = rotate_90_counterclockwise(direction)
             cell_with_direction[current_cell] = direction
             current_cell = (left_cell_row, left_cell_col)
             continue
         front_cell_row = current_cell[0] + direction[0]
         front_cell_col = current_cell[1] + direction[1]
-        if self.maze[front_cell_row][front_cell_col] in (0, 1):
+        if self.maze[front_cell_row][front_cell_col] > 1:
+            cell_with_direction[current_cell] = direction
+            current_cell = (front_cell_row, front_cell_col)
+        else:
             direction = rotate_90_clockwise(direction)
             cell_with_direction[current_cell] = direction
             front_cell_row = current_cell[0] + direction[0]
             front_cell_col = current_cell[1] + direction[1]
-        else:
-            cell_with_direction[current_cell] = direction
-            current_cell = (front_cell_row, front_cell_col)
     path: list[tuple[int, int]] = []
     current_cell = self.start
     while current_cell != self.end:
@@ -67,8 +76,18 @@ def left_hand(self: Maze) -> list[tuple[int, int]]:
     path.append(current_cell)
     return path
 
+
 def right_hand(self: Maze) -> list[tuple[int, int]]:
-    """ Solve the maze with the left hand rule """
+    """ Solve the maze with the right hand rule.
+
+    It start by knowing if the right cell relative to the current direction is a wall or not.\n
+    If it's not a wall, it will turn right, move forward and update the direction.\n
+    Else, it checks if the front cell is a wall or not.\n
+    If it's not a wall, it will move forward.\n
+    Else, it will turn left and update the direction.\n
+
+    To save the path, it will save the direction of the cell in a dictionary.
+    """
     direction_to_right: dict[tuple[int, int], tuple[int, int]] = {
         (0, 1): (1, 0),
         (1, 0): (0, -1),
@@ -82,21 +101,21 @@ def right_hand(self: Maze) -> list[tuple[int, int]]:
     while current_cell != self.end:
         left_cell_col = current_cell[1] + direction_to_right[direction][1]
         left_cell_row = current_cell[0] + direction_to_right[direction][0]
-        if self.maze[left_cell_row][left_cell_col] not in (0, 1):
+        if self.maze[left_cell_row][left_cell_col] > 1:
             direction = rotate_90_clockwise(direction)
             cell_with_direction[current_cell] = direction
             current_cell = (left_cell_row, left_cell_col)
             continue
         front_cell_row = current_cell[0] + direction[0]
         front_cell_col = current_cell[1] + direction[1]
-        if self.maze[front_cell_row][front_cell_col] in (0, 1):
+        if self.maze[front_cell_row][front_cell_col] > 1:
+            cell_with_direction[current_cell] = direction
+            current_cell = (front_cell_row, front_cell_col)
+        else:
             direction = rotate_90_counterclockwise(direction)
             cell_with_direction[current_cell] = direction
             front_cell_row = current_cell[0] + direction[0]
             front_cell_col = current_cell[1] + direction[1]
-        else:
-            cell_with_direction[current_cell] = direction
-            current_cell = (front_cell_row, front_cell_col)
     path: list[tuple[int, int]] = []
     current_cell = self.start
     while current_cell != self.end:
