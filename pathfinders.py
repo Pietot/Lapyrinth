@@ -11,6 +11,11 @@
 # End : 19/05/2024 at 23h15 FR
 # Changelogs : Added the left hand rule pathfinder
 
+# v1.0 :
+# Start : 20/05/2024 at 13h50 FR
+# End : 20/05/2024 at 13h50 FR
+# Changelogs : Added the right hand rule pathfinder
+
 
 import colorsys
 
@@ -47,6 +52,45 @@ def left_hand(self: Maze) -> list[tuple[int, int]]:
         front_cell_col = current_cell[1] + direction[1]
         if self.maze[front_cell_row][front_cell_col] in (0, 1):
             direction = rotate_90_clockwise(direction)
+            cell_with_direction[current_cell] = direction
+            front_cell_row = current_cell[0] + direction[0]
+            front_cell_col = current_cell[1] + direction[1]
+        else:
+            cell_with_direction[current_cell] = direction
+            current_cell = (front_cell_row, front_cell_col)
+    path: list[tuple[int, int]] = []
+    current_cell = self.start
+    while current_cell != self.end:
+        path.append(current_cell)
+        current_cell = (current_cell[0] + cell_with_direction[current_cell][0],
+                        current_cell[1] + cell_with_direction[current_cell][1])
+    path.append(current_cell)
+    return path
+
+def right_hand(self: Maze) -> list[tuple[int, int]]:
+    """ Solve the maze with the left hand rule """
+    direction_to_right: dict[tuple[int, int], tuple[int, int]] = {
+        (0, 1): (1, 0),
+        (1, 0): (0, -1),
+        (0, -1): (-1, 0),
+        (-1, 0): (0, 1)
+    }
+    current_cell: tuple[int, int] = self.start
+    cell_with_direction: dict[tuple[int, int], tuple[int, int]] = {}
+    direction = next(iter(direction_to_right))
+    cell_with_direction[current_cell] = direction
+    while current_cell != self.end:
+        left_cell_col = current_cell[1] + direction_to_right[direction][1]
+        left_cell_row = current_cell[0] + direction_to_right[direction][0]
+        if self.maze[left_cell_row][left_cell_col] not in (0, 1):
+            direction = rotate_90_clockwise(direction)
+            cell_with_direction[current_cell] = direction
+            current_cell = (left_cell_row, left_cell_col)
+            continue
+        front_cell_row = current_cell[0] + direction[0]
+        front_cell_col = current_cell[1] + direction[1]
+        if self.maze[front_cell_row][front_cell_col] in (0, 1):
+            direction = rotate_90_counterclockwise(direction)
             cell_with_direction[current_cell] = direction
             front_cell_row = current_cell[0] + direction[0]
             front_cell_col = current_cell[1] + direction[1]
