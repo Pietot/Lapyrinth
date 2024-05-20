@@ -84,7 +84,7 @@ sys.setrecursionlimit(100000)
 
 class Maze:
     """ The Maze class\n
-        0 is for pillars, 1 for breakable walls, 2 for visited cells and other for unvisited cells
+        0 is for pillars, 1 for breakable walls, 2 for visited cells and other for unvisited cells.
     """
 
     def __init__(self, *nb_cells_by_sides: int) -> None:
@@ -99,7 +99,7 @@ class Maze:
         self.end = (self.maze.shape[0] - 2, self.maze.shape[1] - 1)
 
     def __str__(self) -> str:
-        maze = [['# ' if value in (0, 1) else '  ' for value in row]
+        maze = [['# ' if value < 2 else '  ' for value in row]
                 for row in self.maze]
         return '\n'.join(''.join(row) for row in maze)
 
@@ -112,7 +112,7 @@ class Maze:
             yield (index[0]*2+1, index[1]*2+1), value
 
     def sculpt_grid(self) -> None:
-        """ Creates the grid
+        """ Creates the grid.
         """
         self.maze[1:-1:2, 2:-1:2] = 1
         self.maze[2:-1:2, 1:-1:2] = 1
@@ -120,21 +120,21 @@ class Maze:
         self.was_scuplted = True
 
     def set_values(self) -> None:
-        """ Set a unique value to each cell
+        """ Set a unique value to each cell.
         """
         indices = np.where(self.maze == 3)
         self.maze[indices] = np.arange(3, 3 + len(indices[0]))
 
     def set_start_end(self) -> None:
-        """ Set the entry and the exit of the maze
+        """ Set the entry and the exit of the maze.
         """
         self.maze[self.start],  self.maze[self.end] = (2, 2)
 
     def remove_walls(self) -> None:
-        """ Remove all walls inside the maze
+        """ Remove all walls inside the maze.
 
         Returns:
-            Maze: The Maze object
+            Maze: The Maze object.
         """
         self.maze[1:-1, 1:-1] = 3
 
@@ -214,7 +214,7 @@ class Maze:
         self.algorithm = "Depth First Search algorithm"
 
     def prim(self, start: tuple[int, int] | None = None) -> None:
-        """Applies Prim's algorithm to generate a maze.
+        """ Applies Prim's algorithm to generate a maze.
 
         It starts by selecting a starting cell, either specified in parameter or chosen randomly.\n
         Then it lists all its neighbors and adds them to the list of cells to explore.\n
@@ -484,7 +484,7 @@ class Maze:
     def growing_tree(self, start: tuple[int, int] | None = None,
                      mode: str = 'newest',
                      probability: float | None = None) -> None:
-        """Applies the Growing Tree algorithm to generate a maze.
+        """ Applies the Growing Tree algorithm to generate a maze.
 
         It starts by choosing a random cell to start.\n
         Then it adds the cell to a list of cells to explore.\n
@@ -609,11 +609,11 @@ class Maze:
 
     def merge_values(self, wall_coordinate: tuple[int, int] | list[int],
                      values: tuple[int, int]) -> None:
-        """ Destroys a wall and merging the values
+        """ Destroys a wall and merging the values.
 
         Args:
-            wall_coordinate (tuple[int, int] | list[int]): The wall coordinates
-            values (tuple[int, int]): The values to merge
+            wall_coordinate (tuple[int, int] | list[int]): The wall coordinates.
+            values (tuple[int, int]): The values to merge.
         """
         selected_value = values[0]
         value_to_replace = values[1]
@@ -621,7 +621,7 @@ class Maze:
         self.maze[wall_coordinate[0], wall_coordinate[1]] = selected_value
 
     def make_complex_maze(self, probability: int | float = 0.2) -> None:
-        """ Make the maze more complex by removing some walls randomly
+        """ Make the maze more complex by removing some walls randomly.
 
         Args:
             probability (int | float, optional): Probability of removing a wall. Defaults to 0.2.
@@ -655,7 +655,7 @@ class Maze:
                 draw.rectangle((x1, y1+1, x2, y2), fill=(0, 255, 0))
             elif index == self.end:
                 draw.rectangle((x1, y1+1, x2, y2), fill=(255, 0, 0))
-            elif int(cell_value) in (0, 1):
+            elif int(cell_value) < 2:
                 draw.rectangle((x1, y1, x2, y2), fill=wall_color)
 
         image.save(filename)
@@ -665,10 +665,10 @@ def cells_to_shape(*nb_cells_by_side: int) -> tuple[int, int]:
     """ Convert the number of cells of each dimension (height, width) to the shape of the maze.
 
     Raises:
-        ValueError: nb_cells_by_side must be an one or two int greater or equal to 2
+        ValueError: nb_cells_by_side must be an one or two int greater or equal to 2.
 
     Returns:
-        tuple[int, int]: The shape of the maze
+        tuple[int, int]: The shape of the maze.
     """
     if len(nb_cells_by_side) == 1 and nb_cells_by_side[0] >= 2:
         shape = (nb_cells_by_side[0]*2 + 1, nb_cells_by_side[0]*2 + 1)
@@ -680,19 +680,19 @@ def cells_to_shape(*nb_cells_by_side: int) -> tuple[int, int]:
 
 
 def get_breakable_walls(self: Maze) -> list[list[int]]:
-    """ Gets all breakable walls coordinates
+    """ Gets all breakable walls coordinates.
 
     Returns:
-        list[list[int, int]]: List of all breakable walls coordinates
+        list[list[int, int]]: List of all breakable walls coordinates.
     """
     return np.argwhere(self.maze == 1).tolist()
 
 
 def get_unvisited_cells(self: Maze) -> list[list[int]]:
-    """ Gets all unvisited cells coordinates
+    """ Gets all unvisited cells coordinates.
 
     Returns:
-        list[tuple[int, int]]: List of all unvisited cells coordinates
+        list[tuple[int, int]]: List of all unvisited cells coordinates.
     """
     return np.argwhere(self.maze > 2).tolist()
 
@@ -709,8 +709,8 @@ def get_neighbors(self: Maze,
         cell (tuple[int, int]): The coordinates of the cell.
         directions (tuple[tuple[int, int], ...], optional): The directions to check.
         Defaults to None.
-        return_visited (bool): If we want to return visited neighbors
-        Defaults to False
+        return_visited (bool): If we want to return visited neighbors.
+        Defaults to False.
 
     Returns:
         list[tuple[tuple[int, int], tuple[int, int]]]:
