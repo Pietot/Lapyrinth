@@ -620,18 +620,26 @@ class Maze:
         self.maze[self.maze == value_to_replace] = selected_value
         self.maze[wall_coordinate[0], wall_coordinate[1]] = selected_value
 
-    def make_complex_maze(self, probability: int | float = 0.2) -> None:
+    def make_complex_maze(self, mode: tuple[str, int | float]) -> None:
         """ Make the maze more complex by removing some walls randomly.
 
         Args:
             probability (int | float, optional): Probability of removing a wall. Defaults to 0.2.
         """
         breakable_walls_coordinates = np.argwhere(self.maze == 1)
-        # Force the probability to be between 0 and 1
-        probability = max(0, min(1, probability))
-        for coordinates in breakable_walls_coordinates:
-            if 0 < rdm.uniform(0, 1) <= probability:
+        if mode[0] == 'number':
+            # Force the number to be between 0 and the number of breakable walls
+            number = max(0, min(int(mode[1]), len(breakable_walls_coordinates)))
+            for coordinates in rdm.sample(breakable_walls_coordinates.tolist(), number):
                 self.maze[coordinates[0]][coordinates[1]] = 2
+        elif mode[0] == 'probability':
+            # Force the probability to be between 0 and 1
+            probability = max(0, min(1, mode[1]))
+            for coordinates in breakable_walls_coordinates:
+                if 0 < rdm.uniform(0, 1) <= probability:
+                    self.maze[coordinates[0]][coordinates[1]] = 2
+        else:
+            raise ValueError("mode must be \"probability\" or \"number\"")
 
     def generate_image(self, filename: str | None = None) -> None:
         """ Generate a maze image from a maze object. """
