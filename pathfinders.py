@@ -11,14 +11,20 @@
 # End : 19/05/2024 at 23h15 FR
 # Changelogs : Added the left hand rule pathfinder
 
-# v1.0 :
+# v1.1 :
 # Start : 20/05/2024 at 13h50 FR
 # End : 20/05/2024 at 13h50 FR
 # Changelogs : Added the right hand rule pathfinder
 
+# v1.2 :
+# Start : 21/05/2024 at 21h35 FR
+# End : 21/05/2024 at 23h00 FR
+# Changelogs : Added random mouse pathfinder
+
 
 import colorsys
 
+import random as rdm
 import numpy as np
 
 from PIL import Image, ImageDraw
@@ -138,6 +144,33 @@ def right_hand(self: Maze) -> list[tuple[int, int]]:
         current_cell = (current_cell[0] + cell_with_direction[current_cell][-1][0],
                         current_cell[1] + cell_with_direction[current_cell][-1][1])
     path.append(current_cell)
+    return path
+
+
+def random_mouse(self: Maze) -> list[tuple[int, int]]:
+    """ Solve the maze with the random mouse rule.
+
+    It will randomly choose a direction to move to until it reaches the end of the maze.
+    For performance reasons, it will not choose the opposite direction until it's forced.
+
+    Returns:
+        list[tuple[int, int]]: The path from the start to the end of the maze.
+    """
+    current_cell: tuple[int, int] = self.start
+    path: list[tuple[int, int]] = [current_cell]
+    directions:tuple[tuple[int, int], ...] = ((0, 1), (1, 0), (0, -1), (-1, 0))
+    while current_cell != self.end:
+        neighbors = maze.get_neighbors(self, current_cell,
+                                       directions=directions, return_visited=True)
+        next_cell, _ = rdm.choice(neighbors)
+        if len(path) > 1 and next_cell == path[-2]:
+            path.pop()
+        elif next_cell in path:
+            index = path.index(next_cell)
+            path = path[:index+1]
+        else:
+            path.append(next_cell)
+        current_cell = next_cell
     return path
 
 
