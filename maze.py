@@ -594,7 +594,7 @@ class Maze:
                     index = path.index(neighbor)
                     path = path[:index+1]
                 else:
-                    path.append((neighbor))
+                    path.append(neighbor)
             for index in path:
                 if index == start:
                     self.maze[index] = 2
