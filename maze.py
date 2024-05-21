@@ -92,7 +92,6 @@ class Maze:
         shape = cells_to_shape(*nb_cells_by_sides)
         self.maze = np.zeros(shape, dtype=np.uint)
         self.algorithm: None | str = None
-        self.is_empty = False
         self.is_perfect = False
         self.have_value = False
         self.sculpt_grid()
@@ -354,8 +353,7 @@ class Maze:
         self.algorithm = "Eller's algorithm"
         self.is_perfect = True
 
-    def recursive_division(self, start: tuple[int, int] = (1, 1),
-                           end: tuple[int, int] | None = None) -> None:
+    def recursive_division(self) -> None:
         """ Applies the Recursive division algorithm to generate a maze.
 
         It starts by dividing the maze into two parts, either horizontally or vertically.\n
@@ -400,11 +398,9 @@ class Maze:
                 self.maze[wall_row_index][entry] = 2
                 divide(start, (wall_row_index - 1, end[1]), entry_coordinate)
                 divide((wall_row_index + 1, start[1]), end, entry_coordinate)
-        if end is None:
-            end = (self.maze.shape[0]-2, self.maze.shape[1]-2)
-        if not self.is_empty:
-            self.remove_walls()
-            self.is_empty = True
+        self.remove_walls()
+        start = (1, 1)
+        end = (self.maze.shape[0]-2, self.maze.shape[1]-2)
         divide(start, end)
         self.set_start_end()
         self.algorithm = "Recursive division algorithm"
