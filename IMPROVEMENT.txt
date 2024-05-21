@@ -14,7 +14,6 @@ Here are ideas/tips to improve pathfinder.py:
 
     Specific:
         Set color differentiation for number of times passed through cell for left/right_hand
-        Verification system to catch if a maze is not solvable with this method
 
     General:
         Optimize algorithms
