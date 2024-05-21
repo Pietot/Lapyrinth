@@ -739,7 +739,7 @@ def get_neighbors(self: Maze,
     for direction in directions:
         neighbor = cell[0] + direction[0], cell[1] + direction[1]
         if 1 <= neighbor[0] < self.maze.shape[0] and 1 <= neighbor[1] < self.maze.shape[1]:
-            if return_visited or self.maze[neighbor] != 2:
+            if (return_visited and self.maze[neighbor] > 1) or self.maze[neighbor] > 2:
                 neighbors.append((neighbor, direction))
     return neighbors
 
