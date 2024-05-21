@@ -819,9 +819,9 @@ def select_cell_by_mode(cells: list[tuple[int, int]],
             prob = rdm.random()
             if prob <= 0.25:
                 chosen_cell = cells[-1]
-            if prob <= 0.5:
+            elif prob <= 0.5:
                 chosen_cell = cells[len(cells) // 2]
-            if prob <= 0.75:
+            elif prob <= 0.75:
                 chosen_cell = cells[0]
             else:
                 chosen_cell = rdm.choice(cells)
