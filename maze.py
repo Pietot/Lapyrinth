@@ -360,12 +360,6 @@ class Maze:
         Then it creates a wall in the middle of the division.\n
         After that, it creates a carve into the wall.\n
         This process continues recursively until the maze is fully divided.\n
-
-        Args:
-            start (tuple[int, int], optional): The starting coordinates of the block to divide.\n
-                Defaults to (1, 1).
-            end (tuple[int, int] | None, optional): The ending coordinates of the block to divide.\n
-                Defaults to None.
         """
         def divide_vertically(width: int, height: int) -> int:
             return width > height if width != height else rdm.getrandbits(1)
@@ -632,7 +626,9 @@ class Maze:
         """ Make the maze more complex by removing some walls randomly.
 
         Args:
-            probability (int | float, optional): Probability of removing a wall. Defaults to 0.2.
+            mode (tuple[str, int | float]): The mode to remove walls.
+            The first element is the mode ('number' or 'probability').
+            The second element is the number of walls to remove or the probability to remove a wall.
         """
         breakable_walls_coordinates = np.argwhere(self.maze == 1)
         if float(mode[1]) == 0.0:
