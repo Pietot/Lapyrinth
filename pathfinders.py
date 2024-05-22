@@ -156,18 +156,23 @@ def random_mouse(self: Maze) -> list[tuple[int, int]]:
     Returns:
         list[tuple[int, int]]: The path from the start to the end of the maze.
     """
-    current_cell: tuple[int, int] = self.start
+    current_cell = self.start
     path: list[tuple[int, int]] = [current_cell]
-    directions:tuple[tuple[int, int], ...] = ((0, 1), (1, 0), (0, -1), (-1, 0))
+    directions = ((0, 1), (1, 0), (0, -1), (-1, 0))
+    banned_direction = None
+
     while current_cell != self.end:
-        neighbors = maze.get_neighbors(self, current_cell,
-                                       directions=directions, return_visited=True)
-        next_cell, _ = rdm.choice(neighbors)
-        if len(path) > 1 and next_cell == path[-2]:
-            path.pop()
-        elif next_cell in path:
-            index = path.index(next_cell)
-            path = path[:index+1]
+        neighbors = maze.get_neighbors(
+            self, current_cell, directions=directions, return_visited=True)
+        if banned_direction:
+            neighbors = [neighbor for neighbor in neighbors if neighbor[1] != banned_direction]
+        if not neighbors:
+            neighbors = maze.get_neighbors(
+                self, current_cell, directions=directions, return_visited=True)
+        next_cell, direction = rdm.choice(neighbors)
+        banned_direction = (-direction[0], -direction[1])
+        if next_cell in path:
+            path = path[:path.index(next_cell)+1]
         else:
             path.append(next_cell)
         current_cell = next_cell
