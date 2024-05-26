@@ -1,7 +1,5 @@
 # Maze-Maker-Solver
 
-# Calendar
-
 ![Static Badge](https://img.shields.io/badge/made_in-France-red?labelColor=blue)
 ![Static Badge](https://img.shields.io/badge/language-Python-f7d54d?labelColor=4771a4)
 
