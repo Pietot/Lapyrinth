@@ -21,10 +21,15 @@
 # End : 21/05/2024 at 23h00 FR
 # Changelogs : Added random mouse pathfinder
 
-# v1.2 :
+# v1.3 :
 # Start : 25/05/2024 at 19h10 FR
 # End : 26/05/2024 at 17h30 FR
 # Changelogs : Added Pledge pathfinder
+
+# v1.4 :
+# Start : 26/05/2024 at 22h30 FR
+# End : 28/05/2024 at 00h35 FR
+# Changelogs : Added Dead End Filler pathfinder
 
 
 import colorsys
@@ -46,8 +51,10 @@ class UnsolvableMaze(Exception):
         Exception: The base exception class.
     """
 
-    def __init__(self, algorithm: str) -> None:
-        self.message = f"{algorithm} cannot solve this maze in this configuration"
+    def __init__(self, algorithm: str, error_message: str = "") -> None:
+        if error_message:
+            error_message = ":\n" + error_message
+        self.message = f"{algorithm} cannot solve this maze in this configuration" + error_message
         super().__init__(self.message)
 
     def __str__(self) -> str:
@@ -85,16 +92,22 @@ def left_hand(self: Maze) -> list[tuple[int, int]]:
         left_cell_row = current_cell[0] + direction_to_left[direction][0]
         if self.maze[left_cell_row][left_cell_col] > 1:
             direction = turn_left(direction)
-            update_cell_directions(cell_with_directions, current_cell, direction, "Left Hand Rule")
+            update_cell_directions(cell_with_directions, current_cell, direction,
+                                   algorithm="Left Hand Rule",
+                                   error_message="Pathfinder is stuck in a loop.")
             current_cell = (left_cell_row, left_cell_col)
             continue
         front_cell_row = current_cell[0] + direction[0]
         front_cell_col = current_cell[1] + direction[1]
         if self.maze[front_cell_row][front_cell_col] > 1:
-            update_cell_directions(cell_with_directions, current_cell, direction, "Left Hand Rule")
+            update_cell_directions(cell_with_directions, current_cell, direction,
+                                   algorithm="Left Hand Rule",
+                                   error_message="Pathfinder is stuck in a loop.")
             current_cell = (front_cell_row, front_cell_col)
         else:
-            update_cell_directions(cell_with_directions, current_cell, direction, "Left Hand Rule")
+            update_cell_directions(cell_with_directions, current_cell, direction,
+                                   algorithm="Left Hand Rule",
+                                   error_message="Pathfinder is stuck in a loop.")
             direction = turn_right(direction)
     return directions_to_path(self, cell_with_directions)
 
@@ -127,16 +140,22 @@ def right_hand(self: Maze) -> list[tuple[int, int]]:
         left_cell_row = current_cell[0] + direction_to_right[direction][0]
         if self.maze[left_cell_row][left_cell_col] > 1:
             direction = turn_right(direction)
-            update_cell_directions(cell_with_directions, current_cell, direction, "Right Hand Rule")
+            update_cell_directions(cell_with_directions, current_cell, direction,
+                                   algorithm="Right Hand Rule",
+                                   error_message="Pathfinder is stuck in a loop.")
             current_cell = (left_cell_row, left_cell_col)
             continue
         front_cell_row = current_cell[0] + direction[0]
         front_cell_col = current_cell[1] + direction[1]
         if self.maze[front_cell_row][front_cell_col] > 1:
-            update_cell_directions(cell_with_directions, current_cell, direction, "Right Hand Rule")
+            update_cell_directions(cell_with_directions, current_cell, direction,
+                                   algorithm="Right Hand Rule",
+                                   error_message="Pathfinder is stuck in a loop.")
             current_cell = (front_cell_row, front_cell_col)
         else:
-            update_cell_directions(cell_with_directions, current_cell, direction, "Right Hand Rule")
+            update_cell_directions(cell_with_directions, current_cell, direction,
+                                   algorithm="Right Hand Rule",
+                                   error_message="Pathfinder is stuck in a loop.")
             direction = turn_left(direction)
     return directions_to_path(self, cell_with_directions)
 
@@ -155,7 +174,7 @@ def random_mouse(self: Maze) -> list[tuple[int, int]]:
     """
     current_cell = self.start
     path: list[tuple[int, int]] = [current_cell]
-    directions = ((0, 1), (1, 0), (0, -1), (-1, 0))
+    directions = ((-1, 0), (0, 1), (1, 0), (0, -1))
     banned_direction = None
 
     while current_cell != self.end:
@@ -247,6 +266,47 @@ def pledge(self: Maze, following_direction: str) -> list[tuple[int, int]]:
     return path
 
 
+def dead_end_filler(self: Maze) -> list[tuple[int, int]]:
+    """ Solve the maze with the Dead End Filler pathfinder.
+    
+    It start by converting all path cells to 2.\n
+    Then if will recursively fill the dead ends (cells with only one neighbor)
+    until there is no more dead ends.\n
+    Finally, it will try get the path from the start to the end of the maze.\n
+    If it finds multiple paths, in other words, a cell with two or more neighbor,
+    it will raise an UnsolvableMaze exception.
+
+    Args:
+        self (Maze): The maze object.
+
+    Returns:
+        list[tuple[int, int]]: The path from the start to the end of the maze.
+    """
+    def fill() -> None:
+        if dead_ends_indexes := get_dead_ends(self):
+            rows, cols = zip(*dead_ends_indexes)
+            self.maze[rows, cols] = 2
+            fill()
+
+    def get_path() -> list[tuple[int, int]]:
+        current_cell: tuple[int, int] = self.start
+        path: list[tuple[int, int]] = [self.start]
+        while current_cell != self.end:
+            neighbors = maze.get_neighbors(self, current_cell,
+                                           directions=((-1, 0), (0, 1), (1, 0), (0, -1)))
+            if len(neighbors) > 1:
+                raise UnsolvableMaze("Dead End Filler",
+                                     "Pathfinder found multiple paths but it can't select one.")
+            self.maze[current_cell[0]][current_cell[1]] = 2
+            current_cell = neighbors[0][0]
+            path.append(current_cell)
+        return path
+
+    self.maze[self.maze > 1] = 3
+    fill()
+    return get_path()
+
+
 def turn_right(direction: tuple[int, int]) -> tuple[int, int]:
     """ Rotate a direction 90 degrees clockwise.
 
@@ -293,7 +353,8 @@ def update_path(path: list[tuple[int, int]], new_cell: tuple[int, int]) -> list[
 def update_cell_directions(cell_with_direction: dict[tuple[int, int], list[tuple[int, int]]],
                            current_cell: tuple[int, int],
                            direction: tuple[int, int],
-                           algorithm: str) -> None:
+                           algorithm: str,
+                           error_message: str = "") -> None:
     """ Update the cell_with_direction dictionary with the current cell and direction.
 
     Args:
@@ -302,16 +363,45 @@ def update_cell_directions(cell_with_direction: dict[tuple[int, int], list[tuple
         current_cell (tuple[int, int]):  The current cell.
         direction (tuple[int, int]): The direction to add.
         algorithm (str): The algorithm used to solve the maze.
+        error_message (str, optional): The error message to add if UnsolvableMaze is raised.
+            Defaults to "".
 
     Raises:
         UnsolvableMaze: If the algorithm cannot solve the maze in the configuration given.
     """
     if cell_with_direction.get(current_cell):
         if direction in cell_with_direction[current_cell]:
-            raise UnsolvableMaze(algorithm)
+            raise UnsolvableMaze(algorithm, error_message)
         cell_with_direction[current_cell].append(direction)
     else:
         cell_with_direction[current_cell] = [direction]
+
+
+def get_dead_ends(self: Maze) -> list[tuple[int, int]]:
+    """ Get the dead ends of the maze. Meaning the cells with only one neighbor.
+
+    Args:
+        self (Maze): The maze object.
+
+    Returns:
+        list[tuple[int, int]]: A list on indexes of the dead ends.
+    """
+    dead_ends: list[tuple[int, int]] = []
+    start_neighbor = (1, 1)
+    end_neighbor = (self.maze.shape[0] - 2, self.maze.shape[1] - 2)
+    for index, value in np.ndenumerate(self.maze):
+        # Skip the start and the end because they are not dead ends.
+        # We also skip the neighbors of the start and the end
+        # because we can't reach the start and the endas a neighbor.
+        if (value < 2
+            or index in (self.start, self.end, start_neighbor, end_neighbor)
+                or value == 2):
+            continue
+        neighbors = maze.get_neighbors(self, (index[0], index[1]),
+                                       directions=((-1, 0), (0, 1), (1, 0), (0, -1)))
+        if len(neighbors) == 1:
+            dead_ends.append((index[0], index[1]))
+    return dead_ends
 
 
 def directions_to_path(self: Maze,
