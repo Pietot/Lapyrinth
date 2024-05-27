@@ -1,4 +1,4 @@
-""" A program capable of creating mazes with many different algorithms """
+""" A program capable of creating mazes with many different algorithms. """
 
 
 # By Pietot
