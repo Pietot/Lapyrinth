@@ -31,6 +31,11 @@
 # End : 28/05/2024 at 00h35 FR
 # Changelogs : Added Dead End Filler pathfinder
 
+# v1.5 :
+# Start : 28/05/2024 at 17h00 FR
+# End : 28/05/2024 at 19h45 FR
+# Changelogs : Added Depth First Search pathfinder
+
 
 import colorsys
 
@@ -268,7 +273,7 @@ def pledge(self: Maze, following_direction: str) -> list[tuple[int, int]]:
 
 def dead_end_filler(self: Maze) -> list[tuple[int, int]]:
     """ Solve the maze with the Dead End Filler pathfinder.
-    
+
     It start by converting all path cells to 2.\n
     Then if will recursively fill the dead ends (cells with only one neighbor)
     until there is no more dead ends.\n
@@ -305,6 +310,56 @@ def dead_end_filler(self: Maze) -> list[tuple[int, int]]:
     self.maze[self.maze > 1] = 3
     fill()
     return get_path()
+
+
+def depth_first_search(self: Maze) -> list[tuple[int, int]]:
+    """ Solve the maze with the Depth First Search pathfinder.
+    
+    It starts by converting all path cells to 3 (unvisited).
+    Then it lists all the neighbors of the current cell, starting with the entry cell.
+    It marks the current cell as visited.
+    For each neighbor, it checks if it's the end, a dead end or a path.
+    If the current cell is the end, it returns the path.
+    If the current cell is a dead end, it backtracks to the last cell with multiple neighbors.
+    If the current cell is a path, it will add the cell to the path,
+    and recursively call the function with the neighbor as the current cell.
+    This recursive call finishes when the end is reached or when all the cells has been visited.
+    If the algorithm cannot find the end, it raises an UnsolvableMaze exception.
+
+    Args:
+        self (Maze): The maze object.
+
+    Raises:
+        UnsolvableMaze: If the algorithm cannot solve the maze due to the end not being reachable.
+
+    Returns:
+        list[tuple[int, int]]: The path from the start to the end of the maze.
+    """
+    self.maze[self.maze > 1] = 3
+
+    def search(current_cell: tuple[int, int], path: list[tuple[int, int]]) -> list[tuple[int, int]]:
+        self.maze[current_cell[0]][current_cell[1]] = 2
+        if current_cell == self.end:
+            return path
+        # Condition to optimize the search
+        if current_cell == (self.end[0], self.end[1]-1):
+            path.append(self.end)
+            return path
+        neighbors = maze.get_neighbors(self, current_cell,
+                                       directions=((-1, 0), (0, 1), (1, 0), (0, -1)))
+        for chosen_neighbor, _ in neighbors:
+            if self.maze[chosen_neighbor[0]][chosen_neighbor[1]] == 3:
+                path.append(chosen_neighbor)
+                result = search(chosen_neighbor, path)
+                if result:
+                    return result
+                path.pop()
+        return []
+
+    current_cell = self.start
+    if path := search(current_cell, [current_cell]):
+        return path
+    raise UnsolvableMaze("Depth First Search", "End is not reachable.")
 
 
 def turn_right(direction: tuple[int, int]) -> tuple[int, int]:
