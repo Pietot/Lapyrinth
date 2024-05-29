@@ -71,15 +71,10 @@
 
 from typing import Generator
 
-import sys
-
 import random as rdm
 import numpy as np
 
 from PIL import Image, ImageDraw
-
-
-sys.setrecursionlimit(100000)
 
 
 class Maze:
@@ -138,7 +133,7 @@ class Maze:
         """
         self.maze[1:-1, 1:-1] = 3
 
-    def kruskal(self, breakable_walls: list[list[int]] | None = None) -> None:
+    def kruskal_recursive(self, breakable_walls: list[list[int]] | None = None) -> None:
         """ Applies Kruskal's recursive algorithm to generate a maze.
 
         It starts by initializing each non-wall cell as unique value.\n
@@ -177,12 +172,46 @@ class Maze:
         breakable_walls.remove(coordinates)
         # If the values are the same, we don't destroy the wall or we will create a loop
         if values[0] == values[1]:
-            return self.kruskal(breakable_walls)
+            return self.kruskal_recursive(breakable_walls)
         self.merge_values(coordinates, values)
-        return self.kruskal(breakable_walls)
+        return self.kruskal_recursive(breakable_walls)
 
-    def depth_first_search(self, current_cell: tuple[int, int] | None = None) -> None:
-        """ Applies the Depth First Search algorithm to generate a maze.
+    def kruskal(self) -> None:
+        """ Applies Kruskal's algorithm to generate a maze.
+
+        It starts by initializing each non-wall cell as unique value.\n
+        For each breakable_walls (shuffled) it checks if the cells it connects are different.\n
+        If they are, the program picks a value between them randomly
+        and change all the other by the chosen value including the wall.\n
+        If they are the same, the wall is not destroyed to avoid creating a loop.\n
+        Finally, the wall is removed from the list of breakable walls.\n
+        This process continues until the list if empty, resulting in a maze
+        where each cell is connected to every other cell via a unique path without forming loops.
+        """
+        if not self.have_value:
+            self.set_values()
+            self.have_value = True
+        breakable_walls = get_breakable_walls(self)
+        rdm.shuffle(breakable_walls)
+        while breakable_walls:
+            coordinates = breakable_walls.pop(0)
+            if coordinates[0] % 2 == 0:
+                upper_value = self.maze[coordinates[0]-1, coordinates[1]]
+                bottom_value = self.maze[coordinates[0]+1, coordinates[1]]
+                values = (upper_value, bottom_value)
+            else:
+                left_value = self.maze[coordinates[0], coordinates[1]-1]
+                right_value = self.maze[coordinates[0], coordinates[1]+1]
+                values = (left_value, right_value)
+            if values[0] == values[1]:
+                continue
+            self.merge_values(coordinates, values)
+        self.set_start_end()
+        self.algorithm = "Recursive Kruskal's algorithm"
+        self.is_perfect = True
+
+    def recursive_backtracker(self, current_cell: tuple[int, int] | None = None) -> None:
+        """ Applies the Recursive Backtracker algorithm to generate a maze.
 
         It starts by choosing a random cell to start and marking it as visited.\n
         Then it lists all the neighbors of the current cell and shuffles them.\n
@@ -210,9 +239,35 @@ class Maze:
             wall_coordinates = (current_cell[0] + direction[0] // 2,
                                 current_cell[1] + direction[1] // 2)
             self.maze[wall_coordinates] = 2
-            self.depth_first_search(chosen_neighbor)
+            self.recursive_backtracker(chosen_neighbor)
         self.set_start_end()
-        self.algorithm = "Depth First Search algorithm"
+        self.algorithm = "Recursive Backtracker algorithm"
+        self.is_perfect = True
+
+    def randomized_depth_first_search(self, start: tuple[int, int] | None = None) -> None:
+        current_cell = start if start else get_random_cell(
+            (self.maze.shape[0], self.maze.shape[1]))
+        stack = [current_cell]
+
+        # Mark the start cell as visited
+        self.maze[current_cell] = 2
+
+        while stack:
+            current_cell = stack[-1]  # Peek at the top of the stack
+            neighbors = get_neighbors(self, current_cell)
+
+            if not neighbors:
+                stack.pop()
+            else:
+                chosen_neighbor, direction = rdm.choice(neighbors)
+                wall_coordinates = (current_cell[0] + direction[0] // 2,
+                                    current_cell[1] + direction[1] // 2)
+                self.maze[wall_coordinates] = 2
+                self.maze[chosen_neighbor] = 2 
+                stack.append(chosen_neighbor)
+
+        self.set_start_end()
+        self.algorithm = "Randomized Depth First Search algorithm"
         self.is_perfect = True
 
     def prim(self, start: tuple[int, int] | None = None) -> None:
@@ -652,7 +707,7 @@ class Maze:
         """ Generate a maze image from a maze object. """
         size = self.maze.shape
         filename = (filename + '.png' if filename
-                    else f'Maze_{size[0]}x{size[1]}_{self.algorithm}.png')
+                    else f'Maze_{size[0]//2}x{size[1]//2}_{self.algorithm}.png')
         cell_size = 50
         wall_color = (0, 0, 0)
 
