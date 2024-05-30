@@ -287,12 +287,6 @@ def dead_end_filler(self: Maze) -> list[tuple[int, int]]:
     Returns:
         list[tuple[int, int]]: The path from the start to the end of the maze.
     """
-    def fill() -> None:
-        if dead_ends_indexes := get_dead_ends(self):
-            rows, cols = zip(*dead_ends_indexes)
-            self.maze[rows, cols] = 2
-            fill()
-
     def get_path() -> list[tuple[int, int]]:
         current_cell: tuple[int, int] = self.start
         path: list[tuple[int, int]] = [self.start]
@@ -308,13 +302,18 @@ def dead_end_filler(self: Maze) -> list[tuple[int, int]]:
         return path
 
     self.maze[self.maze > 1] = 3
-    fill()
+    stack = get_dead_ends(self)
+    while stack:
+        rows, columns = zip(*stack)
+        self.maze[rows, columns] = 2
+        stack.clear()
+        stack.extend(get_dead_ends(self))
     return get_path()
 
 
 def depth_first_search(self: Maze) -> list[tuple[int, int]]:
     """ Solve the maze with the Depth First Search pathfinder.
-    
+
     It starts by converting all path cells to 3 (unvisited).
     Then it lists all the neighbors of the current cell, starting with the entry cell.
     It marks the current cell as visited.
@@ -360,6 +359,10 @@ def depth_first_search(self: Maze) -> list[tuple[int, int]]:
     if path := search(current_cell, [current_cell]):
         return path
     raise UnsolvableMaze("Depth First Search", "End is not reachable.")
+
+
+def breadth_first_search(self: Maze) -> list[tuple[int, int]]:
+    pass
 
 
 def turn_right(direction: tuple[int, int]) -> tuple[int, int]:
