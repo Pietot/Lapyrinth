@@ -26,10 +26,10 @@ def prim_time(size: int, queue: Queue) -> None:
     queue.put(("Prim", size, time))
 
 
-def depth_first_search_time(size: int, queue: Queue) -> None:
-    time = round(timeit.timeit(lambda: Maze(size).depth_first_search(),
+def randomized_depth_first_search_time(size: int, queue: Queue) -> None:
+    time = round(timeit.timeit(lambda: Maze(size).randomized_depth_first_search(),
                                number=1, globals=globals()), 5)
-    queue.put(("Depth First Search", size, time))
+    queue.put(("Randomized Depth First Search", size, time))
 
 
 def hunt_and_kill_time(size: int, queue: Queue) -> None:
@@ -104,6 +104,28 @@ def wilson_time(size: int, queue: Queue) -> None:
     queue.put(("Wilson", size, time))
 
 
+def recursive_backtracking_time(size: int, queue: Queue) -> None:
+    time = round(timeit.timeit(lambda: Maze(size).recursive_backtracking(),
+                               number=1, globals=globals()), 5)
+    queue.put(("Recursive Backtracking", size, time))
+
+
+def recursive_kruskal_time(size: int, queue: Queue) -> None:
+    time = round(timeit.timeit(lambda: Maze(size).recursive_kruskal(),
+                               number=1, globals=globals()), 5)
+    queue.put(("Recursive Kruskal", size, time))
+    
+def recursive_hunt_and_kill_time(size: int, queue: Queue) -> None:
+    time = round(timeit.timeit(lambda: Maze(size).recursive_hunt_and_kill(),
+                               number=1, globals=globals()), 5)
+    queue.put(("Recursive Hunt and Kill", size, time))
+    
+def iterative_division_time(size: int, queue: Queue) -> None:
+    time = round(timeit.timeit(lambda: Maze(size).iterative_division(),
+                               number=1, globals=globals()), 5)
+    queue.put(("Iterative Division", size, time))
+
+
 def memory_usage(pid):
     process = psutil.Process(pid)
     return process.memory_info().rss
@@ -125,12 +147,12 @@ def prim_memory(size: int, queue: Queue) -> None:
     queue.put(("Prim", size, mem))
 
 
-def depth_first_search_memory(size: int, queue: Queue) -> None:
+def randomized_depth_first_search_memory(size: int, queue: Queue) -> None:
     maze = Maze(size)
     mem = memory_usage(os.getpid())
-    maze.depth_first_search()
+    maze.randomized_depth_first_search()
     mem = memory_usage(os.getpid()) - mem
-    queue.put(("Depth First Search", size, mem))
+    queue.put(("Randomized Depth First Search", size, mem))
 
 
 def hunt_and_kill_memory(size: int, queue: Queue) -> None:
@@ -229,19 +251,50 @@ def wilson_memory(size: int, queue: Queue) -> None:
     queue.put(("Wilson", size, mem))
 
 
+def recursive_backtracking_memory(size: int, queue: Queue) -> None:
+    maze = Maze(size)
+    mem = memory_usage(os.getpid())
+    maze.recursive_backtracking()
+    mem = memory_usage(os.getpid()) - mem
+    queue.put(("Recursive Backtracking", size, mem))
+
+
+def recursive_kruskal_memory(size: int, queue: Queue) -> None:
+    maze = Maze(size)
+    mem = memory_usage(os.getpid())
+    maze.recursive_kruskal()
+    mem = memory_usage(os.getpid()) - mem
+    queue.put(("Recursive Kruskal", size, mem))
+    
+def recursive_hunt_and_kill_memory(size: int, queue: Queue) -> None:
+    maze = Maze(size)
+    mem = memory_usage(os.getpid())
+    maze.recursive_hunt_and_kill()
+    mem = memory_usage(os.getpid()) - mem
+    queue.put(("Recursive Hunt and Kill", size, mem))
+    
+def iterative_division_memory(size: int, queue: Queue) -> None:
+    maze = Maze(size)
+    mem = memory_usage(os.getpid())
+    maze.iterative_division()
+    mem = memory_usage(os.getpid()) - mem
+    queue.put(("Iterative Division", size, mem))
+
+
 def time_complexity() -> None:
     """ Benchmarking the time complexity of the different algorithms used to generate the maze.
     """
-    max_size = 205
+    max_size = 10000
     execution_time = {}
-    for size in tqdm(range(5, max_size + 1, 25)):
+    for size in tqdm(range(10, max_size + 1, 500)):
         queues = []
         processes = []
-        for func in [kruskal_time, prim_time, depth_first_search_time, hunt_and_kill_time,
+        for func in [kruskal_time, prim_time, randomized_depth_first_search_time, hunt_and_kill_time,
                      binary_tree_time, recursive_division_time, eller_time, sidewinder_time,
                      growing_tree_new_time, growing_tree_mid_time, growing_tree_old_time,
                      growing_tree_rand_time, growing_tree_mixed_time, aldous_broder_time,
-                     wilson_time]:
+                     wilson_time, recursive_backtracking_time, recursive_kruskal_time,
+                     recursive_hunt_and_kill_time, iterative_division_time]:
             queue = Queue()
             queues.append(queue)
             p = Process(target=func, args=(size, queue))
@@ -261,18 +314,19 @@ def time_complexity() -> None:
         writer = csv.writer(csvfile)
 
         # Write the header row
-        writer.writerow(['Size', 'Kruskal', 'Prim', 'Depth First Search',
+        writer.writerow(['Size', 'Kruskal', 'Prim', 'Randomized Depth First Search',
                         'Hunt and Kill', 'Binary Tree', 'Eller', 'Recursive Division', 'Sidewinder',
                          'Growing Tree (Newest)', 'Growing Tree (Middle)', 'Growing Tree (Oldest)',
                          'Growing Tree (Random)', 'Growing Tree (Mixed)', 'Aldous Broder',
-                         'Wilson'])
+                         'Wilson', 'Recursive Backtracking', 'Recursive Kruskal',
+                         'Recursive Hunt and Kill', 'Iterative Division'])
 
         # Write the data rows
         for size in execution_time['Kruskal'].keys():
             writer.writerow([size,
                             execution_time['Kruskal'][size],
                             execution_time['Prim'][size],
-                            execution_time['Depth First Search'][size],
+                            execution_time['Randomized Depth First Search'][size],
                             execution_time['Hunt and Kill'][size],
                             execution_time['Binary Tree'][size],
                             execution_time['Eller'][size],
@@ -284,22 +338,29 @@ def time_complexity() -> None:
                             execution_time['Growing Tree (Random)'][size],
                             execution_time['Growing Tree (Mixed)'][size],
                             execution_time['Aldous Broder'][size],
-                            execution_time['Wilson'][size]])
+                            execution_time['Wilson'][size],
+                            execution_time['Recursive Backtracking'][size],
+                            execution_time['Recursive Kruskal'][size],
+                            execution_time['Recursive Hunt and Kill'][size],
+                            execution_time['Iterative Division'][size]])
 
 
 def memory_complexity() -> None:
     """ Benchmarking the memory complexity of the different algorithms used to generate the maze.
     """
-    max_size = 205
+    max_size = 10000
     memory = {}
-    for size in tqdm(range(5, max_size + 1, 25)):
+    for size in tqdm(range(0, max_size + 1, 500)):
+        if size == 0:
+            size = 5
         queues = []
         processes = []
-        for func in [kruskal_memory, prim_memory, depth_first_search_memory, hunt_and_kill_memory,
+        for func in [kruskal_memory, prim_memory, randomized_depth_first_search_memory, hunt_and_kill_memory,
                      binary_tree_memory, eller_memory, recursive_division_memory, sidewinder_memory,
                      growing_tree_new_memory, growing_tree_mid_memory, growing_tree_old_memory,
                      growing_tree_rand_memory, growing_tree_mixed_memory, aldous_broder_memory,
-                     wilson_memory]:
+                     wilson_memory, recursive_backtracking_memory, recursive_kruskal_memory,
+                     recursive_hunt_and_kill_memory], iterative_division_memory:
             queue = Queue()
             queues.append(queue)
             p = Process(target=func, args=(size, queue))
@@ -319,18 +380,19 @@ def memory_complexity() -> None:
         writer = csv.writer(csvfile)
 
         # Write the header row
-        writer.writerow(['Size', 'Kruskal', 'Prim', 'Depth First Search',
+        writer.writerow(['Size', 'Kruskal', 'Prim', 'Randomized Depth First Search',
                         'Hunt and Kill', 'Binary Tree', 'Eller', 'Recursive Division', 'Sidewinder',
                          'Growing Tree (Newest)', 'Growing Tree (Middle)', 'Growing Tree (Oldest)',
                          'Growing Tree (Random)', 'Growing Tree (Mixed)', 'Aldous Broder',
-                         'Wilson'])
+                         'Wilson', 'Recursive Backtracking', 'Recursive Kruskal',
+                         'Recursive Hunt and Kill', 'Iterative Division'])
 
         # Write the data rows
         for size in memory['Kruskal'].keys():
             writer.writerow([size,
                             memory['Kruskal'][size],
                             memory['Prim'][size],
-                            memory['Depth First Search'][size],
+                            memory['Randomized Depth First Search'][size],
                             memory['Hunt and Kill'][size],
                             memory['Binary Tree'][size],
                             memory['Eller'][size],
@@ -342,7 +404,11 @@ def memory_complexity() -> None:
                             memory['Growing Tree (Random)'][size],
                             memory['Growing Tree (Mixed)'][size],
                             memory['Aldous Broder'][size],
-                            memory['Wilson'][size]])
+                            memory['Wilson'][size],
+                            memory['Recursive Backtracking'][size],
+                            memory['Recursive Kruskal'][size],
+                            memory['Recursive Hunt and Kill'][size],
+                            memory['Iterative Division'][size]])
 
 
 if __name__ == "__main__":
