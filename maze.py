@@ -210,8 +210,8 @@ class Maze:
         self.algorithm = "Recursive Kruskal's algorithm"
         self.is_perfect = True
 
-    def recursive_backtracker(self, current_cell: tuple[int, int] | None = None) -> None:
-        """ Applies the Recursive Backtracker algorithm to generate a maze.
+    def recursive_backtracking(self, current_cell: tuple[int, int] | None = None) -> None:
+        """ Applies the Recursive Backtracking algorithm to generate a maze.
 
         It starts by choosing a random cell to start and marking it as visited.\n
         Then it lists all the neighbors of the current cell and shuffles them.\n
@@ -239,7 +239,7 @@ class Maze:
             wall_coordinates = (current_cell[0] + direction[0] // 2,
                                 current_cell[1] + direction[1] // 2)
             self.maze[wall_coordinates] = 2
-            self.recursive_backtracker(chosen_neighbor)
+            self.recursive_backtracking(chosen_neighbor)
         self.set_start_end()
         self.algorithm = "Recursive Backtracker algorithm"
         self.is_perfect = True
@@ -514,6 +514,71 @@ class Maze:
         divide(start, end)
         self.set_start_end()
         self.algorithm = "Recursive division algorithm"
+        self.is_perfect = True
+
+    def iterative_division(self) -> None:
+        """Applies the Recursive division algorithm but iteratively to generate a maze.
+
+        It starts by dividing the maze into two parts, either horizontally or vertically.
+        Then it creates a wall in the middle of the division.
+        After that, it creates a carve into the wall.
+        This process continues until the maze is fully divided.
+        """
+        def divide_vertically(width: int, height: int) -> int:
+            return width > height if width != height else rdm.getrandbits(1)
+
+        self.remove_walls()
+        stack: list[tuple[tuple[int, int], tuple[int, int], tuple[int, int]]] = [
+            ((1, 1), (self.maze.shape[0] - 2, self.maze.shape[1] - 2), (0, 0))]
+
+        while stack:
+            start_index, end_index, ban = stack.pop()
+            height = end_index[0] - start_index[0]
+            width = end_index[1] - start_index[1]
+
+            if height <= 1 or width <= 1:
+                continue
+
+            if divide_vertically(width, height):
+                wall_columns = [
+                    i for i in range(start_index[1], end_index[1] + 1)
+                    if i not in (start_index[1], ban[1], end_index[1]) and i % 2 == 0
+                ]
+                if not wall_columns:
+                    continue
+                wall_column_index = rdm.choice(wall_columns)
+                self.maze[start_index[0]:end_index[0] + 1, wall_column_index] = 0
+                entries = [i for i in range(start_index[0], end_index[0] + 1) if i % 2 == 1]
+                entry = rdm.choice(entries)
+                entry_coordinate = (entry, wall_column_index)
+                self.maze[entry][wall_column_index] = 2
+
+                stack.append(((start_index[0], start_index[1]), (end_index[0],
+                             wall_column_index - 1), entry_coordinate))
+                stack.append(((start_index[0], wall_column_index + 1),
+                             (end_index[0], end_index[1]), entry_coordinate))
+            else:
+                wall_rows = [
+                    i for i in range(start_index[0], end_index[0] + 1)
+                    if i not in (start_index[0], ban[0], end_index[0]) and i % 2 == 0
+                ]
+                if not wall_rows:
+                    continue
+                wall_row_index = rdm.choice(wall_rows)
+                self.maze[wall_row_index, start_index[1]:end_index[1] + 1] = 0
+                entries = [i for i in range(start_index[1], end_index[1] + 1) if i % 2 == 1]
+                entry = rdm.choice(entries)
+                entry_coordinate = (wall_row_index, entry)
+                self.maze[wall_row_index][entry] = 2
+
+                stack.append(((start_index[0], start_index[1]),
+                             (wall_row_index - 1, end_index[1]), entry_coordinate))
+                stack.append(
+                    ((wall_row_index + 1, start_index[1]),
+                     (end_index[0], end_index[1]), entry_coordinate))
+
+        self.set_start_end()
+        self.algorithm = "Iterative division algorithm"
         self.is_perfect = True
 
     def binary_tree(self) -> None:
