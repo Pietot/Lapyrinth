@@ -36,6 +36,11 @@
 # End : 28/05/2024 at 19h45 FR
 # Changelogs : Added Depth First Search pathfinder
 
+# v1.5 :
+# Start : 31/05/2024 at 15h40 FR
+# End : 31/05/2024 at 17h55 FR
+# Changelogs : Added Breadth First Search pathfinder
+
 
 import colorsys
 
@@ -43,6 +48,7 @@ import random as rdm
 import numpy as np
 
 from PIL import Image, ImageDraw
+from collections import deque
 
 from maze import Maze
 
@@ -356,13 +362,58 @@ def depth_first_search(self: Maze) -> list[tuple[int, int]]:
         for chosen_neighbor, _ in neighbors:
             if self.maze[chosen_neighbor[0]][chosen_neighbor[1]] == 3:
                 stack.append((chosen_neighbor, path + [chosen_neighbor]))
-                self.maze[chosen_neighbor[0]][chosen_neighbor[1]] = 2  # Mark as visited
 
     raise UnsolvableMaze("Depth First Search", "End is not reachable.")
 
 
 def breadth_first_search(self: Maze) -> list[tuple[int, int]]:
-    pass
+    """ Solve the maze with the Breadth First Search pathfinder.
+    
+    It starts by converting all path cells to 3 (unvisited).\n
+    Then it creates a stack with the start cell.\n
+    It creates a dictionary to store the path from a cell to the cell it came from.\n
+    while the stack is not empty, it pops the first cell and get it as the current cell.\n
+    It marks the current cell as visited.\n
+    If the current cell is the end, it ends the loop and tells the end was founds.\n
+    Else, it gets the neighbors of the current cell.\n
+    Adds the neighbors to the stack and updates the came_from dictionary.\n
+    If the end is not found, it raises an UnsolvableMaze exception.\n
+    Finally, it reconstructs and return the path from the start to the end
+    using the came_from dictionary.
+
+    Args:
+        self (Maze): The maze object.
+
+    Raises:
+        UnsolvableMaze: If the algorithm cannot solve the maze due to the end not being reachable.
+
+    Returns:
+        list[tuple[int, int]]: The path from the start to the end of the maze.
+    """
+    self.maze[self.maze > 1] = 3
+    stack: list[tuple[int, int]] = [self.start]
+    came_from: dict[tuple[int, int], tuple[int, int]] = {self.start: (0, 0)}
+    path: deque[tuple[int, int]] = deque([self.start])
+    found_end = False
+
+    while stack:
+        current_cell = stack.pop(0)
+        self.maze[current_cell[0]][current_cell[1]] = 2
+        if current_cell == self.end:
+            found_end = True
+            break
+        neighbors = maze.get_neighbors(
+            self, current_cell, directions=((-1, 0), (0, 1), (1, 0), (0, -1)))
+        stack.extend(neighbor for neighbor, _ in neighbors)
+        came_from.update({neighbor: current_cell for neighbor, _ in neighbors})
+    if not found_end:
+        raise UnsolvableMaze("Breadth First Search", "End is not reachable.")
+    current_cell = self.end
+    while current_cell != self.start:
+        path.appendleft(current_cell)
+        current_cell = came_from[current_cell]
+    path.appendleft(self.start)
+    return list(path)
 
 
 def turn_right(direction: tuple[int, int]) -> tuple[int, int]:
