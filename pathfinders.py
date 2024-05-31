@@ -335,29 +335,29 @@ def depth_first_search(self: Maze) -> list[tuple[int, int]]:
         list[tuple[int, int]]: The path from the start to the end of the maze.
     """
     self.maze[self.maze > 1] = 3
+    path: list[tuple[int, int]] = [self.start]
+    stack: list[tuple[tuple[int, int], list[tuple[int, int]]]] = [(self.start, [self.start])]
 
-    def search(current_cell: tuple[int, int], path: list[tuple[int, int]]) -> list[tuple[int, int]]:
+    while stack:
+        current_cell, path = stack.pop()
         self.maze[current_cell[0]][current_cell[1]] = 2
+
         if current_cell == self.end:
             return path
+
         # Condition to optimize the search
-        if current_cell == (self.end[0], self.end[1]-1):
+        if current_cell == (self.end[0], self.end[1] - 1):
             path.append(self.end)
             return path
-        neighbors = maze.get_neighbors(self, current_cell,
-                                       directions=((-1, 0), (0, 1), (1, 0), (0, -1)))
+
+        neighbors = maze.get_neighbors(
+            self, current_cell, directions=((-1, 0), (0, 1), (1, 0), (0, -1)))
+
         for chosen_neighbor, _ in neighbors:
             if self.maze[chosen_neighbor[0]][chosen_neighbor[1]] == 3:
-                path.append(chosen_neighbor)
-                result = search(chosen_neighbor, path)
-                if result:
-                    return result
-                path.pop()
-        return []
+                stack.append((chosen_neighbor, path + [chosen_neighbor]))
+                self.maze[chosen_neighbor[0]][chosen_neighbor[1]] = 2  # Mark as visited
 
-    current_cell = self.start
-    if path := search(current_cell, [current_cell]):
-        return path
     raise UnsolvableMaze("Depth First Search", "End is not reachable.")
 
 
