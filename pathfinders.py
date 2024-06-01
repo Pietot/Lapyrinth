@@ -121,6 +121,7 @@ def left_hand(self: Maze) -> list[tuple[int, int]]:
                                    algorithm="Left Hand Rule",
                                    error_message="Pathfinder is stuck in a loop.")
             direction = turn_right(direction)
+    self.algorithm = "Left Hand Rule"
     return directions_to_path(self, cell_with_directions)
 
 
@@ -169,6 +170,7 @@ def right_hand(self: Maze) -> list[tuple[int, int]]:
                                    algorithm="Right Hand Rule",
                                    error_message="Pathfinder is stuck in a loop.")
             direction = turn_left(direction)
+    self.algorithm = "Right Hand Rule"
     return directions_to_path(self, cell_with_directions)
 
 
@@ -201,6 +203,7 @@ def random_mouse(self: Maze) -> list[tuple[int, int]]:
         banned_direction = (-direction[0], -direction[1])
         path = update_path(path, next_cell)
         current_cell = next_cell
+    self.algorithm = "Random Mouse"
     return path
 
 
@@ -274,7 +277,7 @@ def pledge(self: Maze, following_direction: str) -> list[tuple[int, int]]:
                     current_cell = (current_cell[0] + direction[0],
                                     current_cell[1] + direction[1])
                     path = update_path(path, current_cell)
-
+    self.algorithm = "Pledge"
     return path
 
 
@@ -315,6 +318,7 @@ def dead_end_filler(self: Maze) -> list[tuple[int, int]]:
         self.maze[rows, columns] = 2
         stack.clear()
         stack.extend(get_dead_ends(self))
+    self.algorithm = "Dead End Filler"
     return get_path()
 
 
@@ -355,6 +359,7 @@ def depth_first_search(self: Maze) -> list[tuple[int, int]]:
         # Condition to optimize the search
         if current_cell == (self.end[0], self.end[1] - 1):
             path.append(self.end)
+            self.algorithm = "Depth First Search"
             return path
 
         neighbors = maze.get_neighbors(
@@ -402,6 +407,7 @@ def breadth_first_search(self: Maze) -> list[tuple[int, int]]:
         self.maze[current_cell] = 2
         if current_cell == self.end:
             found_end = True
+            self.algorithm = "Breadth First Search"
             break
         neighbors = maze.get_neighbors(
             self, current_cell, directions=((-1, 0), (0, 1), (1, 0), (0, -1)))
