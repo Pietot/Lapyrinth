@@ -15,19 +15,21 @@ import numpy as np
 from PIL import Image, ImageDraw
 
 
-class Maze:
+class RecursiveMaze:
     """ The Maze class\n
         0 is for pillars, 1 for breakable walls, 2 for visited cells and other for unvisited cells.
     """
 
-    def __init__(self, *nb_cells_by_sides: int) -> None:
+    def __init__(self, *nb_cells_by_sides: int,
+                 start: tuple[int, int] | None = None,
+                 end: tuple[int, int] | None = None) -> None:
         nb_cells_by_sides = nb_cells_by_sides if nb_cells_by_sides else (5, 5)
         self.maze = np.zeros(cells_to_shape(*nb_cells_by_sides), dtype=np.uint)
         self.algorithm: None | str = None
         self.pathfinder: None | str = None
         self.have_value = False
-        self.start = (1, 0)
-        self.end = (self.maze.shape[0] - 2, self.maze.shape[1] - 1)
+        self.start = start if start else (1, 0)
+        self.end = end if end else (self.maze.shape[0] - 2, self.maze.shape[1] - 1)
         self.sculpt_grid()
 
     def __str__(self) -> str:
@@ -320,7 +322,7 @@ def cells_to_shape(*nb_cells_by_side: int) -> tuple[int, int]:
     raise ValueError("nb_cells_by_side must be an one or two int greater or equal to 2")
 
 
-def get_breakable_walls(self: Maze) -> list[tuple[int, int]]:
+def get_breakable_walls(self: RecursiveMaze) -> list[tuple[int, int]]:
     """ Gets all breakable walls coordinates.
 
     Returns:
@@ -329,7 +331,7 @@ def get_breakable_walls(self: Maze) -> list[tuple[int, int]]:
     return [tuple(coord) for coord in np.argwhere(self.maze == 1).tolist()]
 
 
-def get_unvisited_cells(self: Maze) -> list[list[int]]:
+def get_unvisited_cells(self: RecursiveMaze) -> list[list[int]]:
     """ Gets all unvisited cells coordinates.
 
     Returns:
@@ -338,7 +340,7 @@ def get_unvisited_cells(self: Maze) -> list[list[int]]:
     return np.argwhere(self.maze > 2).tolist()
 
 
-def get_neighbors(self: Maze,
+def get_neighbors(self: RecursiveMaze,
                   cell: tuple[int, int],
                   directions: tuple[tuple[int, int], ...] | None = None,
                   return_visited: bool = False) -> list[tuple[tuple[int,
@@ -384,7 +386,7 @@ def get_random_cell(shape: tuple[int, int]) -> tuple[int, int]:
             rdm.randrange(1, shape[1] - 2, 2))
 
 
-def get_connection(self: Maze, index: tuple[int, int]) -> tuple[tuple[int, int], tuple[int, int]]:
+def get_connection(self: RecursiveMaze, index: tuple[int, int]) -> tuple[tuple[int, int], tuple[int, int]]:
     """ This method is used to get a connections of an unvisited cell to a visited cell in the maze.
 
     Args:

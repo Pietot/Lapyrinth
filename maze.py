@@ -82,14 +82,16 @@ class Maze:
         0 is for pillars, 1 for breakable walls, 2 for visited cells and other for unvisited cells.
     """
 
-    def __init__(self, *nb_cells_by_sides: int) -> None:
+    def __init__(self, *nb_cells_by_sides: int,
+                 start: tuple[int, int] | None = None,
+                 end: tuple[int, int] | None = None) -> None:
         nb_cells_by_sides = nb_cells_by_sides if nb_cells_by_sides else (5, 5)
         self.maze = np.zeros(cells_to_shape(*nb_cells_by_sides), dtype=np.uint)
         self.algorithm: None | str = None
         self.pathfinder: None | str = None
         self.have_value = False
-        self.start = (1, 0)
-        self.end = (self.maze.shape[0] - 2, self.maze.shape[1] - 1)
+        self.start = start if start else (1, 0)
+        self.end = end if end else (self.maze.shape[0] - 2, self.maze.shape[1] - 1)
         self.sculpt_grid()
 
     def __str__(self) -> str:
