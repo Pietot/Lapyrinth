@@ -132,48 +132,6 @@ class Maze:
         """
         self.maze[1:-1, 1:-1] = 3
 
-    def recursive_kruskal(self, breakable_walls: list[tuple[int, int]] | None = None) -> None:
-        """ Applies Kruskal's recursive algorithm to generate a maze.
-
-        It starts by initializing each non-wall cell as unique value.\n
-        For each breakable_walls (shuffled) it checks if the cells it connects are different.\n
-        If they are, the program picks a value between them randomly
-        and change all the other by the chosen value including the wall.\n
-        If they are the same, the wall is not destroyed to avoid creating a loop.\n
-        Finally, the wall is removed from the list of breakable walls.\n
-        This process continues until the list if empty, resulting in a maze
-        where each cell is connected to every other cell via a unique path without forming loops.
-
-        Args:
-            breakable_walls (None | list[tuple[int, int]], optional):
-                A list of coordinates of all breakable walls. Defaults to None.
-        """
-        if not self.have_value:
-            self.set_values()
-            self.have_value = True
-        if breakable_walls is None:
-            breakable_walls = get_breakable_walls(self)
-            rdm.shuffle(breakable_walls)
-        if not breakable_walls:
-            self.set_start_end()
-            self.algorithm = "Recrusive Kruskal's algorithm"
-            return None
-        coordinates = breakable_walls[0]
-        if coordinates[0] % 2 == 0:
-            upper_value = self.maze[coordinates[0]-1, coordinates[1]]
-            bottom_value = self.maze[coordinates[0]+1, coordinates[1]]
-            values = (upper_value, bottom_value)
-        else:
-            left_value = self.maze[coordinates[0], coordinates[1]-1]
-            right_value = self.maze[coordinates[0], coordinates[1]+1]
-            values = (left_value, right_value)
-        breakable_walls.remove(coordinates)
-        # If the values are the same, we don't destroy the wall or we will create a loop
-        if values[0] == values[1]:
-            return self.recursive_kruskal(breakable_walls)
-        self.merge_values(coordinates, values)
-        return self.recursive_kruskal(breakable_walls)
-
     def kruskal(self) -> None:
         """ Applies Kruskal's algorithm to generate a maze.
 
@@ -206,39 +164,6 @@ class Maze:
             self.merge_values(coordinates, values)
         self.set_start_end()
         self.algorithm = "Recursive Kruskal's algorithm"
-
-    def recursive_backtracking(self, current_cell: tuple[int, int] | None = None) -> None:
-        """ Applies the Recursive Backtracking algorithm to generate a maze.
-
-        It starts by choosing a random cell to start and marking it as visited.\n
-        Then it lists all the neighbors of the current cell and shuffles them.\n
-        It loops over the unvisited neighbors.\n
-        If the neighbor cell has not been visited,
-        the wall between the two cells is destroyed and the neighbor becomes the current cell.\n
-        This process continues until the current cell has no unvisited neighbors.\n
-        Then the algorithm backtracks to the previous cell
-        and repeats the process until all cells have been visited.
-
-        Args:
-            current_cell (tuple[int, int] | None, optional):
-                The current cell being visited. Defaults to None.
-        """
-        current_cell = current_cell if current_cell else get_random_cell(
-            (self.maze.shape[0], self.maze.shape[1]))
-        self.maze[current_cell] = 2
-        neighbors = get_neighbors(self, current_cell)
-        if not neighbors:
-            return
-        rdm.shuffle(neighbors)
-        for chosen_neighbor, direction in neighbors:
-            if self.maze[chosen_neighbor] == 2:
-                continue
-            wall_coordinates = (current_cell[0] + direction[0] // 2,
-                                current_cell[1] + direction[1] // 2)
-            self.maze[wall_coordinates] = 2
-            self.recursive_backtracking(chosen_neighbor)
-        self.set_start_end()
-        self.algorithm = "Recursive Backtracker algorithm"
 
     def randomized_depth_first_search(self, start: tuple[int, int] | None = None) -> None:
         """ Applies the randomized version of the Depth First Search algorithm to generate a maze.
@@ -279,7 +204,6 @@ class Maze:
 
         self.set_start_end()
         self.algorithm = "Randomized Depth First Search algorithm"
-        
 
     def prim(self, start: tuple[int, int] | None = None) -> None:
         """ Applies Prim's algorithm to generate a maze.
@@ -313,51 +237,6 @@ class Maze:
             neighbors = list(set(neighbors))
         self.set_start_end()
         self.algorithm = "Prim's algorithm"
-
-    def recursive_hunt_and_kill(self, start: tuple[int, int] | None = None) -> None:
-        """ Applies the Hunt and Kill algorithm recursively to generate a maze.
-
-        It starts at a random cell and carves a path to a random unvisited neighbor (kill phase).\n
-        If there are no unvisited neighbors,
-        it scans the grid for an unvisited cell that is adjacent to a visited one (hunt phase).\n
-        The process ends when the hunt phase fails to find any suitable cells.
-
-        Args:
-            start (tuple[int, int] | None, optional):
-            The starting cell for the algorithm.\n
-            Defaults to None, which means a random cell will be chosen.
-        """
-        start = start if start else get_random_cell(
-            (self.maze.shape[0], self.maze.shape[1]))
-
-        def hunt() -> None:
-            for index, cell_value in self:
-                if int(cell_value) > 2:
-                    neighbor, direction = get_connection(
-                        self, (index[0], index[1]))
-                    if neighbor == (0, 0):
-                        continue
-                    self.maze[neighbor] = 2
-                    wall_coordinates = (neighbor[0] - direction[0] // 2,
-                                        neighbor[1] - direction[1] // 2)
-                    self.maze[wall_coordinates] = 2
-                    self.recursive_hunt_and_kill((index[0], index[1]))
-
-        def kill(cell: tuple[int, int]) -> None:
-            self.maze[cell] = 2
-            neighbors = get_neighbors(self, cell)
-            if not neighbors:
-                return hunt()
-            neighbor, direction = rdm.choice(neighbors)
-            self.maze[neighbor] = 2
-            wall_coordinates = (neighbor[0] - direction[0] // 2,
-                                neighbor[1] - direction[1] // 2)
-            self.maze[wall_coordinates] = 2
-            return kill(neighbor)
-
-        kill(start)
-        self.set_start_end()
-        self.algorithm = "Recursive Hunt and Kill algorithm"
 
     def hunt_and_kill(self, start: tuple[int, int] | None = None) -> None:
         """ Applies Hunt and Kill algorithm to generate a maze.
@@ -460,52 +339,6 @@ class Maze:
                     carves = 0
         self.set_start_end()
         self.algorithm = "Eller's algorithm"
-
-    def recursive_division(self) -> None:
-        """ Applies the Recursive division algorithm to generate a maze.
-
-        It starts by dividing the maze into two parts, either horizontally or vertically.\n
-        Then it creates a wall in the middle of the division.\n
-        After that, it creates a carve into the wall.\n
-        This process continues recursively until the maze is fully divided.\n
-        """
-        def divide_vertically(width: int, height: int) -> int:
-            return width > height if width != height else rdm.getrandbits(1)
-
-        def divide(start: tuple[int, int], end: tuple[int, int],
-                   ban: tuple[int, int] = (0, 0)) -> None:
-            height = end[0] - start[0]
-            width = end[1] - start[1]
-            if height <= 1 or width <= 1:
-                return
-            if divide_vertically(width, height):
-                wall_column_index = [i for i in range(
-                    start[1], end[1]+1) if i not in (start[1], ban[1], end[1]) and i % 2 == 0]
-                wall_column_index = rdm.choice(wall_column_index)
-                self.maze[start[0]:end[0] + 1, wall_column_index] = 0
-                entries = [i for i in range(start[0], end[0]+1) if i % 2 == 1]
-                entry = rdm.choice(entries)
-                entry_coordinate = (entry, wall_column_index)
-                self.maze[entry, wall_column_index] = 2
-                divide(start, (end[0], wall_column_index - 1), entry_coordinate)
-                divide((start[0], wall_column_index + 1), end, entry_coordinate)
-            else:
-                wall_row_index = [i for i in range(
-                    start[0], end[0]+1) if i not in (start[0], ban[0], end[0]) and i % 2 == 0]
-                wall_row_index = rdm.choice(wall_row_index)
-                self.maze[wall_row_index, start[1]:end[1] + 1] = 0
-                entries = [i for i in range(start[1], end[1]+1) if i % 2 == 1]
-                entry = rdm.choice(entries)
-                entry_coordinate = (wall_row_index, entry)
-                self.maze[wall_row_index, entry] = 2
-                divide(start, (wall_row_index - 1, end[1]), entry_coordinate)
-                divide((wall_row_index + 1, start[1]), end, entry_coordinate)
-        self.remove_walls()
-        start = (1, 1)
-        end = (self.maze.shape[0]-2, self.maze.shape[1]-2)
-        divide(start, end)
-        self.set_start_end()
-        self.algorithm = "Recursive division algorithm"
 
     def iterative_division(self) -> None:
         """Applies the Recursive division algorithm but iteratively to generate a maze.
@@ -865,7 +698,7 @@ def get_breakable_walls(self: Maze) -> list[tuple[int, int]]:
     Returns:
         list[list[int, int]]: List of all breakable walls coordinates.
     """
-    return  [tuple(coord) for coord in np.argwhere(self.maze == 1).tolist()]
+    return [tuple(coord) for coord in np.argwhere(self.maze == 1).tolist()]
 
 
 def get_unvisited_cells(self: Maze) -> list[list[int]]:
@@ -947,8 +780,7 @@ def get_connection(self: Maze, index: tuple[int, int]) -> tuple[tuple[int, int],
             continue
         if self.maze[neighbor] == 2:
             neighbors.append((neighbor, (row, column)))
-    return rdm.choice(neighbors) if neighbors else ((0, 0), (0, 0)
-                                                    )
+    return rdm.choice(neighbors) if neighbors else ((0, 0), (0, 0))
 
 
 def select_cell_by_mode(cells: list[tuple[int, int]],
