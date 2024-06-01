@@ -84,15 +84,13 @@ class Maze:
 
     def __init__(self, *nb_cells_by_sides: int) -> None:
         nb_cells_by_sides = nb_cells_by_sides if nb_cells_by_sides else (5, 5)
-        shape = cells_to_shape(*nb_cells_by_sides)
-        self.maze = np.zeros(shape, dtype=np.uint)
+        self.maze = np.zeros(cells_to_shape(*nb_cells_by_sides), dtype=np.uint)
         self.algorithm: None | str = None
         self.pathfinder: None | str = None
-        self.is_perfect = False
         self.have_value = False
-        self.sculpt_grid()
         self.start = (1, 0)
         self.end = (self.maze.shape[0] - 2, self.maze.shape[1] - 1)
+        self.sculpt_grid()
 
     def __str__(self) -> str:
         maze = [['# ' if value < 2 else '  ' for value in row]
@@ -159,7 +157,6 @@ class Maze:
         if not breakable_walls:
             self.set_start_end()
             self.algorithm = "Recrusive Kruskal's algorithm"
-            self.is_perfect = True
             return None
         coordinates = breakable_walls[0]
         if coordinates[0] % 2 == 0:
@@ -209,7 +206,6 @@ class Maze:
             self.merge_values(coordinates, values)
         self.set_start_end()
         self.algorithm = "Recursive Kruskal's algorithm"
-        self.is_perfect = True
 
     def recursive_backtracking(self, current_cell: tuple[int, int] | None = None) -> None:
         """ Applies the Recursive Backtracking algorithm to generate a maze.
@@ -243,7 +239,6 @@ class Maze:
             self.recursive_backtracking(chosen_neighbor)
         self.set_start_end()
         self.algorithm = "Recursive Backtracker algorithm"
-        self.is_perfect = True
 
     def randomized_depth_first_search(self, start: tuple[int, int] | None = None) -> None:
         """ Applies the randomized version of the Depth First Search algorithm to generate a maze.
@@ -284,7 +279,7 @@ class Maze:
 
         self.set_start_end()
         self.algorithm = "Randomized Depth First Search algorithm"
-        self.is_perfect = True
+        
 
     def prim(self, start: tuple[int, int] | None = None) -> None:
         """ Applies Prim's algorithm to generate a maze.
@@ -318,7 +313,6 @@ class Maze:
             neighbors = list(set(neighbors))
         self.set_start_end()
         self.algorithm = "Prim's algorithm"
-        self.is_perfect = True
 
     def recursive_hunt_and_kill(self, start: tuple[int, int] | None = None) -> None:
         """ Applies the Hunt and Kill algorithm recursively to generate a maze.
@@ -364,7 +358,6 @@ class Maze:
         kill(start)
         self.set_start_end()
         self.algorithm = "Recursive Hunt and Kill algorithm"
-        self.is_perfect = True
 
     def hunt_and_kill(self, start: tuple[int, int] | None = None) -> None:
         """ Applies Hunt and Kill algorithm to generate a maze.
@@ -410,7 +403,6 @@ class Maze:
 
         self.set_start_end()
         self.algorithm = "Hunt and Kill algorithm"
-        self.is_perfect = True
 
     def eller(self, probability_carve_horizontally: float = 0.5,
               probability_carve_vertically: float = 0.5) -> None:
@@ -468,7 +460,6 @@ class Maze:
                     carves = 0
         self.set_start_end()
         self.algorithm = "Eller's algorithm"
-        self.is_perfect = True
 
     def recursive_division(self) -> None:
         """ Applies the Recursive division algorithm to generate a maze.
@@ -515,7 +506,6 @@ class Maze:
         divide(start, end)
         self.set_start_end()
         self.algorithm = "Recursive division algorithm"
-        self.is_perfect = True
 
     def iterative_division(self) -> None:
         """Applies the Recursive division algorithm but iteratively to generate a maze.
@@ -580,7 +570,6 @@ class Maze:
 
         self.set_start_end()
         self.algorithm = "Iterative division algorithm"
-        self.is_perfect = True
 
     def binary_tree(self) -> None:
         """ Applies the Binary Tree algorithm to generate a maze.
@@ -619,7 +608,6 @@ class Maze:
                 self.maze[wall_coordinates] = 2
         self.set_start_end()
         self.algorithm = "Binary Tree algorithm"
-        self.is_perfect = True
 
     def sidewinder(self, probability: float = 0.5) -> None:
         """ Applies the Sidewinder algorithm to generate a maze.
@@ -660,7 +648,6 @@ class Maze:
                 self.maze[wall_coordinates] = 2
         self.set_start_end()
         self.algorithm = "Sidewinder algorithm"
-        self.is_perfect = True
 
     def growing_tree(self, start: tuple[int, int] | None = None,
                      mode: str = 'newest',
@@ -711,7 +698,6 @@ class Maze:
         else:
             split = ''
         self.algorithm = f"Growing Tree algorithm ({mode}{split})"
-        self.is_perfect = True
 
     def aldous_broder(self, start: tuple[int, int] | None = None) -> None:
         """ Applies the Aldous-Broder algorithm to generate a maze.
@@ -744,7 +730,6 @@ class Maze:
             current_cell = rdm_neighbor
         self.set_start_end()
         self.algorithm = "Aldous-Broder algorithm"
-        self.is_perfect = True
 
     def wilson(self) -> None:
         """ Applies the Wilson's algorithm to generate a maze.
@@ -789,7 +774,6 @@ class Maze:
                     self.maze[wall_coordinates] = 2
         self.set_start_end()
         self.algorithm = "Wilson's algorithm"
-        self.is_perfect = True
 
     def merge_values(self, wall_coordinate: tuple[int, int] | list[int],
                      values: tuple[int, int]) -> None:
@@ -828,7 +812,6 @@ class Maze:
                     self.maze[coordinates] = 2
         else:
             raise ValueError("mode must be \"probability\" or \"number\"")
-        self.is_perfect = False
 
     def generate_image(self, filename: str | None = None) -> None:
         """ Generate a maze image from a maze object. """
