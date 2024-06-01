@@ -37,18 +37,19 @@
 # Changelogs : Added Depth First Search pathfinder
 
 # v1.5 :
-# Start : 31/05/2024 at 15h40 FR
+# Start : 01/06/2024 at 17h05 FR
 # End : 31/05/2024 at 17h55 FR
 # Changelogs : Added Breadth First Search pathfinder
 
 
 import colorsys
 
+from collections import deque
+
 import random as rdm
 import numpy as np
 
 from PIL import Image, ImageDraw
-from collections import deque
 
 from maze import Maze
 
@@ -101,7 +102,7 @@ def left_hand(self: Maze) -> list[tuple[int, int]]:
     while current_cell != self.end:
         left_cell_col = current_cell[1] + direction_to_left[direction][1]
         left_cell_row = current_cell[0] + direction_to_left[direction][0]
-        if self.maze[left_cell_row][left_cell_col] > 1:
+        if self.maze[left_cell_row, left_cell_col] > 1:
             direction = turn_left(direction)
             update_cell_directions(cell_with_directions, current_cell, direction,
                                    algorithm="Left Hand Rule",
@@ -110,7 +111,7 @@ def left_hand(self: Maze) -> list[tuple[int, int]]:
             continue
         front_cell_row = current_cell[0] + direction[0]
         front_cell_col = current_cell[1] + direction[1]
-        if self.maze[front_cell_row][front_cell_col] > 1:
+        if self.maze[front_cell_row, front_cell_col] > 1:
             update_cell_directions(cell_with_directions, current_cell, direction,
                                    algorithm="Left Hand Rule",
                                    error_message="Pathfinder is stuck in a loop.")
@@ -149,7 +150,7 @@ def right_hand(self: Maze) -> list[tuple[int, int]]:
     while current_cell != self.end:
         left_cell_col = current_cell[1] + direction_to_right[direction][1]
         left_cell_row = current_cell[0] + direction_to_right[direction][0]
-        if self.maze[left_cell_row][left_cell_col] > 1:
+        if self.maze[left_cell_row, left_cell_col] > 1:
             direction = turn_right(direction)
             update_cell_directions(cell_with_directions, current_cell, direction,
                                    algorithm="Right Hand Rule",
@@ -158,7 +159,7 @@ def right_hand(self: Maze) -> list[tuple[int, int]]:
             continue
         front_cell_row = current_cell[0] + direction[0]
         front_cell_col = current_cell[1] + direction[1]
-        if self.maze[front_cell_row][front_cell_col] > 1:
+        if self.maze[front_cell_row, front_cell_col] > 1:
             update_cell_directions(cell_with_directions, current_cell, direction,
                                    algorithm="Right Hand Rule",
                                    error_message="Pathfinder is stuck in a loop.")
@@ -246,7 +247,7 @@ def pledge(self: Maze, following_direction: str) -> list[tuple[int, int]]:
         front_neighbor = (current_cell[0] + direction[0],
                           current_cell[1] + direction[1])
         if nb_rotations == 0:
-            if self.maze[front_neighbor[0]][front_neighbor[1]] > 1:
+            if self.maze[front_neighbor] > 1:
                 current_cell = (current_cell[0] + direction[0],
                                 current_cell[1] + direction[1])
                 path = update_path(path, current_cell)
@@ -259,13 +260,13 @@ def pledge(self: Maze, following_direction: str) -> list[tuple[int, int]]:
                                   current_cell[1] + direction[1])
                 side_to_follow = (current_cell[0] + direction_to_turn[direction][0],
                                   current_cell[1] + direction_to_turn[direction][1])
-                if self.maze[side_to_follow[0]][side_to_follow[1]] > 1:
+                if self.maze[side_to_follow] > 1:
                     direction = direction_to_turn[direction]
                     nb_rotations -= 1
-                    path = update_path(path, current_cell)
                     current_cell = (current_cell[0] + direction[0],
                                     current_cell[1] + direction[1])
-                elif self.maze[front_neighbor[0]][front_neighbor[1]] < 2:
+                    path = update_path(path, current_cell)
+                elif self.maze[front_neighbor] < 2:
                     # Turning to one side equals turning to the other side 3 times
                     direction = direction_to_turn[direction_to_turn[direction_to_turn[direction]]]
                     nb_rotations += 1
@@ -302,7 +303,7 @@ def dead_end_filler(self: Maze) -> list[tuple[int, int]]:
             if len(neighbors) > 1:
                 raise UnsolvableMaze("Dead End Filler",
                                      "Pathfinder found multiple paths but it can't select one.")
-            self.maze[current_cell[0]][current_cell[1]] = 2
+            self.maze[current_cell] = 2
             current_cell = neighbors[0][0]
             path.append(current_cell)
         return path
@@ -346,7 +347,7 @@ def depth_first_search(self: Maze) -> list[tuple[int, int]]:
 
     while stack:
         current_cell, path = stack.pop()
-        self.maze[current_cell[0]][current_cell[1]] = 2
+        self.maze[current_cell] = 2
 
         if current_cell == self.end:
             return path
@@ -360,7 +361,7 @@ def depth_first_search(self: Maze) -> list[tuple[int, int]]:
             self, current_cell, directions=((-1, 0), (0, 1), (1, 0), (0, -1)))
 
         for chosen_neighbor, _ in neighbors:
-            if self.maze[chosen_neighbor[0]][chosen_neighbor[1]] == 3:
+            if self.maze[chosen_neighbor] == 3:
                 stack.append((chosen_neighbor, path + [chosen_neighbor]))
 
     raise UnsolvableMaze("Depth First Search", "End is not reachable.")
@@ -368,7 +369,7 @@ def depth_first_search(self: Maze) -> list[tuple[int, int]]:
 
 def breadth_first_search(self: Maze) -> list[tuple[int, int]]:
     """ Solve the maze with the Breadth First Search pathfinder.
-    
+
     It starts by converting all path cells to 3 (unvisited).\n
     Then it creates a stack with the start cell.\n
     It creates a dictionary to store the path from a cell to the cell it came from.\n
@@ -398,7 +399,7 @@ def breadth_first_search(self: Maze) -> list[tuple[int, int]]:
 
     while stack:
         current_cell = stack.pop(0)
-        self.maze[current_cell[0]][current_cell[1]] = 2
+        self.maze[current_cell] = 2
         if current_cell == self.end:
             found_end = True
             break
@@ -414,6 +415,21 @@ def breadth_first_search(self: Maze) -> list[tuple[int, int]]:
         current_cell = came_from[current_cell]
     path.appendleft(self.start)
     return list(path)
+
+
+def best_first_search(self: Maze) -> list[tuple[int, int]]:
+    def heuristic(cell: tuple[int, int]) -> int:
+        return abs(cell[0] - self.end[0]) + abs(cell[1] - self.end[1])
+    self.maze[self.maze > 1] = 3
+    stack: dict[tuple[int, int], int] = {}
+    came_from: dict[tuple[int, int], tuple[int, int]] = {self.start: (0, 0)}
+    stack[self.start] = heuristic(self.start)
+    while stack:
+        current_cell = min(stack, key=lambda k: stack[k])
+        if current_cell == self.end:
+            found_end = True
+            break
+        self.maze[current_cell] = 2
 
 
 def turn_right(direction: tuple[int, int]) -> tuple[int, int]:
