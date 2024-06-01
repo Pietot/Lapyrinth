@@ -12,7 +12,7 @@ import psutil
 from tqdm import tqdm
 
 from maze import Maze
-
+from recursive_maze import RecursiveMaze
 
 def kruskal_time(size: int, queue: Queue) -> None:
     time = round(timeit.timeit(lambda: Maze(size).kruskal(),
@@ -45,7 +45,7 @@ def eller_time(size: int, queue: Queue) -> None:
 
 
 def recursive_division_time(size: int, queue: Queue) -> None:
-    time = round(timeit.timeit(lambda: Maze(size).recursive_division(),
+    time = round(timeit.timeit(lambda: RecursiveMaze(size).recursive_division(),
                                number=1, globals=globals()), 5)
     queue.put(("Recursive Division", size, time))
 
@@ -105,18 +105,18 @@ def wilson_time(size: int, queue: Queue) -> None:
 
 
 def recursive_backtracking_time(size: int, queue: Queue) -> None:
-    time = round(timeit.timeit(lambda: Maze(size).recursive_backtracking(),
+    time = round(timeit.timeit(lambda: RecursiveMaze(size).recursive_backtracking(),
                                number=1, globals=globals()), 5)
     queue.put(("Recursive Backtracking", size, time))
 
 
 def recursive_kruskal_time(size: int, queue: Queue) -> None:
-    time = round(timeit.timeit(lambda: Maze(size).recursive_kruskal(),
+    time = round(timeit.timeit(lambda: RecursiveMaze(size).recursive_kruskal(),
                                number=1, globals=globals()), 5)
     queue.put(("Recursive Kruskal", size, time))
     
 def recursive_hunt_and_kill_time(size: int, queue: Queue) -> None:
-    time = round(timeit.timeit(lambda: Maze(size).recursive_hunt_and_kill(),
+    time = round(timeit.timeit(lambda: RecursiveMaze(size).recursive_hunt_and_kill(),
                                number=1, globals=globals()), 5)
     queue.put(("Recursive Hunt and Kill", size, time))
     
@@ -172,7 +172,7 @@ def eller_memory(size: int, queue: Queue) -> None:
 
 
 def recursive_division_memory(size: int, queue: Queue) -> None:
-    maze = Maze(size)
+    maze = RecursiveMaze(size)
     mem = memory_usage(os.getpid())
     maze.recursive_division()
     mem = memory_usage(os.getpid()) - mem
@@ -252,7 +252,7 @@ def wilson_memory(size: int, queue: Queue) -> None:
 
 
 def recursive_backtracking_memory(size: int, queue: Queue) -> None:
-    maze = Maze(size)
+    maze = RecursiveMaze(size)
     mem = memory_usage(os.getpid())
     maze.recursive_backtracking()
     mem = memory_usage(os.getpid()) - mem
@@ -260,14 +260,14 @@ def recursive_backtracking_memory(size: int, queue: Queue) -> None:
 
 
 def recursive_kruskal_memory(size: int, queue: Queue) -> None:
-    maze = Maze(size)
+    maze = RecursiveMaze(size)
     mem = memory_usage(os.getpid())
     maze.recursive_kruskal()
     mem = memory_usage(os.getpid()) - mem
     queue.put(("Recursive Kruskal", size, mem))
     
 def recursive_hunt_and_kill_memory(size: int, queue: Queue) -> None:
-    maze = Maze(size)
+    maze = RecursiveMaze(size)
     mem = memory_usage(os.getpid())
     maze.recursive_hunt_and_kill()
     mem = memory_usage(os.getpid()) - mem
