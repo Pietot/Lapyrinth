@@ -87,6 +87,7 @@ class Maze:
         shape = cells_to_shape(*nb_cells_by_sides)
         self.maze = np.zeros(shape, dtype=np.uint)
         self.algorithm: None | str = None
+        self.pathfinder: None | str = None
         self.is_perfect = False
         self.have_value = False
         self.sculpt_grid()
@@ -133,7 +134,7 @@ class Maze:
         """
         self.maze[1:-1, 1:-1] = 3
 
-    def recursive_kruskal(self, breakable_walls: list[list[int]] | None = None) -> None:
+    def recursive_kruskal(self, breakable_walls: list[tuple[int, int]] | None = None) -> None:
         """ Applies Kruskal's recursive algorithm to generate a maze.
 
         It starts by initializing each non-wall cell as unique value.\n
@@ -146,7 +147,7 @@ class Maze:
         where each cell is connected to every other cell via a unique path without forming loops.
 
         Args:
-            breakable_walls (None | list[list[int]], optional):
+            breakable_walls (None | list[tuple[int, int]], optional):
                 A list of coordinates of all breakable walls. Defaults to None.
         """
         if not self.have_value:
@@ -494,7 +495,7 @@ class Maze:
                 entries = [i for i in range(start[0], end[0]+1) if i % 2 == 1]
                 entry = rdm.choice(entries)
                 entry_coordinate = (entry, wall_column_index)
-                self.maze[entry][wall_column_index] = 2
+                self.maze[entry, wall_column_index] = 2
                 divide(start, (end[0], wall_column_index - 1), entry_coordinate)
                 divide((start[0], wall_column_index + 1), end, entry_coordinate)
             else:
@@ -505,7 +506,7 @@ class Maze:
                 entries = [i for i in range(start[1], end[1]+1) if i % 2 == 1]
                 entry = rdm.choice(entries)
                 entry_coordinate = (wall_row_index, entry)
-                self.maze[wall_row_index][entry] = 2
+                self.maze[wall_row_index, entry] = 2
                 divide(start, (wall_row_index - 1, end[1]), entry_coordinate)
                 divide((wall_row_index + 1, start[1]), end, entry_coordinate)
         self.remove_walls()
@@ -551,7 +552,7 @@ class Maze:
                 entries = [i for i in range(start_index[0], end_index[0] + 1) if i % 2 == 1]
                 entry = rdm.choice(entries)
                 entry_coordinate = (entry, wall_column_index)
-                self.maze[entry][wall_column_index] = 2
+                self.maze[entry, wall_column_index] = 2
 
                 stack.append(((start_index[0], start_index[1]), (end_index[0],
                              wall_column_index - 1), entry_coordinate))
@@ -569,7 +570,7 @@ class Maze:
                 entries = [i for i in range(start_index[1], end_index[1] + 1) if i % 2 == 1]
                 entry = rdm.choice(entries)
                 entry_coordinate = (wall_row_index, entry)
-                self.maze[wall_row_index][entry] = 2
+                self.maze[wall_row_index, entry] = 2
 
                 stack.append(((start_index[0], start_index[1]),
                              (wall_row_index - 1, end_index[1]), entry_coordinate))
@@ -764,7 +765,7 @@ class Maze:
             start = rdm.choice(unvisited_cells)
             start = (start[0], start[1])
             path = [start]
-            while self.maze[tuple(path[-1])] != 2:
+            while self.maze[path[-1]] != 2:
                 current_cell = path[-1]
                 neighbors = get_neighbors(
                     self, current_cell, return_visited=True)
@@ -801,7 +802,7 @@ class Maze:
         selected_value = values[0]
         value_to_replace = values[1]
         self.maze[self.maze == value_to_replace] = selected_value
-        self.maze[wall_coordinate[0], wall_coordinate[1]] = selected_value
+        self.maze[wall_coordinate] = selected_value
 
     def make_imperfect_maze(self, mode: tuple[str, int | float]) -> None:
         """ Make the maze more complex by removing some walls randomly.
@@ -811,20 +812,20 @@ class Maze:
             The first element is the mode ('number' or 'probability').
             The second element is the number of walls to remove or the probability to remove a wall.
         """
-        breakable_walls_coordinates = np.argwhere(self.maze == 1)
+        breakable_walls_coordinates = get_breakable_walls(self)
         if float(mode[1]) == 0.0:
             raise ValueError("The number of walls to remove or the probab must be greater than 0")
         if mode[0] == 'number':
             # Force the number to be between 0 and the number of breakable walls
             number = max(0, min(int(mode[1]), len(breakable_walls_coordinates)))
-            for coordinates in rdm.sample(breakable_walls_coordinates.tolist(), number):
-                self.maze[coordinates[0]][coordinates[1]] = 2
+            for coordinates in rdm.sample(breakable_walls_coordinates, number):
+                self.maze[coordinates] = 2
         elif mode[0] == 'probability':
             # Force the probability to be between 0 and 1
             probability = max(0, min(1, mode[1]))
             for coordinates in breakable_walls_coordinates:
                 if 0 < rdm.uniform(0, 1) <= probability:
-                    self.maze[coordinates[0]][coordinates[1]] = 2
+                    self.maze[coordinates] = 2
         else:
             raise ValueError("mode must be \"probability\" or \"number\"")
         self.is_perfect = False
@@ -875,13 +876,13 @@ def cells_to_shape(*nb_cells_by_side: int) -> tuple[int, int]:
     raise ValueError("nb_cells_by_side must be an one or two int greater or equal to 2")
 
 
-def get_breakable_walls(self: Maze) -> list[list[int]]:
+def get_breakable_walls(self: Maze) -> list[tuple[int, int]]:
     """ Gets all breakable walls coordinates.
 
     Returns:
         list[list[int, int]]: List of all breakable walls coordinates.
     """
-    return np.argwhere(self.maze == 1).tolist()
+    return  [tuple(coord) for coord in np.argwhere(self.maze == 1).tolist()]
 
 
 def get_unvisited_cells(self: Maze) -> list[list[int]]:
