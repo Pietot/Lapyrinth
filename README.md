@@ -27,9 +27,20 @@ This **Mazer Maker Solver** made entirely in Python is a program where you can g
 
 ## How to use ?
 
-To begin, write these lines at the end of :
+To begin, write these lines at the end of <a href="https://github.com/Pietot/Maze-Maker-Solver/blob/main/maze.py">maze.py</a>:
 
 ```python
+maze = Maze(x, y) # or Maze(x) for a maze of x*x cells
+maze.binary_tree()
+print(maze)
+maze.generate_image() # optional
+```
+
+or write these lines in another python file in the same directory as <a href="https://github.com/Pietot/Maze-Maker-Solver/blob/main/maze.py">maze.py</a>
+
+```python
+from maze import Maze
+
 maze = Maze(x, y) # or Maze(x) for a maze of x*x cells
 maze.binary_tree()
 print(maze)
@@ -58,7 +69,7 @@ That's it. See, it's very simple. You can go with all of these algorithms:
 
 <img src="assets/eller.png" width="300" style="border:solid white 1px"/><br><br>
 
-- Recursive Division
+- Iterative Division
 
 <img src="assets/recursive_division.png" width="300" style="border:solid white 1px"/><br><br>
 
