@@ -69,6 +69,8 @@
 # Changelogs : Added Wilson's algorithm
 
 
+import pickle
+
 import random as rdm
 
 from typing import Generator, Any
@@ -677,6 +679,18 @@ class Maze:
 
         image.save(filename)
 
+    def save_object(self, filename: str | None = None) -> None:
+        """ Save the maze object to a binary file.
+
+        Args:
+            filename (str | None, optional): The name of the file. Defaults to None.
+        """
+        size = self.maze.shape
+        filename = (f"{filename}.pkl" if filename
+                    else f'Maze_{size[0]//2}x{size[1]//2}_{self.algorithm}.pkl')
+        with open(filename, 'wb') as file:
+            pickle.dump(self, file)
+
     def save_maze(self, filename: str, file_type: str | None) -> None:
         """ Save the maze to a binary file or a txt file.
 
@@ -717,10 +731,11 @@ class Maze:
         else:
             raise ValueError("file must be a '.npy' or '.txt' file")
         if not verify_shape(loaded_maze.shape):
-            raise ValueError("The maze shape must be the same as the loaded maze")
-        if not np.all(0 <= loaded_maze ) and not np.all(loaded_maze == 1):
-            raise ValueError("The maze must be binary")
-        
+            raise ValueError("The file contain an invalid maze shape")
+        if not np.all(0 <= loaded_maze) and not np.all(loaded_maze == 1):
+            raise ValueError("The file contain an invalid maze")
+        self.maze = loaded_maze
+
 
 def cells_to_shape(*nb_cells_by_side: int) -> tuple[int, int]:
     """ Convert the number of cells of each dimension (height, width) to the shape of the maze.
@@ -739,7 +754,8 @@ def cells_to_shape(*nb_cells_by_side: int) -> tuple[int, int]:
         return shape
     raise ValueError(
         "nb_cells_by_side must be an one or two int greater or equal to 2")
-    
+
+
 def verify_shape(shape: Any | tuple[Any, ...]) -> bool:
     """ Verifies if shape of the maze if an int greater than 5 and odd
         or a tuple of 2 int greater than 5 and odd
@@ -752,8 +768,18 @@ def verify_shape(shape: Any | tuple[Any, ...]) -> bool:
         return False
     return True
 
+
 def verify_values_maze(maze: npt.NDArray[np.uint]) -> bool:
+    """ Verifies if the all the values in the maze are ints greater or equal than 0.
+
+    Args:
+        maze (npt.NDArray[np.uint]): The maze to verify.
+
+    Returns:
+        bool: True if all the values are valid, False otherwise.
+    """
     return bool(np.issubdtype(maze.dtype, np.uint) and np.all(maze >= 0))
+
 
 def get_breakable_walls(self: Maze) -> list[tuple[int, int]]:
     """ Gets all breakable walls coordinates.
@@ -907,3 +933,19 @@ def select_cell_by_mode(cells: list[tuple[int, int]],
         case _:
             raise ValueError("Invalid mode")
     return chosen_cell
+
+
+def load_object(file_path: str) -> Maze:
+    """ Load a maze object from a pkl file.
+
+    Args:
+        file (str): The location of the file.
+
+    Returns:
+        Maze: The loaded maze object.
+    """
+    with open(file_path, 'rb') as file:
+        self = pickle.load(file)
+    if verify_shape(self.maze.shape) and verify_values_maze(self.maze):
+        return self
+    raise ValueError("The file contain an invalid maze")
