@@ -7,9 +7,13 @@
 # End : 19/03/2024 at 16h30 FR
 
 
-from typing import Generator
+import pickle
 
 import random as rdm
+
+from typing import Generator, Any
+from numpy import typing as npt
+
 import numpy as np
 
 from PIL import Image, ImageDraw
@@ -303,6 +307,63 @@ class RecursiveMaze:
 
         image.save(filename)
 
+    def save_object(self, filename: str | None = None) -> None:
+        """ Save the maze object to a binary file.
+
+        Args:
+            filename (str | None, optional): The name of the file. Defaults to None.
+        """
+        size = self.maze.shape
+        filename = (f"{filename}.pkl" if filename
+                    else f'Maze_{size[0]//2}x{size[1]//2}_{self.algorithm}.pkl')
+        with open(filename, 'wb') as file:
+            pickle.dump(self, file)
+
+    def save_maze(self, filename: str, file_type: str | None) -> None:
+        """ Save the maze to a binary file or a txt file.
+
+        Binary file is recommended because it saves and loads faster.
+        Additionally, it stores the maze without loss of accuracy.\n
+        Texte file is useful for editing and compatibility.
+
+        Args:
+            file_type (str): The type of the file ('npy' or 'txt').
+            filename (str | None): The name of the file. Defaults to None.
+
+        Raises:
+            ValueError: file_type must be 'npy' or 'txt'.
+        """
+        if file_type not in ('npy', 'txt'):
+            raise ValueError("file_type must be 'npy' or 'txt'")
+        size = self.maze.shape
+        filename = (f"{filename}.{file_type}" if filename
+                    else f'Maze_{size[0]//2}x{size[1]//2}_{self.algorithm}.{file_type}')
+        if file_type == 'npy':
+            np.save(filename, self.maze)
+        else:
+            np.savetxt(filename, self.maze, fmt='%d', delimiter=',')
+
+    def load_maze(self, file: str) -> None:
+        """ Load a maze from a binary file or a txt file.
+
+        Args:
+            file (str): The location of the file.
+
+        Raises:
+            ValueError: file must be a '.npy' or '.txt' file.
+        """
+        if file.endswith('.npy'):
+            loaded_maze = np.load(file)
+        elif file.endswith('.txt'):
+            loaded_maze = np.loadtxt(file, delimiter=',', dtype=np.uint)
+        else:
+            raise ValueError("file must be a '.npy' or '.txt' file")
+        if not verify_shape(loaded_maze.shape):
+            raise ValueError("The file contain an invalid maze shape")
+        if not np.all(0 <= loaded_maze) and not np.all(loaded_maze == 1):
+            raise ValueError("The file contain an invalid maze")
+        self.maze = loaded_maze
+
 
 def cells_to_shape(*nb_cells_by_side: int) -> tuple[int, int]:
     """ Convert the number of cells of each dimension (height, width) to the shape of the maze.
@@ -319,7 +380,33 @@ def cells_to_shape(*nb_cells_by_side: int) -> tuple[int, int]:
     if len(nb_cells_by_side) == 2 and all(cells >= 2 for cells in nb_cells_by_side):
         shape = (nb_cells_by_side[0]*2 + 1, nb_cells_by_side[1]*2 + 1)
         return shape
-    raise ValueError("nb_cells_by_side must be an one or two int greater or equal to 2")
+    raise ValueError(
+        "nb_cells_by_side must be an one or two int greater or equal to 2")
+
+
+def verify_shape(shape: Any | tuple[Any, ...]) -> bool:
+    """ Verifies if shape of the maze if an int greater than 5 and odd
+        or a tuple of 2 int greater than 5 and odd
+    """
+    if not isinstance(shape, tuple):
+        return False
+    if not len(shape) == 2:
+        return False
+    if not all(isinstance(i, int) for i in shape if i > 4 and i % 2 == 1):
+        return False
+    return True
+
+
+def verify_values_maze(maze: npt.NDArray[np.uint]) -> bool:
+    """ Verifies if the all the values in the maze are ints greater or equal than 0.
+
+    Args:
+        maze (npt.NDArray[np.uint]): The maze to verify.
+
+    Returns:
+        bool: True if all the values are valid, False otherwise.
+    """
+    return bool(np.issubdtype(maze.dtype, np.uint) and np.all(maze >= 0))
 
 
 def get_breakable_walls(self: RecursiveMaze) -> list[tuple[int, int]]:
@@ -411,3 +498,82 @@ def get_connection(self: RecursiveMaze, index: tuple[int, int]) -> tuple[tuple[i
         if self.maze[neighbor] == 2:
             neighbors.append((neighbor, (row, column)))
     return rdm.choice(neighbors) if neighbors else ((0, 0), (0, 0))
+
+
+def select_cell_by_mode(cells: list[tuple[int, int]],
+                        mode: str, probability: float) -> tuple[int, int]:
+    """ Choose a cell from a list depending on the selection mode.
+
+    Args:
+        cells (list[tuple[int, int]]): A list of cells to choose from.
+        mode (str): The selection mode.
+        probability (float): The probability to choose the first mode for 2 modes.
+
+    Raises:
+        ValueError: If the mod set doesn't exist.
+
+    Returns:
+        tuple[int, int]: The chosen cell.
+    """
+    match mode:
+        case 'newest':
+            chosen_cell = cells[-1]
+        case 'middle':
+            chosen_cell = cells[len(cells) // 2]
+        case 'oldest':
+            chosen_cell = cells[0]
+        case 'random':
+            chosen_cell = rdm.choice(cells)
+        case 'mixed':
+            prob = rdm.random()
+            if prob <= 0.25:
+                chosen_cell = cells[-1]
+            elif prob <= 0.5:
+                chosen_cell = cells[len(cells) // 2]
+            elif prob <= 0.75:
+                chosen_cell = cells[0]
+            else:
+                chosen_cell = rdm.choice(cells)
+        case 'new/mid':
+            if rdm.random() <= probability:
+                chosen_cell = cells[-1]
+            chosen_cell = cells[len(cells) // 2]
+        case 'new/old':
+            if rdm.random() <= probability:
+                chosen_cell = cells[-1]
+            chosen_cell = cells[0]
+        case 'new/rand':
+            if rdm.random() <= probability:
+                chosen_cell = cells[-1]
+            chosen_cell = rdm.choice(cells)
+        case 'mid/old':
+            if rdm.random() <= probability:
+                chosen_cell = cells[len(cells) // 2]
+            chosen_cell = cells[0]
+        case 'mid/rand':
+            if rdm.random() <= probability:
+                chosen_cell = cells[len(cells) // 2]
+            chosen_cell = rdm.choice(cells)
+        case 'old/rand':
+            if rdm.random() <= probability:
+                chosen_cell = cells[0]
+            chosen_cell = rdm.choice(cells)
+        case _:
+            raise ValueError("Invalid mode")
+    return chosen_cell
+
+
+def load_object(file_path: str) -> RecursiveMaze:
+    """ Load a maze object from a pkl file.
+
+    Args:
+        file (str): The location of the file.
+
+    Returns:
+        Maze: The loaded maze object.
+    """
+    with open(file_path, 'rb') as file:
+        self = pickle.load(file)
+    if verify_shape(self.maze.shape) and verify_values_maze(self.maze):
+        return self
+    raise ValueError("The file contain an invalid maze")
