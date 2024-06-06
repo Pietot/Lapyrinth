@@ -68,6 +68,12 @@
 # End : 14/05/2024 at 12h50 FR
 # Changelogs : Added Wilson's algorithm
 
+# v1.13 :
+# Start : 06/06/2024 at 9h30 FR
+# End : 06/06/2024 at 21h00 FR
+# Changelogs : Added 3 ways to save the maze (pickle.dump, numpy.save and numpy.savetxt),
+#              added 2 way to load the maze (pickle.load, numpy.load) and added requirements.txt
+
 
 import pickle
 
