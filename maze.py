@@ -69,9 +69,11 @@
 # Changelogs : Added Wilson's algorithm
 
 
-from typing import Generator
-
 import random as rdm
+
+from typing import Generator, Any
+from numpy import typing as npt
+
 import numpy as np
 
 from PIL import Image, ImageDraw
@@ -675,6 +677,50 @@ class Maze:
 
         image.save(filename)
 
+    def save_maze(self, filename: str, file_type: str | None) -> None:
+        """ Save the maze to a binary file or a txt file.
+
+        Binary file is recommended because it saves and loads faster.
+        Additionally, it stores the maze without loss of accuracy.\n
+        Texte file is useful for editing and compatibility.
+
+        Args:
+            file_type (str): The type of the file ('npy' or 'txt').
+            filename (str | None): The name of the file. Defaults to None.
+
+        Raises:
+            ValueError: file_type must be 'npy' or 'txt'.
+        """
+        if file_type not in ('npy', 'txt'):
+            raise ValueError("file_type must be 'npy' or 'txt'")
+        size = self.maze.shape
+        filename = (f"{filename}.{file_type}" if filename
+                    else f'Maze_{size[0]//2}x{size[1]//2}_{self.algorithm}.{file_type}')
+        if file_type == 'npy':
+            np.save(filename, self.maze)
+        else:
+            np.savetxt(filename, self.maze, fmt='%d', delimiter=',')
+
+    def load_maze(self, file: str) -> None:
+        """ Load a maze from a binary file or a txt file.
+
+        Args:
+            file (str): The location of the file.
+
+        Raises:
+            ValueError: file must be a '.npy' or '.txt' file.
+        """
+        if file.endswith('.npy'):
+            loaded_maze = np.load(file)
+        elif file.endswith('.txt'):
+            loaded_maze = np.loadtxt(file, delimiter=',', dtype=np.uint)
+        else:
+            raise ValueError("file must be a '.npy' or '.txt' file")
+        if not verify_shape(loaded_maze.shape):
+            raise ValueError("The maze shape must be the same as the loaded maze")
+        if not np.all(0 <= loaded_maze ) and not np.all(loaded_maze == 1):
+            raise ValueError("The maze must be binary")
+        
 
 def cells_to_shape(*nb_cells_by_side: int) -> tuple[int, int]:
     """ Convert the number of cells of each dimension (height, width) to the shape of the maze.
@@ -691,8 +737,23 @@ def cells_to_shape(*nb_cells_by_side: int) -> tuple[int, int]:
     if len(nb_cells_by_side) == 2 and all(cells >= 2 for cells in nb_cells_by_side):
         shape = (nb_cells_by_side[0]*2 + 1, nb_cells_by_side[1]*2 + 1)
         return shape
-    raise ValueError("nb_cells_by_side must be an one or two int greater or equal to 2")
+    raise ValueError(
+        "nb_cells_by_side must be an one or two int greater or equal to 2")
+    
+def verify_shape(shape: Any | tuple[Any, ...]) -> bool:
+    """ Verifies if shape of the maze if an int greater than 5 and odd
+        or a tuple of 2 int greater than 5 and odd
+    """
+    if not isinstance(shape, tuple):
+        return False
+    if not len(shape) == 2:
+        return False
+    if not all(isinstance(i, int) for i in shape if i > 4 and i % 2 == 1):
+        return False
+    return True
 
+def verify_values_maze(maze: npt.NDArray[np.uint]) -> bool:
+    return bool(np.issubdtype(maze.dtype, np.uint) and np.all(maze >= 0))
 
 def get_breakable_walls(self: Maze) -> list[tuple[int, int]]:
     """ Gets all breakable walls coordinates.
