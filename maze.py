@@ -685,24 +685,14 @@ class Maze:
 
         image.save(filename)
 
-    def save_object(self, filename: str | None = None) -> None:
-        """ Save the maze object to a binary file.
-
-        Args:
-            filename (str | None, optional): The name of the file. Defaults to None.
-        """
-        size = self.maze.shape
-        filename = (f"{filename}.pkl" if filename
-                    else f'Maze_{size[0]//2}x{size[1]//2}_{self.algorithm}.pkl')
-        with open(filename, 'wb') as file:
-            pickle.dump(self, file)
-
     def save_maze(self, filename: str, file_type: str | None) -> None:
-        """ Save the maze to a binary file or a txt file.
-
-        Binary file is recommended because it saves and loads faster.
+        """ Save the maze to a pickle file or a binary file or a txt file.
+        
+        Pickle file is recommanded because it saves the object with all its attributes
+        and it's easier to load.\n
+        Binary file is used to only store the array of the because it saves and loads faster.\n
         Additionally, it stores the maze without loss of accuracy.\n
-        Texte file is useful for editing and compatibility.
+        Texte file is useful for editing and compatibility and it takes less space.
 
         Args:
             file_type (str): The type of the file ('npy' or 'txt').
@@ -711,15 +701,19 @@ class Maze:
         Raises:
             ValueError: file_type must be 'npy' or 'txt'.
         """
-        if file_type not in ('npy', 'txt'):
-            raise ValueError("file_type must be 'npy' or 'txt'")
         size = self.maze.shape
         filename = (f"{filename}.{file_type}" if filename
                     else f'Maze_{size[0]//2}x{size[1]//2}_{self.algorithm}.{file_type}')
-        if file_type == 'npy':
-            np.save(filename, self.maze)
-        else:
-            np.savetxt(filename, self.maze, fmt='%d', delimiter=',')
+        match file_type:
+            case 'pkl':
+                with open(filename, 'wb') as file:
+                    pickle.dump(self, file)
+            case 'npy':
+                np.save(filename, self.maze)
+            case 'txt':
+                np.savetxt(filename, self.maze, fmt='%d', delimiter=',')
+            case _:
+                raise ValueError("file_type must be 'obj' or 'npy' or 'txt'")
 
     def load_maze(self, file: str) -> None:
         """ Load a maze from a binary file or a txt file.
