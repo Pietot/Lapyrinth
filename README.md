@@ -11,7 +11,7 @@ This **Mazer Maker Solver** made entirely in Python is a program where you can g
 
 ## Download
 
-- 🟢 **[Latest version](https://github.com/Pietot/Maze-Maker-Solver/blob/main/maze.py)**
+- 🟢 **[Latest version](https://github.com/Pietot/Maze-Maker-Solver/archive/refs/heads/main.zip)**
 
 ## Features
 
@@ -27,13 +27,29 @@ This **Mazer Maker Solver** made entirely in Python is a program where you can g
 
 ## How to use ?
 
-To begin, write these lines at the end of <a href="https://github.com/Pietot/Maze-Maker-Solver/blob/main/maze.py">maze.py</a>:
+To begin, download and uncompress the project <a href="https://github.com/Pietot/Maze-Maker-Solver/archive/refs/heads/main.zip">here</a> or clone it by using one of the following command:
+```
+https://github.com/Pietot/Maze-Maker-Solver.git
+```
+or
+```
+git@github.com:Pietot/Maze-Maker-Solver.git
+```
+
+Then, you need to install all dependencies by opening a CLI (command line interface) and write these lines
+
+```
+cd "{the path to the project directory}"
+pip install -r requirements.txt
+```
+
+Finally, write these lines at the end of <a href="https://github.com/Pietot/Maze-Maker-Solver/blob/main/maze.py">maze.py</a>:
 
 ```python
 maze = Maze(x, y) # or Maze(x) for a maze of x*x cells
-maze.binary_tree()
-print(maze)
-maze.generate_image() # optional
+maze.binary_tree() # Choose the algorithm you want
+print(maze) # If you want to print the maze in the CLI
+maze.generate_image() # If you want to generate a .png file of the maze
 ```
 
 or write these lines in another python file in the same directory as <a href="https://github.com/Pietot/Maze-Maker-Solver/blob/main/maze.py">maze.py</a>
@@ -42,10 +58,12 @@ or write these lines in another python file in the same directory as <a href="ht
 from maze import Maze
 
 maze = Maze(x, y) # or Maze(x) for a maze of x*x cells
-maze.binary_tree()
-print(maze)
-maze.generate_image() # optional
+maze.binary_tree() # Choose the algorithm you want below
+print(maze) # If you want to print the maze in the CLI
+maze.generate_image() # If you want to generate a .png file of the maze
 ```
+
+> **Note**: Obviously, the larger the maze, the longer it will take to create and generate the image.
 
 That's it. See, it's very simple. You can go with all of these algorithms:
 
@@ -53,7 +71,7 @@ That's it. See, it's very simple. You can go with all of these algorithms:
 
 <img src="assets/kruskal.png" width="300" style="border:solid white 1px"/><br><br>
 
-- Depth First Search (or recursive backtracker)
+- Randomized Depth First Search
 
 <img src="assets/dfs.png" width="300" style="border:solid white 1px"/><br><br>
 
@@ -73,7 +91,7 @@ That's it. See, it's very simple. You can go with all of these algorithms:
 
 <img src="assets/recursive_division.png" width="300" style="border:solid white 1px"/><br><br>
 
-- Binary Tree
+- Binary Tree (may vary depending on parameters)
 
 <img src="assets/binary_tree.png" width="300" style="border:solid white 1px"/><br><br>
 
