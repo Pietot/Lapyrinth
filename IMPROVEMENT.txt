@@ -3,9 +3,7 @@ Here are ideas/tips to improve maze.py:
     Specific:
         Add Growing Forest algorithm, simplified prim, modified prim or True prim (I think i did True but i'm not sure) (https://www.astrolog.org/labyrnth/algrithm.htm)
         Add Blob Division (https://weblog.jamisbuck.org/2015/1/15/better-recursive-division-algorithm.html)
-        Convert hunt and kill and recursive division to iterative
         Set private values
-        Set custom start and end
         Use deque instead of list for specific algorithms
         Add an iterative or recursive version of algorithms that doesn't have both version
 
