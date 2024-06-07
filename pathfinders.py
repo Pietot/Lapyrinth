@@ -512,6 +512,9 @@ def best_first_search(self: Maze) -> list[tuple[int, int]]:
     self.algorithm = "Best First Search"
     return list(path)
 
+def a_star(self: Maze) -> list[tuple[int, int]]:
+    pass
+
 
 def turn_right(direction: tuple[int, int]) -> tuple[int, int]:
     """ Rotate a direction 90 degrees clockwise.
@@ -681,3 +684,22 @@ def generate_path(self: Maze, path: list[tuple[int, int]],
 
     draw_path()
     image.save(filename)
+
+def print_path(self:Maze, path: list[tuple[int, int]]) -> None:
+    """ Print the path of the maze.
+
+    Args:
+        maze (Maze): The maze object.
+        path (list[tuple[int, int]]): The path to print.
+    """
+    for index, value in np.ndenumerate(self.maze):
+        if index in path:
+            print("o ", end="")
+        elif value < 2:
+            print("# ", end="")
+        else:
+            print("  ", end="")
+
+        if index[1] == self.maze.shape[1] - 1:
+            print()
+    
