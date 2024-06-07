@@ -100,8 +100,9 @@ class Maze:
         self.algorithm: None | str = None
         self.pathfinder: None | str = None
         self.have_value = False
-        self.start = start if start else (1, 0)
-        self.end = end if end else (self.maze.shape[0] - 2, self.maze.shape[1] - 1)
+        shape = self.maze.shape[0], self.maze.shape[1]
+        self.start = verify_coordinates(start, shape) if start else (1, 0)
+        self.end = (verify_coordinates(end, shape) if end else (shape[0] - 2, shape[1] - 1))
         self.sculpt_grid()
 
     def __str__(self) -> str:
@@ -685,9 +686,9 @@ class Maze:
 
         image.save(filename)
 
-    def save_maze(self, filename: str, file_type: str | None) -> None:
+    def save_maze(self, file_type: str, filename: str) -> None:
         """ Save the maze to a pickle file or a binary file or a txt file.
-        
+
         Pickle file is recommanded because it saves the object with all its attributes
         and it's easier to load.\n
         Binary file is used to only store the array of the because it saves and loads faster.\n
@@ -713,7 +714,7 @@ class Maze:
             case 'txt':
                 np.savetxt(filename, self.maze, fmt='%d', delimiter=',')
             case _:
-                raise ValueError("file_type must be 'obj' or 'npy' or 'txt'")
+                raise ValueError("file_type must be 'pkl' or 'npy' or 'txt'")
 
     def load_maze(self, file: str) -> None:
         """ Load a maze from a binary file or a txt file.
@@ -756,6 +757,27 @@ def cells_to_shape(*nb_cells_by_side: int) -> tuple[int, int]:
         "nb_cells_by_side must be an one or two int greater or equal to 2")
 
 
+def verify_coordinates(end: Any | tuple[Any, ...], shape: tuple[int, int]) -> tuple[int, int]:
+    """ Verifies if the end coordinates are valid.
+
+    Args:
+        end (Any): The end coordinates.
+        shape (tuple[int, int]): The shape of the maze.
+
+    Returns:
+        bool: True if the end coordinates are valid, False otherwise.
+    """
+    if not isinstance(end, tuple):
+        raise ValueError("end must be a tuple of 2 ints corresponding to a point inside the maze")
+    if not len(end) == 2:
+        raise ValueError("end must be a tuple of 2 ints corresponding to a point inside the maze")
+    if not all(isinstance(i, int) for i in end):
+        raise ValueError("end must be a tuple of 2 ints corresponding to a point inside the maze")
+    if not (0 <= end[0] <= shape[0] and 0 <= end[1] <= shape[1]):
+        raise ValueError("end must be a tuple of 2 ints corresponding to a point inside the maze")
+    return end
+
+
 def verify_shape(shape: Any | tuple[Any, ...]) -> bool:
     """ Verifies if shape of the maze if an int greater than 5 and odd
         or a tuple of 2 int greater than 5 and odd
@@ -787,7 +809,8 @@ def get_breakable_walls(self: Maze) -> list[tuple[int, int]]:
     Returns:
         list[list[int, int]]: List of all breakable walls coordinates.
     """
-    return [tuple(coord) for coord in np.argwhere(self.maze == 1).tolist()]
+    return [(coordinates[0], coordinates[1])
+            for coordinates in np.argwhere(self.maze == 1).tolist()]
 
 
 def get_unvisited_cells(self: Maze) -> list[list[int]]:
