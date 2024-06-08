@@ -108,7 +108,6 @@ maze.generate_image()
 
 > **Note**: Obviously, the larger the maze, the longer it will take to create and generate the image.
 
-
 ## 4 - Example of mazes
 
 That's it. See, it's very simple. You can go with all of these algorithms:
@@ -271,7 +270,7 @@ Here are all the pathfinders available:
 
 ## 8 - Maze Generation Benchmarks
 
-Wonder which one is **faster**? Or which one is less **memory intensive**?
+Wonder which algorithm is **faster**? Or which one is less **memory intensive**?
 
 Well.. I already did it for you! So here you are:
 
