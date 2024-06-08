@@ -387,6 +387,7 @@ def depth_first_search(self: Maze) -> list[tuple[int, int]]:
         self.maze[current_cell] = 2
 
         if current_cell == self.end:
+            self.pathfinder = "Depth First Search"
             return path
 
         # Condition to optimize the search
@@ -432,34 +433,21 @@ def breadth_first_search(self: Maze) -> list[tuple[int, int]]:
     self.maze[self.maze > 1] = 3
     stack: list[tuple[int, int]] = [self.start]
     came_from: dict[tuple[int, int], tuple[int, int]] = {self.start: (0, 0)}
-    found_end = False
 
     while stack:
         current_cell = stack.pop(0)
         self.maze[current_cell] = 2
 
         if current_cell == self.end:
-            found_end = True
             self.pathfinder = "Breadth First Search"
-            break
+            return reconstruct_path(self, came_from)
 
         neighbors = maze.get_neighbors(
             self, current_cell, directions=((-1, 0), (0, 1), (1, 0), (0, -1)))
         stack.extend(neighbor for neighbor, _ in neighbors)
         came_from.update({neighbor: current_cell for neighbor, _ in neighbors})
 
-    if not found_end:
-        raise UnsolvableMaze("Breadth First Search", "End is not reachable.")
-
-    path: deque[tuple[int, int]] = deque([self.start])
-    current_cell = self.end
-
-    while current_cell != self.start:
-        path.appendleft(current_cell)
-        current_cell = came_from[current_cell]
-
-    path.appendleft(self.start)
-    return list(path)
+    raise UnsolvableMaze("Breadth First Search", "End is not reachable.")
 
 
 def greedy_best_first_search(self: Maze) -> list[tuple[int, int]]:
@@ -491,40 +479,26 @@ def greedy_best_first_search(self: Maze) -> list[tuple[int, int]]:
         return abs(cell[0] - self.end[0]) + abs(cell[1] - self.end[1])
 
     self.maze[self.maze > 1] = 3
-    cell_to_explore: set[tuple[int, int]] = set()
-    cell_to_explore.add(self.start)
+    cell_to_explore: list[tuple[int, tuple[int, int]]] = []
+    heapq.heappush(cell_to_explore, (0, self.start))
     came_from: dict[tuple[int, int], tuple[int, int]] = {self.start: (0, 0)}
-    found_end = False
 
     while cell_to_explore:
-        current_cell = min(cell_to_explore, key=heuristic)
+        _, current_cell = heapq.heappop(cell_to_explore)
 
         if current_cell == self.end:
-            found_end = True
-            break
+            self.pathfinder = "Greedy Best First Search"
+            return reconstruct_path(self, came_from)
 
         self.maze[current_cell] = 2
-        cell_to_explore.remove(current_cell)
         neighbors = maze.get_neighbors(
             self, current_cell, directions=((-1, 0), (0, 1), (1, 0), (0, -1)))
 
         for neighbor, _ in neighbors:
-            cell_to_explore.add(neighbor)
+            heapq.heappush(cell_to_explore, (heuristic(neighbor), neighbor))
             came_from[neighbor] = current_cell
 
-    if not found_end:
-        raise UnsolvableMaze("Greedy Best First Search", "End is not reachable.")
-
-    path: deque[tuple[int, int]] = deque()
-    current_cell = self.end
-
-    while current_cell != self.start:
-        path.appendleft(current_cell)
-        current_cell = came_from[current_cell]
-
-    path.appendleft(self.start)
-    self.pathfinder = "Greedy Best First Search"
-    return list(path)
+    raise UnsolvableMaze("Greedy Best First Search", "End is not reachable.")
 
 
 def a_star(self: Maze) -> list[tuple[int, int]]:
@@ -561,7 +535,6 @@ def a_star(self: Maze) -> list[tuple[int, int]]:
     cell_to_explore: list[tuple[int, tuple[int, int]]] = []
     heapq.heappush(cell_to_explore, (0, self.start))
     came_from: dict[tuple[int, int], tuple[int, int]] = {self.start: (0, 0)}
-    found_end = False
     g_score = {self.start: 0}
     f_score = {self.start: heuristic(self.start)}
 
@@ -570,8 +543,8 @@ def a_star(self: Maze) -> list[tuple[int, int]]:
         self.maze[current_cell] = 2
 
         if current_cell == self.end:
-            found_end = True
-            break
+            self.pathfinder = "A star"
+            return reconstruct_path(self, came_from)
 
         neighbors = maze.get_neighbors(self, current_cell,
                                        directions=((-1, 0), (0, 1), (1, 0), (0, -1)))
@@ -586,19 +559,7 @@ def a_star(self: Maze) -> list[tuple[int, int]]:
                 f_score[neighbor] = g_score[neighbor] + heuristic(neighbor)
                 heapq.heappush(cell_to_explore, (f_score[neighbor], neighbor))
 
-    if not found_end:
-        raise UnsolvableMaze("A*", "End is not reachable.")
-
-    path: deque[tuple[int, int]] = deque()
-    current_cell = self.end
-
-    while current_cell != self.start:
-        path.appendleft(current_cell)
-        current_cell = came_from[current_cell]
-
-    path.appendleft(self.start)
-    self.pathfinder = "A star"
-    return list(path)
+    raise UnsolvableMaze("A*", "End is not reachable.")
 
 
 def turn_right(direction: tuple[int, int]) -> tuple[int, int]:
@@ -725,6 +686,28 @@ def directions_to_path(self: Maze,
 
     path.append(current_cell)
     return path
+
+def reconstruct_path(self: Maze, came_from: dict[tuple[int, int],
+                                                 tuple[int, int]]) -> list[tuple[int, int]]:
+    """ Reconstruct the path from the start to the end of the maze.
+
+    Args:
+        self (Maze): The maze object.
+        came_from (dict[tuple[int, int], tuple[int, int]]): The dictionary to reconstruct the path.
+
+    Returns:
+        list[tuple[int, int]]: The path from the start to the end of the maze.
+    """
+    path: deque[tuple[int, int]] = deque()
+    current_cell = self.end
+
+    while current_cell != self.start:
+        path.appendleft(current_cell)
+        current_cell = came_from[current_cell]
+
+    path.appendleft(self.start)
+    self.pathfinder = "Greedy Best First Search"
+    return list(path)
 
 
 def generate_path(self: Maze, path: list[tuple[int, int]],
