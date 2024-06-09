@@ -176,7 +176,7 @@ class Maze:
                 continue
             self.merge_values(coordinates, values)
         self.set_start_end()
-        self.algorithm = "Recursive Kruskal's algorithm"
+        self.algorithm = "Kruskal"
 
     def randomized_depth_first_search(
         self, start: tuple[int, int] | None = None
@@ -223,7 +223,7 @@ class Maze:
                 stack.append(chosen_neighbor)
 
         self.set_start_end()
-        self.algorithm = "Randomized Depth First Search algorithm"
+        self.algorithm = "Randomized Depth First Search"
 
     def prim(self, start: tuple[int, int] | None = None) -> None:
         """Applies Prim's algorithm to generate a maze.
@@ -261,7 +261,7 @@ class Maze:
             neighbors.extend(get_neighbors(self, neighbor))
             neighbors = list(set(neighbors))
         self.set_start_end()
-        self.algorithm = "Prim's algorithm"
+        self.algorithm = "Prim"
 
     def hunt_and_kill(self, start: tuple[int, int] | None = None) -> None:
         """Applies Hunt and Kill algorithm to generate a maze.
@@ -282,28 +282,20 @@ class Maze:
             else get_random_cell((self.maze.shape[0], self.maze.shape[1]))
         )
 
-        rows_fully_visited = 0
-
-        def hunt(
-            row_fully_visited: int,
-        ) -> tuple[tuple[int, int], int] | tuple[None, int]:
-            for row_index, row in enumerate(self.maze[1:-1:2][row_fully_visited]):
-                for cell_index, cell_value in enumerate(row[1:-1:2]):
-                    if int(cell_value) > 2:
-                        neighbor, direction = get_connection(
-                            self, (row_index, cell_index)
-                        )
-                        if neighbor == (0, 0):
-                            continue
-                        self.maze[neighbor] = 2
-                        wall_coordinates = (
-                            neighbor[0] - direction[0] // 2,
-                            neighbor[1] - direction[1] // 2,
-                        )
-                        self.maze[wall_coordinates] = 2
-                        return (row_index, cell_index), rows_fully_visited
-            row_fully_visited += 1
-            return (None, row_fully_visited)
+        def hunt() -> tuple[int, int] | None:
+            for index, cell_value in self:
+                if int(cell_value) > 2:
+                    neighbor, direction = get_connection(self, (index[0], index[1]))
+                    if neighbor == (0, 0):
+                        continue
+                    self.maze[neighbor] = 2
+                    wall_coordinates = (
+                        neighbor[0] - direction[0] // 2,
+                        neighbor[1] - direction[1] // 2,
+                    )
+                    self.maze[wall_coordinates] = 2
+                    return (index[0], index[1])
+            return None
 
         while cell:
             self.maze[cell] = 2
@@ -318,10 +310,10 @@ class Maze:
                 self.maze[wall_coordinates] = 2
                 cell = neighbor
             else:
-                cell, rows_fully_visited = hunt(rows_fully_visited)
+                cell = hunt()
 
         self.set_start_end()
-        self.algorithm = "Hunt and Kill algorithm"
+        self.algorithm = "Hunt and Kill"
 
     def eller(
         self,
@@ -394,7 +386,7 @@ class Maze:
                 if values[0] != values[1]:
                     carves = 0
         self.set_start_end()
-        self.algorithm = "Eller's algorithm"
+        self.algorithm = "Eller"
 
     def iterative_division(self) -> None:
         """Applies the Recursive division algorithm but iteratively to generate a maze.
@@ -485,7 +477,7 @@ class Maze:
                 )
 
         self.set_start_end()
-        self.algorithm = "Iterative division algorithm"
+        self.algorithm = "Iterative division"
 
     def binary_tree(self) -> None:
         """Applies the Binary Tree algorithm to generate a maze.
@@ -524,7 +516,7 @@ class Maze:
                 )
                 self.maze[wall_coordinates] = 2
         self.set_start_end()
-        self.algorithm = "Binary Tree algorithm"
+        self.algorithm = "Binary Tree"
 
     def sidewinder(self, probability: float = 0.5) -> None:
         """Applies the Sidewinder algorithm to generate a maze.
@@ -568,7 +560,7 @@ class Maze:
                 )
                 self.maze[wall_coordinates] = 2
         self.set_start_end()
-        self.algorithm = "Sidewinder algorithm"
+        self.algorithm = "Sidewinder"
 
     def growing_tree(
         self,
@@ -627,7 +619,7 @@ class Maze:
             split = str(probability) + "/" + str(1 - probability)
         else:
             split = ""
-        self.algorithm = f"Growing Tree algorithm ({mode}{split})"
+        self.algorithm = f"Growing Tree ({mode}{split})"
 
     def aldous_broder(self, start: tuple[int, int] | None = None) -> None:
         """Applies the Aldous-Broder algorithm to generate a maze.
@@ -666,7 +658,7 @@ class Maze:
                 visited_cell += 1
             current_cell = rdm_neighbor
         self.set_start_end()
-        self.algorithm = "Aldous-Broder algorithm"
+        self.algorithm = "Aldous-Broder"
 
     def wilson(self) -> None:
         """Applies the Wilson's algorithm to generate a maze.
@@ -713,7 +705,7 @@ class Maze:
                     )
                     self.maze[wall_coordinates] = 2
         self.set_start_end()
-        self.algorithm = "Wilson's algorithm"
+        self.algorithm = "Wilson"
 
     def merge_values(
         self, wall_coordinate: tuple[int, int] | list[int], values: tuple[int, int]
