@@ -352,9 +352,9 @@ def iterative_division_memory(size: int, queue: Queue) -> None:
 
 def time_complexity() -> None:
     """Benchmarking the time complexity of the different algorithms used to generate the maze."""
-    max_size = 100
+    max_size = 10000
     execution_time = {}
-    for size in tqdm(range(max_size + 1, 5)):
+    for size in tqdm(range(max_size + 1, 1000)):
         if size == 0:
             size = 5
         queues = []
@@ -452,9 +452,9 @@ def time_complexity() -> None:
 
 def memory_complexity() -> None:
     """Benchmarking the memory complexity of the different algorithms used to generate the maze."""
-    max_size = 100
+    max_size = 10000
     memory = {}
-    for size in tqdm(range(max_size + 1, 5)):
+    for size in tqdm(range(max_size + 1, 1000)):
         if size == 0:
             size = 5
         queues = []
