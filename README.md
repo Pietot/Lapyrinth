@@ -279,7 +279,7 @@ Well.. I already did it for you! So here you are:
 <img src="assets/svg/Maze generation time depending on its size.svg">
 <img src="assets/svg/Maze generation memory location depending on the size.svg">
 
-> **Note**: For the generation time, I deliberately excluded Aldous-Broder and Wilson algorithms because they are truly random (""luck"" based in other words), so they are very inconsistent on a generation to another.
+> **Note**: For the generation time, Aldous-Broder and Wilson algorithms are truly random (""luck"" based in other words), so their times are very inconsistent on a generation to another.
 
 If you want the values of these graphs with Aldous-Broder and Wilson algorithms, watch this:
 
@@ -294,7 +294,7 @@ If you want to benchmark these algorithms yourself:
 - Download the benchmark file <a href="https://github.com/Pietot/Maze-Maker-Solver/blob/main/benchmark_generation_algorithm.py">here</a> and put it in the same folder as <a href="https://github.com/Pietot/Maze-Maker-Solver/blob/main/maze.py">maze.py</a>
 
 - Edit the benchmark file for your needs:<br>
-  line 216/218 and 273/275 change the max size of the maze like you want and adapt the step in the for loop.
+  line 355/455 change the max size of the maze and line 357/457 adapt the step in the for loop.
 
 - Run the script
 
