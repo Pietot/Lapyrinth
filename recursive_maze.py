@@ -95,26 +95,34 @@ class RecursiveMaze:
         if not self.have_value:
             self.set_values()
             self.have_value = True
+
         if breakable_walls is None:
             breakable_walls = get_breakable_walls(self)
             rdm.shuffle(breakable_walls)
+
         if not breakable_walls:
             self.set_start_end()
-            self.algorithm = "Recrusive Kruskal's algorithm"
+            self.algorithm = "Recrusive Kruskal's"
             return None
+
         coordinates = breakable_walls[0]
+
         if coordinates[0] % 2 == 0:
             upper_value = self.maze[coordinates[0]-1, coordinates[1]]
             bottom_value = self.maze[coordinates[0]+1, coordinates[1]]
             values = (upper_value, bottom_value)
+
         else:
             left_value = self.maze[coordinates[0], coordinates[1]-1]
             right_value = self.maze[coordinates[0], coordinates[1]+1]
             values = (left_value, right_value)
+
         breakable_walls.remove(coordinates)
+
         # If the values are the same, we don't destroy the wall or we will create a loop
         if values[0] == values[1]:
             return self.recursive_kruskal(breakable_walls)
+
         self.merge_values(coordinates, values)
         return self.recursive_kruskal(breakable_walls)
 
@@ -138,18 +146,24 @@ class RecursiveMaze:
             (self.maze.shape[0], self.maze.shape[1]))
         self.maze[current_cell] = 2
         neighbors = get_neighbors(self, current_cell)
+
         if not neighbors:
             return
+
         rdm.shuffle(neighbors)
+
         for chosen_neighbor, direction in neighbors:
+
             if self.maze[chosen_neighbor] == 2:
                 continue
+
             wall_coordinates = (current_cell[0] + direction[0] // 2,
                                 current_cell[1] + direction[1] // 2)
             self.maze[wall_coordinates] = 2
             self.recursive_backtracking(chosen_neighbor)
+
         self.set_start_end()
-        self.algorithm = "Recursive Backtracker algorithm"
+        self.algorithm = "Recursive Backtracker"
 
     def recursive_hunt_and_kill(self, start: tuple[int, int] | None = None) -> None:
         """ Applies the Hunt and Kill algorithm recursively to generate a maze.
@@ -169,11 +183,14 @@ class RecursiveMaze:
 
         def hunt() -> None:
             for index, cell_value in self:
+
                 if int(cell_value) > 2:
                     neighbor, direction = get_connection(
                         self, (index[0], index[1]))
+
                     if neighbor == (0, 0):
                         continue
+
                     self.maze[neighbor] = 2
                     wall_coordinates = (neighbor[0] - direction[0] // 2,
                                         neighbor[1] - direction[1] // 2)
@@ -183,8 +200,10 @@ class RecursiveMaze:
         def kill(cell: tuple[int, int]) -> None:
             self.maze[cell] = 2
             neighbors = get_neighbors(self, cell)
+
             if not neighbors:
                 return hunt()
+
             neighbor, direction = rdm.choice(neighbors)
             self.maze[neighbor] = 2
             wall_coordinates = (neighbor[0] - direction[0] // 2,
@@ -194,7 +213,7 @@ class RecursiveMaze:
 
         kill(start)
         self.set_start_end()
-        self.algorithm = "Recursive Hunt and Kill algorithm"
+        self.algorithm = "Recursive Hunt and Kill"
 
     def recursive_division(self) -> None:
         """ Applies the Recursive division algorithm to generate a maze.
@@ -209,10 +228,13 @@ class RecursiveMaze:
 
         def divide(start: tuple[int, int], end: tuple[int, int],
                    ban: tuple[int, int] = (0, 0)) -> None:
+
             height = end[0] - start[0]
             width = end[1] - start[1]
+
             if height <= 1 or width <= 1:
                 return
+
             if divide_vertically(width, height):
                 wall_column_index = [i for i in range(
                     start[1], end[1]+1) if i not in (start[1], ban[1], end[1]) and i % 2 == 0]
@@ -224,6 +246,7 @@ class RecursiveMaze:
                 self.maze[entry, wall_column_index] = 2
                 divide(start, (end[0], wall_column_index - 1), entry_coordinate)
                 divide((start[0], wall_column_index + 1), end, entry_coordinate)
+
             else:
                 wall_row_index = [i for i in range(
                     start[0], end[0]+1) if i not in (start[0], ban[0], end[0]) and i % 2 == 0]
@@ -235,12 +258,13 @@ class RecursiveMaze:
                 self.maze[wall_row_index, entry] = 2
                 divide(start, (wall_row_index - 1, end[1]), entry_coordinate)
                 divide((wall_row_index + 1, start[1]), end, entry_coordinate)
+
         self.remove_walls()
         start = (1, 1)
         end = (self.maze.shape[0]-2, self.maze.shape[1]-2)
         divide(start, end)
         self.set_start_end()
-        self.algorithm = "Recursive division algorithm"
+        self.algorithm = "Recursive division"
 
     def merge_values(self, wall_coordinate: tuple[int, int] | list[int],
                      values: tuple[int, int]) -> None:
@@ -264,19 +288,24 @@ class RecursiveMaze:
             The second element is the number of walls to remove or the probability to remove a wall.
         """
         breakable_walls_coordinates = get_breakable_walls(self)
+
         if float(mode[1]) == 0.0:
             raise ValueError("The number of walls to remove or the probab must be greater than 0")
+
         if mode[0] == 'number':
             # Force the number to be between 0 and the number of breakable walls
             number = max(0, min(int(mode[1]), len(breakable_walls_coordinates)))
             for coordinates in rdm.sample(breakable_walls_coordinates, number):
                 self.maze[coordinates] = 2
+
         elif mode[0] == 'probability':
             # Force the probability to be between 0 and 1
             probability = max(0, min(1, mode[1]))
             for coordinates in breakable_walls_coordinates:
+
                 if 0 < rdm.uniform(0, 1) <= probability:
                     self.maze[coordinates] = 2
+
         else:
             raise ValueError("mode must be \"probability\" or \"number\"")
 
@@ -285,6 +314,7 @@ class RecursiveMaze:
         size = self.maze.shape
         filename = (filename + '.png' if filename
                     else f'Maze_{size[0]//2}x{size[1]//2}_{self.algorithm}.png')
+
         cell_size = 50
         wall_color = (0, 0, 0)
 
@@ -293,6 +323,7 @@ class RecursiveMaze:
         draw = ImageDraw.Draw(image)
 
         for index, cell_value in np.ndenumerate(self.maze):
+
             x1 = index[1] * cell_size
             y1 = index[0] * cell_size
             x2 = (index[1] + 1) * cell_size
@@ -300,8 +331,10 @@ class RecursiveMaze:
 
             if index == self.start:
                 draw.rectangle((x1, y1+1, x2, y2), fill=(0, 255, 0))
+
             elif index == self.end:
                 draw.rectangle((x1, y1+1, x2, y2), fill=(255, 0, 0))
+
             elif int(cell_value) < 2:
                 draw.rectangle((x1, y1, x2, y2), fill=wall_color)
 
@@ -316,6 +349,7 @@ class RecursiveMaze:
         size = self.maze.shape
         filename = (f"{filename}.pkl" if filename
                     else f'Maze_{size[0]//2}x{size[1]//2}_{self.algorithm}.pkl')
+
         with open(filename, 'wb') as file:
             pickle.dump(self, file)
 
@@ -335,11 +369,14 @@ class RecursiveMaze:
         """
         if file_type not in ('npy', 'txt'):
             raise ValueError("file_type must be 'npy' or 'txt'")
+
         size = self.maze.shape
         filename = (f"{filename}.{file_type}" if filename
                     else f'Maze_{size[0]//2}x{size[1]//2}_{self.algorithm}.{file_type}')
+
         if file_type == 'npy':
             np.save(filename, self.maze)
+
         else:
             np.savetxt(filename, self.maze, fmt='%d', delimiter=',')
 
@@ -354,14 +391,19 @@ class RecursiveMaze:
         """
         if file.endswith('.npy'):
             loaded_maze = np.load(file)
+
         elif file.endswith('.txt'):
             loaded_maze = np.loadtxt(file, delimiter=',', dtype=np.uint)
+
         else:
             raise ValueError("file must be a '.npy' or '.txt' file")
+
         if not verify_shape(loaded_maze.shape):
             raise ValueError("The file contain an invalid maze shape")
+
         if not np.all(0 <= loaded_maze) and not np.all(loaded_maze == 1):
             raise ValueError("The file contain an invalid maze")
+
         self.maze = loaded_maze
 
 
@@ -377,9 +419,11 @@ def cells_to_shape(*nb_cells_by_side: int) -> tuple[int, int]:
     if len(nb_cells_by_side) == 1 and nb_cells_by_side[0] >= 2:
         shape = (nb_cells_by_side[0]*2 + 1, nb_cells_by_side[0]*2 + 1)
         return shape
+
     if len(nb_cells_by_side) == 2 and all(cells >= 2 for cells in nb_cells_by_side):
         shape = (nb_cells_by_side[0]*2 + 1, nb_cells_by_side[1]*2 + 1)
         return shape
+
     raise ValueError(
         "nb_cells_by_side must be an one or two int greater or equal to 2")
 
@@ -390,10 +434,13 @@ def verify_shape(shape: Any | tuple[Any, ...]) -> bool:
     """
     if not isinstance(shape, tuple):
         return False
+
     if not len(shape) == 2:
         return False
+
     if not all(isinstance(i, int) for i in shape if i > 4 and i % 2 == 1):
         return False
+
     return True
 
 
@@ -415,7 +462,8 @@ def get_breakable_walls(self: RecursiveMaze) -> list[tuple[int, int]]:
     Returns:
         list[list[int, int]]: List of all breakable walls coordinates.
     """
-    return [tuple(coord) for coord in np.argwhere(self.maze == 1).tolist()]
+    return [(coordinates[0], coordinates[1])
+            for coordinates in np.argwhere(self.maze == 1).tolist()]
 
 
 def get_unvisited_cells(self: RecursiveMaze) -> list[list[int]]:
@@ -451,11 +499,16 @@ def get_neighbors(self: RecursiveMaze,
     # North, East, South, West
     directions = directions if directions else (
         (-2, 0), (0, 2), (2, 0), (0, -2))
+
     for direction in directions:
+
         neighbor = cell[0] + direction[0], cell[1] + direction[1]
+
         if 1 <= neighbor[0] < self.maze.shape[0] and 1 <= neighbor[1] < self.maze.shape[1]:
+
             if (return_visited and self.maze[neighbor] > 1) or self.maze[neighbor] > 2:
                 neighbors.append((neighbor, direction))
+
     return neighbors
 
 
@@ -490,13 +543,18 @@ def get_connection(self: RecursiveMaze, index: tuple[int, int]) -> tuple[tuple[i
     neighbors: list[tuple[tuple[int, int], tuple[int, int]]] = []
     # North, East, South, West
     directions = [(-2, 0), (0, 2), (2, 0), (0, -2)]
+
     for row, column in directions:
+
         neighbor = (index[0] + row,
                     index[1] + column)
+
         if not 0 <= neighbor[0] < self.maze.shape[0] or not 0 <= neighbor[1] < self.maze.shape[1]:
             continue
+
         if self.maze[neighbor] == 2:
             neighbors.append((neighbor, (row, column)))
+
     return rdm.choice(neighbors) if neighbors else ((0, 0), (0, 0))
 
 
@@ -516,50 +574,73 @@ def select_cell_by_mode(cells: list[tuple[int, int]],
         tuple[int, int]: The chosen cell.
     """
     match mode:
+
         case 'newest':
             chosen_cell = cells[-1]
+
         case 'middle':
             chosen_cell = cells[len(cells) // 2]
+
         case 'oldest':
             chosen_cell = cells[0]
+
         case 'random':
             chosen_cell = rdm.choice(cells)
+
         case 'mixed':
             prob = rdm.random()
+
             if prob <= 0.25:
                 chosen_cell = cells[-1]
+
             elif prob <= 0.5:
                 chosen_cell = cells[len(cells) // 2]
+
             elif prob <= 0.75:
                 chosen_cell = cells[0]
+
             else:
                 chosen_cell = rdm.choice(cells)
+
         case 'new/mid':
             if rdm.random() <= probability:
                 chosen_cell = cells[-1]
+
             chosen_cell = cells[len(cells) // 2]
+
         case 'new/old':
             if rdm.random() <= probability:
                 chosen_cell = cells[-1]
+
             chosen_cell = cells[0]
+
         case 'new/rand':
             if rdm.random() <= probability:
                 chosen_cell = cells[-1]
+
             chosen_cell = rdm.choice(cells)
+
         case 'mid/old':
             if rdm.random() <= probability:
                 chosen_cell = cells[len(cells) // 2]
+
             chosen_cell = cells[0]
+
         case 'mid/rand':
+
             if rdm.random() <= probability:
                 chosen_cell = cells[len(cells) // 2]
+
             chosen_cell = rdm.choice(cells)
         case 'old/rand':
             if rdm.random() <= probability:
                 chosen_cell = cells[0]
+
             chosen_cell = rdm.choice(cells)
+
         case _:
             raise ValueError("Invalid mode")
+
     return chosen_cell
 
 
@@ -574,6 +655,8 @@ def load_object(file_path: str) -> RecursiveMaze:
     """
     with open(file_path, 'rb') as file:
         self = pickle.load(file)
+
     if verify_shape(self.maze.shape) and verify_values_maze(self.maze):
         return self
+
     raise ValueError("The file contain an invalid maze")
