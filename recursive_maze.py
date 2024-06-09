@@ -466,15 +466,6 @@ def get_breakable_walls(self: RecursiveMaze) -> list[tuple[int, int]]:
             for coordinates in np.argwhere(self.maze == 1).tolist()]
 
 
-def get_unvisited_cells(self: RecursiveMaze) -> list[list[int]]:
-    """ Gets all unvisited cells coordinates.
-
-    Returns:
-        list[tuple[int, int]]: List of all unvisited cells coordinates.
-    """
-    return np.argwhere(self.maze > 2).tolist()
-
-
 def get_neighbors(self: RecursiveMaze,
                   cell: tuple[int, int],
                   directions: tuple[tuple[int, int], ...] | None = None,
