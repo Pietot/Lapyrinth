@@ -354,7 +354,7 @@ def time_complexity() -> None:
     """Benchmarking the time complexity of the different algorithms used to generate the maze."""
     max_size = 10000
     execution_time = {}
-    for size in tqdm(range(max_size + 1, 1000)):
+    for size in tqdm(range(0, max_size + 1, 1000)):
         if size == 0:
             size = 5
         queues = []
@@ -395,7 +395,7 @@ def time_complexity() -> None:
                 execution_time[algo] = {}
             execution_time[algo][size] = time
 
-    with open("time_complexity.csv", "w", newline="", encoding="utf-8") as csvfile:
+    with open("maze_generation_time_complexity.csv", "w", newline="", encoding="utf-8") as csvfile:
         writer = csv.writer(csvfile)
 
         writer.writerow(
@@ -454,7 +454,7 @@ def memory_complexity() -> None:
     """Benchmarking the memory complexity of the different algorithms used to generate the maze."""
     max_size = 10000
     memory = {}
-    for size in tqdm(range(max_size + 1, 1000)):
+    for size in tqdm(range(0, max_size + 1, 1000)):
         if size == 0:
             size = 5
         queues = []
@@ -495,7 +495,7 @@ def memory_complexity() -> None:
                 memory[algo] = {}
             memory[algo][size] = mem / 1000
 
-    with open("memory_complexity.csv", "w", newline="", encoding="utf-8") as csvfile:
+    with open("maze_generation_memory_complexity.csv", "w", newline="", encoding="utf-8") as csvfile:
         writer = csv.writer(csvfile)
 
         writer.writerow(
