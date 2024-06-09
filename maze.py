@@ -675,7 +675,7 @@ class Maze:
         end = get_random_cell((self.maze.shape[0], self.maze.shape[1]))
         self.maze[end] = 2
         while np.any(self.maze > 2):
-            unvisited_cells = get_unvisited_cells(self)
+            unvisited_cells = np.argwhere(self.maze > 2).tolist()
             start = rdm.choice(unvisited_cells)
             start = (start[0], start[1])
             path = [start]
@@ -918,15 +918,6 @@ def get_breakable_walls(self: Maze) -> list[tuple[int, int]]:
         (coordinates[0], coordinates[1])
         for coordinates in np.argwhere(self.maze == 1).tolist()
     ]
-
-
-def get_unvisited_cells(self: Maze) -> list[list[int]]:
-    """Gets all unvisited cells coordinates.
-
-    Returns:
-        list[tuple[int, int]]: List of all unvisited cells coordinates.
-    """
-    return np.argwhere(self.maze > 2).tolist()
 
 
 def get_neighbors(
