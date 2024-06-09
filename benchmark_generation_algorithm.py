@@ -352,9 +352,9 @@ def iterative_division_memory(size: int, queue: Queue) -> None:
 
 def time_complexity() -> None:
     """Benchmarking the time complexity of the different algorithms used to generate the maze."""
-    max_size = 10000
+    max_size = 100
     execution_time = {}
-    for size in tqdm(range(0, max_size + 1, 500)):
+    for size in tqdm(range(max_size + 1, 5)):
         if size == 0:
             size = 5
         queues = []
@@ -452,36 +452,34 @@ def time_complexity() -> None:
 
 def memory_complexity() -> None:
     """Benchmarking the memory complexity of the different algorithms used to generate the maze."""
-    max_size = 10000
+    max_size = 100
     memory = {}
-    for size in tqdm(range(0, max_size + 1, 500)):
+    for size in tqdm(range(max_size + 1, 5)):
         if size == 0:
             size = 5
         queues = []
         processes = []
-        for func in (
-            [
-                kruskal_memory,
-                prim_memory,
-                randomized_depth_first_search_memory,
-                hunt_and_kill_memory,
-                binary_tree_memory,
-                eller_memory,
-                recursive_division_memory,
-                sidewinder_memory,
-                growing_tree_new_memory,
-                growing_tree_mid_memory,
-                growing_tree_old_memory,
-                growing_tree_rand_memory,
-                growing_tree_mixed_memory,
-                aldous_broder_memory,
-                wilson_memory,
-                recursive_backtracking_memory,
-                recursive_kruskal_memory,
-                recursive_hunt_and_kill_memory,
-            ],
+        for func in [
+            kruskal_memory,
+            prim_memory,
+            randomized_depth_first_search_memory,
+            hunt_and_kill_memory,
+            binary_tree_memory,
+            eller_memory,
+            recursive_division_memory,
+            sidewinder_memory,
+            growing_tree_new_memory,
+            growing_tree_mid_memory,
+            growing_tree_old_memory,
+            growing_tree_rand_memory,
+            growing_tree_mixed_memory,
+            aldous_broder_memory,
+            wilson_memory,
+            recursive_backtracking_memory,
+            recursive_kruskal_memory,
+            recursive_hunt_and_kill_memory,
             iterative_division_memory,
-        ):
+        ]:
             queue = Queue()
             queues.append(queue)
             p = Process(target=func, args=(size, queue))

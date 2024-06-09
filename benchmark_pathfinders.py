@@ -188,9 +188,9 @@ def a_star_memory(maze: Maze, size: int, queue: Queue) -> None:
 
 def time_complexity() -> None:
     """Benchmarking the time complexity of the different algorithms used to generate the maze."""
-    max_size = 1000
+    max_size = 10000
     execution_time = {}
-    for size in tqdm(range(0, max_size + 1, 50)):
+    for size in tqdm(range(max_size + 1, 500)):
         if size == 0:
             size = 5
         queues = []
@@ -265,9 +265,9 @@ def time_complexity() -> None:
 
 def memory_complexity() -> None:
     """Benchmarking the memory complexity of the different algorithms used to generate the maze."""
-    max_size = 1000
+    max_size = 10000
     memory = {}
-    for size in tqdm(range(0, max_size + 1, 50)):
+    for size in tqdm(range(max_size + 1, 500)):
         if size == 0:
             size = 5
         queues = []
