@@ -1,5 +1,5 @@
 """ Benchmarking the time and memory complexity of the different algorithms
-    used to generate the maze."""
+    used to generate a maze."""
 
 
 from multiprocessing import Process, Queue
@@ -7,12 +7,16 @@ from multiprocessing import Process, Queue
 import csv
 import os
 import timeit
+import sys
 import psutil
 
 from tqdm import tqdm
 
 from maze import Maze
 from recursive_maze import RecursiveMaze
+
+sys.setrecursionlimit(10**6)
+
 
 def kruskal_time(size: int, queue: Queue) -> None:
     time = round(timeit.timeit(lambda: Maze(size).kruskal(),
@@ -114,12 +118,14 @@ def recursive_kruskal_time(size: int, queue: Queue) -> None:
     time = round(timeit.timeit(lambda: RecursiveMaze(size).recursive_kruskal(),
                                number=1, globals=globals()), 5)
     queue.put(("Recursive Kruskal", size, time))
-    
+
+
 def recursive_hunt_and_kill_time(size: int, queue: Queue) -> None:
     time = round(timeit.timeit(lambda: RecursiveMaze(size).recursive_hunt_and_kill(),
                                number=1, globals=globals()), 5)
     queue.put(("Recursive Hunt and Kill", size, time))
-    
+
+
 def iterative_division_time(size: int, queue: Queue) -> None:
     time = round(timeit.timeit(lambda: Maze(size).iterative_division(),
                                number=1, globals=globals()), 5)
@@ -265,14 +271,16 @@ def recursive_kruskal_memory(size: int, queue: Queue) -> None:
     maze.recursive_kruskal()
     mem = memory_usage(os.getpid()) - mem
     queue.put(("Recursive Kruskal", size, mem))
-    
+
+
 def recursive_hunt_and_kill_memory(size: int, queue: Queue) -> None:
     maze = RecursiveMaze(size)
     mem = memory_usage(os.getpid())
     maze.recursive_hunt_and_kill()
     mem = memory_usage(os.getpid()) - mem
     queue.put(("Recursive Hunt and Kill", size, mem))
-    
+
+
 def iterative_division_memory(size: int, queue: Queue) -> None:
     maze = Maze(size)
     mem = memory_usage(os.getpid())
@@ -286,7 +294,9 @@ def time_complexity() -> None:
     """
     max_size = 10000
     execution_time = {}
-    for size in tqdm(range(10, max_size + 1, 500)):
+    for size in tqdm(range(0, max_size + 1, 500)):
+        if size == 0:
+            size = 5
         queues = []
         processes = []
         for func in [kruskal_time, prim_time, randomized_depth_first_search_time, hunt_and_kill_time,
@@ -313,7 +323,6 @@ def time_complexity() -> None:
     with open('time_complexity.csv', 'w', newline='', encoding='utf-8') as csvfile:
         writer = csv.writer(csvfile)
 
-        # Write the header row
         writer.writerow(['Size', 'Kruskal', 'Prim', 'Randomized Depth First Search',
                         'Hunt and Kill', 'Binary Tree', 'Eller', 'Recursive Division', 'Sidewinder',
                          'Growing Tree (Newest)', 'Growing Tree (Middle)', 'Growing Tree (Oldest)',
@@ -321,7 +330,6 @@ def time_complexity() -> None:
                          'Wilson', 'Recursive Backtracking', 'Recursive Kruskal',
                          'Recursive Hunt and Kill', 'Iterative Division'])
 
-        # Write the data rows
         for size in execution_time['Kruskal'].keys():
             writer.writerow([size,
                             execution_time['Kruskal'][size],
@@ -379,7 +387,6 @@ def memory_complexity() -> None:
     with open('memory_complexity.csv', 'w', newline='', encoding='utf-8') as csvfile:
         writer = csv.writer(csvfile)
 
-        # Write the header row
         writer.writerow(['Size', 'Kruskal', 'Prim', 'Randomized Depth First Search',
                         'Hunt and Kill', 'Binary Tree', 'Eller', 'Recursive Division', 'Sidewinder',
                          'Growing Tree (Newest)', 'Growing Tree (Middle)', 'Growing Tree (Oldest)',
@@ -387,7 +394,6 @@ def memory_complexity() -> None:
                          'Wilson', 'Recursive Backtracking', 'Recursive Kruskal',
                          'Recursive Hunt and Kill', 'Iterative Division'])
 
-        # Write the data rows
         for size in memory['Kruskal'].keys():
             writer.writerow([size,
                             memory['Kruskal'][size],
