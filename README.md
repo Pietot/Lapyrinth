@@ -95,7 +95,7 @@ from maze import Maze
 start = (1, 7)
 end = (5, 9)
 # Or Maze(x) for a maze of x*x cells
-maze = Maze(x, y, start, end)
+maze = Maze(x, y, start=start, end=end)
 # Choose the algorithm you want below
 maze.binary_tree()
 # If you want to make a so-called imperfect maze.
