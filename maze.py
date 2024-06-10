@@ -775,9 +775,9 @@ class Maze:
             y2 = (index[0] + 1) * cell_size
 
             if index == self.start:
-                draw.rectangle((x1, y1 + 1, x2, y2), fill=(0, 255, 0))
-            elif index == self.end:
                 draw.rectangle((x1, y1 + 1, x2, y2), fill=(255, 0, 0))
+            elif index == self.end:
+                draw.rectangle((x1, y1 + 1, x2, y2), fill=(255, 255, 0))
             elif int(cell_value) < 2:
                 draw.rectangle((x1, y1, x2, y2), fill=wall_color)
 
