@@ -283,18 +283,22 @@ class Maze:
         )
 
         def hunt() -> tuple[int, int] | None:
-            for index, cell_value in self:
-                if int(cell_value) > 2:
-                    neighbor, direction = get_connection(self, (index[0], index[1]))
-                    if neighbor == (0, 0):
-                        continue
-                    self.maze[neighbor] = 2
-                    wall_coordinates = (
-                        neighbor[0] - direction[0] // 2,
-                        neighbor[1] - direction[1] // 2,
-                    )
-                    self.maze[wall_coordinates] = 2
-                    return (index[0], index[1])
+            unvisited_cells = np.argwhere(self.maze > 2)
+            if not unvisited_cells.size:
+                return None
+            unvisited_cells = unvisited_cells.tolist()
+            for cell_index in unvisited_cells:
+                neighbor, direction = get_connection(
+                    self, (cell_index[0], cell_index[1]))
+                if neighbor == (0, 0):
+                    continue
+                self.maze[neighbor] = 2
+                wall_coordinates = (
+                    neighbor[0] - direction[0] // 2,
+                    neighbor[1] - direction[1] // 2,
+                )
+                self.maze[wall_coordinates] = 2
+                return (cell_index[0], cell_index[1])
             return None
 
         while cell:
