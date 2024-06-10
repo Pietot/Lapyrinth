@@ -86,7 +86,7 @@ class UnsolvableMaze(Exception):
 
 
 def left_hand(self: Maze) -> list[tuple[int, int]]:
-    """Solve the maze with the left hand rule.
+    """Solves the maze with the left hand rule.
 
     It start by knowing if the left cell relative to the current direction is a wall or not.\n
     If it's not a wall, it will turn left, move forward and update the direction.\n
@@ -155,7 +155,7 @@ def left_hand(self: Maze) -> list[tuple[int, int]]:
 
 
 def right_hand(self: Maze) -> list[tuple[int, int]]:
-    """Solve the maze with the right hand rule.
+    """Solves the maze with the right hand rule.
 
     It start by knowing if the right cell relative to the current direction is a wall or not.\n
     If it's not a wall, it will turn right, move forward and update the direction.\n
@@ -221,7 +221,7 @@ def right_hand(self: Maze) -> list[tuple[int, int]]:
 
 
 def random_mouse(self: Maze) -> list[tuple[int, int]]:
-    """Solve the maze with the random mouse pathfinder.
+    """Solves the maze with the random mouse pathfinder.
 
     It will randomly choose a direction to move to until it reaches the end of the maze.\n
     For performance reasons, it will not choose the opposite direction until it's forced.\n
@@ -261,7 +261,7 @@ def random_mouse(self: Maze) -> list[tuple[int, int]]:
 
 
 def pledge(self: Maze, following_direction: str) -> list[tuple[int, int]]:
-    """Solve the maze with the Pledge pathfinder.
+    """Solves the maze with the Pledge pathfinder.
 
     While the end is not reached, the pathfinder go straightforward.\n
     If it reaches a wall, it will walk along the left/right wall defined by following_direction\n
@@ -356,7 +356,7 @@ def pledge(self: Maze, following_direction: str) -> list[tuple[int, int]]:
 
 
 def dead_end_filler(self: Maze) -> list[tuple[int, int]]:
-    """Solve the maze with the Dead End Filler pathfinder.
+    """Solves the maze with the Dead End Filler pathfinder.
 
     It start by converting all path cells to 2.\n
     Then if will recursively fill the dead ends (cells with only one neighbor)
@@ -392,13 +392,13 @@ def dead_end_filler(self: Maze) -> list[tuple[int, int]]:
         return path
 
     self.maze[self.maze > 1] = 3
-    stack = get_dead_ends(self)
+    stack = get_dead_ends_in_depth(self)
 
     while stack:
         rows, columns = zip(*stack)
         self.maze[rows, columns] = 2
         stack.clear()
-        stack.extend(get_dead_ends(self))
+        stack.extend(get_dead_ends_in_depth(self))
 
     self.pathfinder = "Dead End Filler"
     return get_path()
@@ -459,7 +459,7 @@ def depth_first_search(self: Maze) -> list[tuple[int, int]]:
 
 
 def breadth_first_search(self: Maze) -> list[tuple[int, int]]:
-    """Solve the maze with the Breadth First Search pathfinder.
+    """Solves the maze with the Breadth First Search pathfinder.
 
     It starts by converting all path cells to 3 (unvisited).\n
     Then it creates a stack with the start cell.\n
@@ -504,7 +504,7 @@ def breadth_first_search(self: Maze) -> list[tuple[int, int]]:
 
 
 def greedy_best_first_search(self: Maze) -> list[tuple[int, int]]:
-    """Solve the maze with the Best First Search pathfinder.
+    """Solves the maze with the Best First Search pathfinder.
 
     It starts by converting all path cells to 3 (unvisited).\n
     Then it creates a set with the start cell.\n
@@ -557,7 +557,7 @@ def greedy_best_first_search(self: Maze) -> list[tuple[int, int]]:
 
 
 def a_star(self: Maze) -> list[tuple[int, int]]:
-    """Solve the maze with the A* pathfinder.
+    """Solves the maze with the A* pathfinder.
 
     It starts by converting all path cells to 3 (unvisited).\n
     Then it creates a min-heap with the start cell.\n
@@ -620,7 +620,7 @@ def a_star(self: Maze) -> list[tuple[int, int]]:
 
 
 def turn_right(direction: tuple[int, int]) -> tuple[int, int]:
-    """Rotate a direction 90 degrees clockwise.
+    """Rotates a direction 90 degrees clockwise.
 
     Args:
         direction (tuple[int, int]): The direction to rotate.
@@ -633,7 +633,7 @@ def turn_right(direction: tuple[int, int]) -> tuple[int, int]:
 
 
 def turn_left(direction: tuple[int, int]) -> tuple[int, int]:
-    """Rotate a direction 90 degrees counterclockwise.
+    """Rotates a direction 90 degrees counterclockwise.
 
     Args:
         direction (tuple[int, int]): The direction to rotate.
@@ -648,7 +648,7 @@ def turn_left(direction: tuple[int, int]) -> tuple[int, int]:
 def update_path(
     path: list[tuple[int, int]], new_cell: tuple[int, int]
 ) -> list[tuple[int, int]]:
-    """Update the path with the new cell.
+    """Updates the path with the new cell.
 
     Args:
         path (list[tuple[int, int]]): The path to update.
@@ -671,7 +671,7 @@ def update_cell_directions(
     algorithm: str,
     error_message: str = "",
 ) -> None:
-    """Update the cell_with_direction dictionary with the current cell and direction.
+    """Updates the cell_with_direction dictionary with the current cell and direction.
 
     Args:
         cell_with_direction (dict[tuple[int, int], list[tuple[int, int]]]):
@@ -693,8 +693,10 @@ def update_cell_directions(
         cell_with_direction[current_cell] = [direction]
 
 
-def get_dead_ends(self: Maze) -> list[tuple[int, int]]:
-    """Get the dead ends of the maze. Meaning the cells with only one neighbor.
+def get_dead_ends_in_depth(self: Maze) -> list[tuple[int, int]]:
+    """Gets the dead ends of the maze in depth.This means that a cell that is
+        not initially a dead end can become one if one of its neighbors becomes a dead end.
+
 
     Args:
         self (Maze): The maze object.
@@ -703,26 +705,52 @@ def get_dead_ends(self: Maze) -> list[tuple[int, int]]:
         list[tuple[int, int]]: A list on indexes of the dead ends.
     """
     dead_ends: list[tuple[int, int]] = []
-    start_neighbor = (1, 1)
-    end_neighbor = (self.maze.shape[0] - 2, self.maze.shape[1] - 2)
-
-    for index, value in np.ndenumerate(self.maze):
+    start_neighbors = maze.get_neighbors(
+        self, self.start, directions=((-1, 0), (0, 1), (1, 0), (0, -1))
+    )
+    end_neighbors = maze.get_neighbors(
+        self, self.end, directions=((-1, 0), (0, 1), (1, 0), (0, -1))
+    )
+    start_neighbors = [neighbor[0] for neighbor in start_neighbors]
+    end_neighbors = [neighbor[0] for neighbor in end_neighbors]
+    unvisited_cells = list(zip(*np.where(self.maze > 2)))
+    for index in unvisited_cells:
         # Skip the start and the end because they are not dead ends.
+        if index in (self.start, self.end):
+            continue
         # We also skip the neighbors of the start and the end
-        # because we can't reach the start and the endas a neighbor.
+        # because we can't reach the start and the end as a neighbor.
         if (
-            value < 2
-            or index in (self.start, self.end, start_neighbor, end_neighbor)
-            or value == 2
+            index in start_neighbors
+            and len(
+                maze.get_neighbors(
+                    self, self.start, directions=((-1, 0), (0, 1), (1, 0), (0, -1))
+                )
+            )
+            == 1
+        ):
+            continue
+        if (
+            index in end_neighbors
+            and len(
+                maze.get_neighbors(
+                    self, self.end, directions=((-1, 0), (0, 1), (1, 0), (0, -1))
+                )
+            )
+            == 1
         ):
             continue
 
         neighbors = maze.get_neighbors(
-            self, (index[0], index[1]), directions=((-1, 0), (0, 1), (1, 0), (0, -1))
+            self, index, directions=((-1, 0), (0, 1), (1, 0), (0, -1))
         )
 
         if len(neighbors) == 1:
-            dead_ends.append((index[0], index[1]))
+            dead_ends.append(index)
+            unvisited_cells.remove(index)
+
+        if not unvisited_cells:
+            break
 
     return dead_ends
 
