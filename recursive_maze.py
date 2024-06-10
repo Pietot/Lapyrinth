@@ -190,13 +190,13 @@ class RecursiveMaze:
             unvisited_cells = unvisited_cells.tolist()
 
             for cell_index in unvisited_cells:
-                
+
                 neighbor, direction = get_connection(
                     self, (cell_index[0], cell_index[1]))
-                
+
                 if neighbor == (0, 0):
                     continue
-                
+
                 self.maze[neighbor] = 2
                 wall_coordinates = (
                     neighbor[0] - direction[0] // 2,
