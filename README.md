@@ -178,8 +178,8 @@ Benefits / Inconveniences:
 
 - Saves all the data of the maze
 - Can't be edited
-- Easier to load
-- Heavy file (~ 15Mo for a 1000x1000 cell maze)
+- Easy to load
+- Heavy file (~15Mo for a 1000x1000 cell maze)
 
 #### - Save the maze's array as a binary file:
 
@@ -194,7 +194,7 @@ Benefits / Inconveniences:
 - Only saves the maze's array
 - Can't be edited
 - Fast to load
-- Heavy file (~ 15Mo for a 1000x1000 cell maze)
+- Heavy file (~15Mo for a 1000x1000 cell maze)
 
 #### - Save the maze's array as a text file:
 
@@ -209,7 +209,7 @@ Benefits / Inconveniences:
 - Only saves the maze's array
 - Easy to read and edit
 - Slow to load
-- Light file (~ 7.5Mo for a 1000x1000 cell maze)
+- Light file (~7.5Mo for a 1000x1000 cell maze)
 
 ## 6 - Load a maze
 
@@ -267,7 +267,7 @@ Here are all the pathfinders available:
 - Dead End Filler
 - Depth First Search
 - Breadth First Search
-- Best First Search
+- Greedy Best First Search
 - A\*
 
 ## 8 - Maze Generation Benchmarks
