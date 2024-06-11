@@ -243,7 +243,7 @@ class RecursiveMaze:
             height = end[0] - start[0]
             width = end[1] - start[1]
 
-            if height <= 1 or width <= 1:
+            if height < 2 or width < 2:
                 return
 
             if divide_vertically(width, height):

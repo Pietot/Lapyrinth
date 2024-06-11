@@ -288,7 +288,8 @@ class Maze:
             unvisited_cells = unvisited_cells.tolist()
             for cell_index in unvisited_cells:
                 neighbor, direction = get_connection(
-                    self, (cell_index[0], cell_index[1]))
+                    self, (cell_index[0], cell_index[1])
+                )
                 if neighbor == (0, 0):
                     continue
                 self.maze[neighbor] = 2
@@ -413,7 +414,7 @@ class Maze:
             height = end_index[0] - start_index[0]
             width = end_index[1] - start_index[1]
 
-            if height <= 1 or width <= 1:
+            if height < 2 or width < 2:
                 continue
 
             if divide_vertically(width, height):
@@ -422,8 +423,6 @@ class Maze:
                     for i in range(start_index[1], end_index[1] + 1)
                     if i not in (start_index[1], ban[1], end_index[1]) and i % 2 == 0
                 ]
-                if not wall_columns:
-                    continue
                 wall_column_index = rdm.choice(wall_columns)
                 self.maze[start_index[0] : end_index[0] + 1, wall_column_index] = 0
                 entries = [
@@ -431,7 +430,7 @@ class Maze:
                 ]
                 entry = rdm.choice(entries)
                 entry_coordinate = (entry, wall_column_index)
-                self.maze[entry, wall_column_index] = 2
+                self.maze[entry, wall_column_index] = 3
 
                 stack.append(
                     (
@@ -453,8 +452,6 @@ class Maze:
                     for i in range(start_index[0], end_index[0] + 1)
                     if i not in (start_index[0], ban[0], end_index[0]) and i % 2 == 0
                 ]
-                if not wall_rows:
-                    continue
                 wall_row_index = rdm.choice(wall_rows)
                 self.maze[wall_row_index, start_index[1] : end_index[1] + 1] = 0
                 entries = [
@@ -462,7 +459,7 @@ class Maze:
                 ]
                 entry = rdm.choice(entries)
                 entry_coordinate = (wall_row_index, entry)
-                self.maze[wall_row_index, entry] = 2
+                self.maze[wall_row_index, entry] = 3
 
                 stack.append(
                     (
