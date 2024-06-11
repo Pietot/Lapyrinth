@@ -44,7 +44,7 @@ class RecursiveMaze:
     def __repr__(self) -> str:
         return np.array2string(self.maze, separator=' ')
 
-    def __iter__(self) -> Generator[tuple[tuple[int, ...], np.uint16], None, None]:
+    def __iter__(self) -> Generator[tuple[tuple[int, int], np.uint16], None, None]:
         # The slice is using to avoid walls/edges. We only want to iterate over the cells.
         for index, value in np.ndenumerate(self.maze[1:-1:2, 1:-1:2]):
             yield (index[0]*2+1, index[1]*2+1), value
