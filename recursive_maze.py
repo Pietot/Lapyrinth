@@ -187,8 +187,7 @@ class RecursiveMaze:
             if not unvisited_cells.size:
                 return None
 
-            unvisited_cells = unvisited_cells.tolist()
-
+            unvisited_cells = unvisited_cells
             for cell_index in unvisited_cells:
 
                 neighbor, direction = get_connection(
@@ -204,7 +203,8 @@ class RecursiveMaze:
                 )
 
                 self.maze[wall_coordinates] = 2
-                self.recursive_hunt_and_kill((cell_index[0], cell_index[1]))
+                cell_index = tuple(cell_index)
+                return self.recursive_hunt_and_kill(cell_index)
 
             return None
 
