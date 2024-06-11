@@ -116,7 +116,7 @@ class Maze:
     def __repr__(self) -> str:
         return np.array2string(self.maze, separator=" ")
 
-    def __iter__(self) -> Generator[tuple[tuple[int, ...], np.uint16], None, None]:
+    def __iter__(self) -> Generator[tuple[tuple[int, int], np.uint16], None, None]:
         # The slice is using to avoid walls/edges. We only want to iterate over the cells.
         for index, value in np.ndenumerate(self.maze[1:-1:2, 1:-1:2]):
             yield (index[0] * 2 + 1, index[1] * 2 + 1), value
@@ -288,7 +288,7 @@ class Maze:
             unvisited_cells = unvisited_cells.tolist()
             for cell_index in unvisited_cells:
                 neighbor, direction = get_connection(
-                    self, (cell_index[0], cell_index[1])
+                    self, cell_index
                 )
                 if neighbor == (0, 0):
                     continue
@@ -298,7 +298,7 @@ class Maze:
                     neighbor[1] - direction[1] // 2,
                 )
                 self.maze[wall_coordinates] = 2
-                return (cell_index[0], cell_index[1])
+                return cell_index
             return None
 
         while cell:
@@ -479,35 +479,48 @@ class Maze:
         self.set_start_end()
         self.algorithm = "Iterative division"
 
-    def binary_tree(self) -> None:
+    def binary_tree(self, user_biais: int = 1) -> None:
         """Applies the Binary Tree algorithm to generate a maze.
 
         It starts by iterating over the maze and checking if the cell is a path.\n
         Then looks for neighbors corresponding to the biais.\n
-        For example, here the biais is ((-2, 0), (0, -2)) for nortwest.\n
+        For example, by default the biais is ((-2, 0), (0, -2)) for nortwest.\n
         So it will look for the neighbors at (-2, 0) and (0, -2).\n
         After choosing randomly a neighbor, it will destroy the wall between the two cells.\n
 
-        For difficulty reasons, the biais is arbitrary set to Nortwest beacause others biais
-        are very easy to solve. \n
-        If you want to choose the bais randomly (or not), you can use the following code:
-
-        def binary_tree(self, biais: tuple[tuple[int, int],
-                                           tuple[int, int]] | None = None) -> 'Maze':
-            # Nortwest, Northeast, Southwest, Southeast\n
-            biais_choices = ((-2, 0), (0, -2),
-                    ((-2, 0), (0, 2)),\n
-                    ((2, 0), (0, -2)),\n
-                    ((2, 0), (0, 2)))
-            biais = rdm.choice(biais_choices)
+        Here are the different biais you can choose from :\n
+        1 = Northwest\n
+        2 = Northeast\n
+        3 = Southwest\n
+        4 = Southeast\n
+        5 = Random\n
         """
-        # Northwest
-        biais = ((-2, 0), (0, -2))
-        for index, _ in self:
+        match user_biais:
+            case 1:
+                biais = ((-2, 0), (0, -2))
+            case 2:
+                biais = ((-2, 0), (0, 2))
+            case 3:
+                biais = ((2, 0), (0, -2))
+            case 4:
+                biais = ((2, 0), (0, 2))
+            case 5:
+                biais = rdm.choice(
+                    [
+                        ((-2, 0), (0, -2)),
+                        ((-2, 0), (0, 2)),
+                        ((2, 0), (0, -2)),
+                        ((2, 0), (0, 2)),
+                    ]
+                )
+            case _:
+                raise ValueError("biais must be between 1 and 5")
+
+        for index, value in self:
             # If the cell is a wall
-            if index[0] % 2 == 0 or index[1] % 2 == 0:
+            if int(value) < 2:
                 continue
-            neighbors = get_neighbors(self, (index[0], index[1]), biais)
+            neighbors = get_neighbors(self, index, biais)
             if neighbors:
                 _, direction = rdm.choice(neighbors)
                 wall_coordinates = (
@@ -540,11 +553,11 @@ class Maze:
         north_direction = (-1, 0)
         set_cells: list[tuple[int, int]] = []
         self.maze[1][1:-1] = 2
-        for index, _ in self:
+        for index, value in self:
             # If we are in the second row or if the cell is a wall
-            if index[0] == 1 or index[0] % 2 == 0 or index[1] % 2 == 0:
+            if index[0] == 1 or value < 2:
                 continue
-            set_cells.append((index[0], index[1]))
+            set_cells.append(index)
             if rdm.random() <= probability or index[1] == self.maze.shape[1] - 2:
                 chosen_cell = rdm.choice(set_cells)
                 wall_coordinates = (
