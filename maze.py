@@ -163,7 +163,7 @@ class Maze:
         breakable_walls = get_breakable_walls(self)
         rdm.shuffle(breakable_walls)
         while breakable_walls:
-            coordinates = breakable_walls.pop(0)
+            coordinates = breakable_walls.pop()
             if coordinates[0] % 2 == 0:
                 upper_value = self.maze[coordinates[0] - 1, coordinates[1]]
                 bottom_value = self.maze[coordinates[0] + 1, coordinates[1]]
