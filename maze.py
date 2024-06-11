@@ -259,7 +259,6 @@ class Maze:
                 self.maze[wall_coordinates] = 2
             neighbors.remove((neighbor, direction))
             neighbors.extend(get_neighbors(self, neighbor))
-            neighbors = list(set(neighbors))
         self.set_start_end()
         self.algorithm = "Prim"
 
