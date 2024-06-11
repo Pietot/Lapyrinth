@@ -392,13 +392,13 @@ def dead_end_filler(self: Maze) -> list[tuple[int, int]]:
         return path
 
     self.maze[self.maze > 1] = 3
-    stack = get_dead_ends_in_depth(self)
+    stack = get_dead_ends(self)
 
     while stack:
         rows, columns = zip(*stack)
         self.maze[rows, columns] = 2
         stack.clear()
-        stack.extend(get_dead_ends_in_depth(self))
+        stack.extend(get_dead_ends(self))
 
     self.pathfinder = "Dead End Filler"
     return get_path()
@@ -693,9 +693,8 @@ def update_cell_directions(
         cell_with_direction[current_cell] = [direction]
 
 
-def get_dead_ends_in_depth(self: Maze) -> list[tuple[int, int]]:
-    """Gets the dead ends of the maze in depth.This means that a cell that is
-        not initially a dead end can become one if one of its neighbors becomes a dead end.
+def get_dead_ends(self: Maze) -> list[tuple[int, int]]:
+    """Get the dead ends of the maze. Meaning the cells with only one neighbor.
 
 
     Args:
