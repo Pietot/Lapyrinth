@@ -287,9 +287,7 @@ class Maze:
                 return None
             unvisited_cells = unvisited_cells
             for cell_index in unvisited_cells:
-                neighbor, direction = get_connection(
-                    self, cell_index
-                )
+                neighbor, direction = get_connection(self, cell_index)
                 if neighbor == (0, 0):
                     continue
                 self.maze[neighbor] = 2
