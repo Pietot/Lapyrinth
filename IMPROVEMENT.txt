@@ -4,7 +4,6 @@ Here are ideas/tips to improve maze.py:
         Add Growing Forest algorithm, simplified prim, modified prim or True prim (I think i did True but i'm not sure) (https://www.astrolog.org/labyrnth/algrithm.htm)
         Add Blob Division (https://weblog.jamisbuck.org/2015/1/15/better-recursive-division-algorithm.html)
         Set private values
-        Use deque instead of list for specific algorithms
         Add an iterative or recursive version of algorithms that doesn't have both version
 
     General:
@@ -21,4 +20,5 @@ Here are ideas/tips to improve pathfinder.py:
     General:
         Optimize algorithms
 
+USE GIF/VIDEO TU ILLUSTRATE HOW EACH ALGORITM WORKS FOR GENERATING A MAZE IN THE README
 ADD PACKAGE TO PIP
