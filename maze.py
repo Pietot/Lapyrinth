@@ -285,7 +285,7 @@ class Maze:
             unvisited_cells = np.argwhere(self.maze > 2)
             if not unvisited_cells.size:
                 return None
-            unvisited_cells = unvisited_cells.tolist()
+            unvisited_cells = unvisited_cells
             for cell_index in unvisited_cells:
                 neighbor, direction = get_connection(
                     self, cell_index
@@ -298,6 +298,7 @@ class Maze:
                     neighbor[1] - direction[1] // 2,
                 )
                 self.maze[wall_coordinates] = 2
+                cell_index = tuple(cell_index)
                 return cell_index
             return None
 
