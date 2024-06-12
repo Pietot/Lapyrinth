@@ -926,11 +926,7 @@ def get_breakable_walls(self: Maze) -> list[tuple[int, int]]:
     Returns:
         list[list[int, int]]: List of all breakable walls coordinates.
     """
-    return [
-        (coordinates[0], coordinates[1])
-        for coordinates in np.argwhere(self.maze == 1).tolist()
-    ]
-
+    return list(zip(*np.where(self.maze == 1)))
 
 def get_neighbors(
     self: Maze,
