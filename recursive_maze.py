@@ -182,16 +182,15 @@ class RecursiveMaze:
             (self.maze.shape[0], self.maze.shape[1]))
 
         def hunt() -> None:
-            unvisited_cells = np.argwhere(self.maze > 2)
+            unvisited_cells = np.where(self.maze > 2)
 
-            if not unvisited_cells.size:
+            if not unvisited_cells:
                 return None
 
-            unvisited_cells = unvisited_cells
+            unvisited_cells = np.transpose(np.asarray(unvisited_cells))
             for cell_index in unvisited_cells:
 
-                neighbor, direction = get_connection(
-                    self, (cell_index[0], cell_index[1]))
+                neighbor, direction = get_connection(self, cell_index)
 
                 if neighbor == (0, 0):
                     continue
@@ -201,7 +200,6 @@ class RecursiveMaze:
                     neighbor[0] - direction[0] // 2,
                     neighbor[1] - direction[1] // 2,
                 )
-
                 self.maze[wall_coordinates] = 2
                 cell_index = tuple(cell_index)
                 return self.recursive_hunt_and_kill(cell_index)
@@ -468,13 +466,12 @@ def verify_values_maze(maze: npt.NDArray[np.uint]) -> bool:
 
 
 def get_breakable_walls(self: RecursiveMaze) -> list[tuple[int, int]]:
-    """ Gets all breakable walls coordinates.
+    """Gets all breakable walls coordinates.
 
     Returns:
         list[list[int, int]]: List of all breakable walls coordinates.
     """
-    return [(coordinates[0], coordinates[1])
-            for coordinates in np.argwhere(self.maze == 1).tolist()]
+    return list(zip(*np.where(self.maze == 1)))
 
 
 def get_neighbors(self: RecursiveMaze,
