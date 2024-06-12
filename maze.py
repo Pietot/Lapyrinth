@@ -476,7 +476,7 @@ class Maze:
         self.set_start_end()
         self.algorithm = "Iterative division"
 
-    def binary_tree(self, user_biais: int = 1) -> None:
+    def binary_tree(self, user_biais: int = 0) -> None:
         """Applies the Binary Tree algorithm to generate a maze.
 
         It starts by iterating over the maze and checking if the cell is a path.\n
@@ -486,45 +486,37 @@ class Maze:
         After choosing randomly a neighbor, it will destroy the wall between the two cells.\n
 
         Here are the different biais you can choose from :\n
-        1 = Northwest\n
-        2 = Northeast\n
-        3 = Southwest\n
-        4 = Southeast\n
-        5 = Random\n
+        0 = Northwest (default) \n
+        1 = Northeast\n
+        2 = Southwest\n
+        3 = Southeast\n
+        4 = Random\n
         """
         match user_biais:
+            case 0:
+                nb_rotation = 0
             case 1:
-                biais = ((-2, 0), (0, -2))
+                nb_rotation = -1
             case 2:
-                biais = ((-2, 0), (0, 2))
+                nb_rotation = -2
             case 3:
-                biais = ((2, 0), (0, -2))
+                nb_rotation = 1
             case 4:
-                biais = ((2, 0), (0, 2))
-            case 5:
-                biais = rdm.choice(
-                    [
-                        ((-2, 0), (0, -2)),
-                        ((-2, 0), (0, 2)),
-                        ((2, 0), (0, -2)),
-                        ((2, 0), (0, 2)),
-                    ]
-                )
+                nb_rotation = rdm.choice([0, 1, 2, -1])
             case _:
-                raise ValueError("biais must be between 1 and 5")
-
-        for index, value in self:
-            # If the cell is a wall
-            if int(value) < 2:
-                continue
-            neighbors = get_neighbors(self, index, biais)
-            if neighbors:
-                _, direction = rdm.choice(neighbors)
-                wall_coordinates = (
-                    index[0] + direction[0] // 2,
-                    index[1] + direction[1] // 2,
-                )
+                raise ValueError("biais must be between 1 and 4")
+        self.maze[1][1:-1] = 2
+        self.maze[1:-1, 1] = 2
+        north_biais, west_biais = (1, 1)
+        for index, _ in np.ndenumerate(self.maze[3:-1:2, 3:-1:2]):
+            if rdm.random() <= 0.5:
+                wall_coordinates = (index[0] * 2 + 3 - north_biais, index[1] * 2 + 3)
                 self.maze[wall_coordinates] = 2
+            else:
+                wall_coordinates = (index[0] * 2 + 3, index[1] * 2 + 3 - west_biais)
+                self.maze[wall_coordinates] = 2
+        if nb_rotation:
+            self.maze = np.rot90(self.maze, nb_rotation)
         self.set_start_end()
         self.algorithm = "Binary Tree"
 
@@ -993,7 +985,7 @@ def get_connection(
     """
     neighbors: list[tuple[tuple[int, int], tuple[int, int]]] = []
     # North, East, South, West
-    directions = [(-2, 0), (0, 2), (2, 0), (0, -2)]
+    directions = ((-2, 0), (0, 2), (2, 0), (0, -2))
     for row, column in directions:
         neighbor = (index[0] + row, index[1] + column)
         if (
