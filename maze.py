@@ -202,12 +202,10 @@ class Maze:
             else get_random_cell((self.maze.shape[0], self.maze.shape[1]))
         )
         stack = [current_cell]
-
-        # Mark the start cell as visited
         self.maze[current_cell] = 2
 
         while stack:
-            current_cell = stack[-1]  # Peek at the top of the stack
+            current_cell = stack[-1]
             neighbors = get_neighbors(self, current_cell)
 
             if not neighbors:
