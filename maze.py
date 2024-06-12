@@ -926,6 +926,7 @@ def get_breakable_walls(self: Maze) -> list[tuple[int, int]]:
     """
     return list(zip(*np.where(self.maze == 1)))
 
+
 def get_neighbors(
     self: Maze,
     cell: tuple[int, int],
