@@ -39,9 +39,7 @@ This **Mazer Maker Solver** made entirely in Python is a program where you can g
 
 - Save the maze to load it later
 
-- Solve them with different pathfinders
-
-- Ability to benchmark all algorithms in one click
+- Solve them with various pathfinders among 9 of them
 
 ## 2 - Installation
 
