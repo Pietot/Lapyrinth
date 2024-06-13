@@ -1093,3 +1093,25 @@ def load_object(file_path: str) -> Maze:
     if verify_shape(self.maze.shape) and verify_values_maze(self.maze):
         return self
     raise ValueError("The file contain an invalid maze")
+
+
+def curious_maze() -> Maze:
+    """ Don't run this function, it's only for curious people
+    """
+    redflag = Maze()
+    redflag.maze = np.array(
+        [
+            [0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [3, 3, 3, 3, 3, 3, 3, 3, 0],
+            [0, 3, 0, 3, 0, 1, 0, 3, 0],
+            [0, 3, 1, 3, 1, 3, 3, 3, 0],
+            [0, 3, 0, 1, 0, 1, 0, 3, 0],
+            [0, 3, 3, 3, 1, 3, 1, 3, 0],
+            [0, 3, 0, 1, 0, 3, 0, 3, 0],
+            [0, 3, 3, 3, 3, 3, 3, 3, 3],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        ]
+    )
+    print(redflag)
+    print("Oups... Well, I guess you found an easter egg")
+    return redflag
