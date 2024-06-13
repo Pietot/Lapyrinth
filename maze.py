@@ -476,7 +476,7 @@ class Maze:
         self.set_start_end()
         self.algorithm = "Iterative division"
 
-    def binary_tree(self, user_biais: int = 0) -> None:
+    def binary_tree(self, user_biais: int = 0, probability_carve_vertically : float = 0.5) -> None:
         """Applies the Binary Tree algorithm to generate a maze.
 
         It starts by iterating over the maze and checking if the cell is a path.\n
@@ -491,7 +491,15 @@ class Maze:
         2 = Southwest\n
         3 = Southeast\n
         4 = Random\n
+        
+        Args:
+            user_biais (int, optional): The biais to choose from.
+                Defaults to 0.\n
+            probability_carve_vertically (float, optional):
+                The probability to carve a wall vertically.
+                Defaults to 0.5.
         """
+        probability_carve_vertically = min(1.0, max(0.0, probability_carve_vertically)) if probability_carve_vertically else 0.5
         match user_biais:
             case 0:
                 nb_rotation = 0
@@ -509,7 +517,7 @@ class Maze:
         self.maze[1:-1, 1] = 2
         north_biais, west_biais = (1, 1)
         for index, _ in np.ndenumerate(self.maze[3:-1:2, 3:-1:2]):
-            if rdm.random() <= 0.5:
+            if rdm.random() <= probability_carve_vertically:
                 wall_coordinates = (index[0] * 2 + 3 - north_biais, index[1] * 2 + 3)
                 self.maze[wall_coordinates] = 2
             else:
@@ -520,7 +528,7 @@ class Maze:
         self.set_start_end()
         self.algorithm = "Binary Tree"
 
-    def sidewinder(self, probability: float = 0.5) -> None:
+    def sidewinder(self, probability_carve_north: float = 0.5) -> None:
         """Applies the Sidewinder algorithm to generate a maze.
 
         It starts by carving the second row.\n
@@ -537,7 +545,7 @@ class Maze:
             The lower the value is, the more the maze will have a row shape.\n
             Defaults to 0.5.
         """
-        probability = min(1.0, max(0.0, probability))
+        probability_carve_north = min(1.0, max(0.0, probability_carve_north))
         east_direction = (0, 1)
         north_direction = (-1, 0)
         set_cells: list[tuple[int, int]] = []
@@ -547,7 +555,7 @@ class Maze:
             if index[0] == 1 or value < 2:
                 continue
             set_cells.append(index)
-            if rdm.random() <= probability or index[1] == self.maze.shape[1] - 2:
+            if rdm.random() <= probability_carve_north or index[1] == self.maze.shape[1] - 2:
                 chosen_cell = rdm.choice(set_cells)
                 wall_coordinates = (
                     chosen_cell[0] + north_direction[0],
