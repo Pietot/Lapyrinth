@@ -476,7 +476,9 @@ class Maze:
         self.set_start_end()
         self.algorithm = "Iterative division"
 
-    def binary_tree(self, user_biais: int = 0, probability_carve_vertically : float = 0.5) -> None:
+    def binary_tree(
+        self, user_biais: int = 0, probability_carve_vertically: float = 0.5
+    ) -> None:
         """Applies the Binary Tree algorithm to generate a maze.
 
         It starts by iterating over the maze and checking if the cell is a path.\n
@@ -491,7 +493,7 @@ class Maze:
         2 = Southwest\n
         3 = Southeast\n
         4 = Random\n
-        
+
         Args:
             user_biais (int, optional): The biais to choose from.
                 Defaults to 0.\n
@@ -499,7 +501,11 @@ class Maze:
                 The probability to carve a wall vertically.
                 Defaults to 0.5.
         """
-        probability_carve_vertically = min(1.0, max(0.0, probability_carve_vertically)) if probability_carve_vertically else 0.5
+        probability_carve_vertically = (
+            min(1.0, max(0.0, probability_carve_vertically))
+            if probability_carve_vertically
+            else 0.5
+        )
         match user_biais:
             case 0:
                 nb_rotation = 0
@@ -555,7 +561,10 @@ class Maze:
             if index[0] == 1 or value < 2:
                 continue
             set_cells.append(index)
-            if rdm.random() <= probability_carve_north or index[1] == self.maze.shape[1] - 2:
+            if (
+                rdm.random() <= probability_carve_north
+                or index[1] == self.maze.shape[1] - 2
+            ):
                 chosen_cell = rdm.choice(set_cells)
                 wall_coordinates = (
                     chosen_cell[0] + north_direction[0],
