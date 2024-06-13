@@ -1113,5 +1113,5 @@ def curious_maze() -> Maze:
         ]
     )
     print(redflag)
-    print("Oups... Well, I guess you found an easter egg")
+    print("Oups... My algorithm generated a curious maze... How do you find it?")
     return redflag
