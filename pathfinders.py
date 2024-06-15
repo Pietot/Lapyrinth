@@ -767,17 +767,16 @@ def directions_to_path(
     Returns:
         list[tuple[int, int]]: The path from the start to the end of the maze.
     """
-    path: list[tuple[int, int]] = []
+    path: list[tuple[int, int]] = [self.start]
     current_cell = self.start
 
     while current_cell != self.end:
-        path.append(current_cell)
         current_cell = (
             current_cell[0] + cell_with_directions[current_cell][-1][0],
             current_cell[1] + cell_with_directions[current_cell][-1][1],
         )
+        path.append(current_cell)
 
-    path.append(current_cell)
     return path
 
 
