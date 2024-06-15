@@ -798,7 +798,7 @@ class Maze:
 
         image.save(filename)
 
-    def save_maze(self, file_type: str, filename: str) -> None:
+    def save_maze(self, filename: str) -> None:
         """Save the maze to a pickle file or a binary file or a txt file.
 
         Pickle file is recommanded because it saves the object with all its attributes
@@ -808,12 +808,12 @@ class Maze:
         Texte file is useful for editing and compatibility and it takes less space.
 
         Args:
-            file_type (str): The type of the file ('npy' or 'txt').
             filename (str | None): The name of the file. Defaults to None.
 
         Raises:
             ValueError: file_type must be 'npy' or 'txt'.
         """
+        file_type = filename.split(".")[-1]
         size = self.maze.shape
         filename = (
             f"{filename}.{file_type}"
