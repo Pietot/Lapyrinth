@@ -816,9 +816,9 @@ class Maze:
         file_type = filename.split(".")[-1]
         size = self.maze.shape
         filename = (
-            f"{filename}.{file_type}"
+            f"{filename}"
             if filename
-            else f"Maze_{size[0]//2}x{size[1]//2}_{self.algorithm}.{file_type}"
+            else f"Maze_{size[0]//2}x{size[1]//2}_{self.algorithm}"
         )
         match file_type:
             case "pkl":
