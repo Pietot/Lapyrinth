@@ -829,7 +829,7 @@ class Maze:
             case "txt":
                 np.savetxt(filename, self.maze, fmt="%d", delimiter=",")
             case _:
-                raise ValueError("file_type must be 'pkl' or 'npy' or 'txt'")
+                raise ValueError("filename must end with 'pkl' or 'npy' or 'txt'")
 
     def load_maze(self, file: str) -> None:
         """Load a maze from a binary file or a txt file.
