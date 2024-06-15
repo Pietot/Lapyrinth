@@ -792,15 +792,13 @@ def reconstruct_path(
     Returns:
         list[tuple[int, int]]: The path from the start to the end of the maze.
     """
-    path: deque[tuple[int, int]] = deque()
+    path: deque[tuple[int, int]] = deque([self.end])
     current_cell = self.end
 
     while current_cell != self.start:
-        path.appendleft(current_cell)
         current_cell = came_from[current_cell]
+        path.appendleft(current_cell)
 
-    path.appendleft(self.start)
-    self.pathfinder = "Greedy Best First Search"
     return list(path)
 
 
