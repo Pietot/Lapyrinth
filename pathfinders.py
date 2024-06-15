@@ -123,7 +123,7 @@ def left_hand(self: Maze) -> list[tuple[int, int]]:
                 current_cell,
                 direction,
                 algorithm="Left Hand Rule",
-                error_message="Pathfinder is stuck in a loop.",
+                error_message="Pathfinder is stuck in a loop or end is not reachable.",
             )
             current_cell = (left_cell_row, left_cell_col)
             continue
@@ -137,7 +137,7 @@ def left_hand(self: Maze) -> list[tuple[int, int]]:
                 current_cell,
                 direction,
                 algorithm="Left Hand Rule",
-                error_message="Pathfinder is stuck in a loop.",
+                error_message="Pathfinder is stuck in a loop or end is not reachable.",
             )
             current_cell = (front_cell_row, front_cell_col)
         else:
@@ -146,7 +146,7 @@ def left_hand(self: Maze) -> list[tuple[int, int]]:
                 current_cell,
                 direction,
                 algorithm="Left Hand Rule",
-                error_message="Pathfinder is stuck in a loop.",
+                error_message="Pathfinder is stuck in a loop or end is not reachable.",
             )
             direction = turn_right(direction)
 
@@ -189,7 +189,7 @@ def right_hand(self: Maze) -> list[tuple[int, int]]:
                 current_cell,
                 direction,
                 algorithm="Right Hand Rule",
-                error_message="Pathfinder is stuck in a loop.",
+                error_message="Pathfinder is stuck in a loop or end is not reachable.",
             )
             current_cell = (left_cell_row, left_cell_col)
             continue
@@ -203,7 +203,7 @@ def right_hand(self: Maze) -> list[tuple[int, int]]:
                 current_cell,
                 direction,
                 algorithm="Right Hand Rule",
-                error_message="Pathfinder is stuck in a loop.",
+                error_message="Pathfinder is stuck in a loop or end is not reachable.",
             )
             current_cell = (front_cell_row, front_cell_col)
         else:
@@ -212,7 +212,7 @@ def right_hand(self: Maze) -> list[tuple[int, int]]:
                 current_cell,
                 direction,
                 algorithm="Right Hand Rule",
-                error_message="Pathfinder is stuck in a loop.",
+                error_message="Pathfinder is stuck in a loop or end is not reachable.",
             )
             direction = turn_left(direction)
 
@@ -351,6 +351,9 @@ def pledge(self: Maze, following_direction: str) -> list[tuple[int, int]]:
                     )
                     path = update_path(path, current_cell)
 
+        if current_cell == self.start and nb_rotations == 0:
+            raise UnsolvableMaze("Pledge", "End is not reachable.")
+
     self.pathfinder = "Pledge"
     return path
 
@@ -385,6 +388,8 @@ def dead_end_filler(self: Maze) -> list[tuple[int, int]]:
                     "Dead End Filler",
                     "Pathfinder found multiple paths but it can't select one.",
                 )
+            if len(neighbors) == 0:
+                raise UnsolvableMaze("Dead End Filler", "End is not reachable.")
             self.maze[current_cell] = 2
             current_cell = neighbors[0][0]
             path.append(current_cell)
@@ -480,7 +485,7 @@ def breadth_first_search(self: Maze) -> list[tuple[int, int]]:
         UnsolvableMaze: If the algorithm cannot solve the maze due to the end not being reachable.
 
     Returns:
-        list[tuple[int, int]]: The path from the start to the end of the maze.  
+        list[tuple[int, int]]: The path from the start to the end of the maze.
     """
     self.maze[self.maze > 1] = 3
     queue: deque[tuple[int, int]] = deque([self.start])
@@ -494,11 +499,12 @@ def breadth_first_search(self: Maze) -> list[tuple[int, int]]:
             self.pathfinder = "Breadth First Search"
             return reconstruct_path(self, came_from)
 
-        for neighbor, _ in maze.get_neighbors(self, current_cell, directions=((-1, 0), (0, 1), (1, 0), (0, -1))):
+        for neighbor, _ in maze.get_neighbors(
+            self, current_cell, directions=((-1, 0), (0, 1), (1, 0), (0, -1))
+        ):
             if neighbor not in came_from:
                 queue.append(neighbor)
                 came_from[neighbor] = current_cell
-
 
     raise UnsolvableMaze("Breadth First Search", "End is not reachable.")
 
