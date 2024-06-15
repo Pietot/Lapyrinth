@@ -687,12 +687,10 @@ def update_cell_directions(
     Raises:
         UnsolvableMaze: If the algorithm cannot solve the maze in the configuration given.
     """
-    if cell_with_direction.get(current_cell):
-        if direction in cell_with_direction[current_cell]:
-            raise UnsolvableMaze(algorithm, error_message)
-        cell_with_direction[current_cell].append(direction)
-    else:
-        cell_with_direction[current_cell] = [direction]
+    directions = cell_with_direction.setdefault(current_cell, [])
+    if direction in directions:
+        raise UnsolvableMaze(algorithm, error_message)
+    directions.append(direction)
 
 
 def get_dead_ends(self: Maze) -> list[tuple[int, int]]:
