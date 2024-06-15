@@ -659,10 +659,10 @@ def update_path(
     """
     try:
         index = path.index(new_cell)
-        path = path[:index + 1]
+        path = path[: index + 1]
     except ValueError:
         path.append(new_cell)
-    
+
     return path
 
 
