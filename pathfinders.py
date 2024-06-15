@@ -657,10 +657,12 @@ def update_path(
     Returns:
         list[tuple[int, int]]: The updated path.
     """
-    if new_cell in path:
-        path = path[: path.index(new_cell) + 1]
-    else:
+    try:
+        index = path.index(new_cell)
+        path = path[:index + 1]
+    except ValueError:
         path.append(new_cell)
+    
     return path
 
 
