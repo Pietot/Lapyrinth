@@ -462,13 +462,13 @@ def breadth_first_search(self: Maze) -> list[tuple[int, int]]:
     """Solves the maze with the Breadth First Search pathfinder.
 
     It starts by converting all path cells to 3 (unvisited).\n
-    Then it creates a stack with the start cell.\n
+    Then it creates a queue with the start cell.\n
     It creates a dictionary to store the path from a cell to the cell it came from.\n
-    while the stack is not empty, it pops the first cell and get it as the current cell.\n
+    while the queue is not empty, it pops the first cell and get it as the current cell.\n
     It marks the current cell as visited.\n
     If the current cell is the end, it ends the loop and tells the end was founds.\n
     Else, it gets the neighbors of the current cell.\n
-    Adds the neighbors to the stack and updates the came_from dictionary.\n
+    Adds the neighbors to the queue and updates the came_from dictionary.\n
     If the end is not found, it raises an UnsolvableMaze exception.\n
     Finally, it reconstructs and return the path from the start to the end
     using the came_from dictionary.
@@ -480,25 +480,25 @@ def breadth_first_search(self: Maze) -> list[tuple[int, int]]:
         UnsolvableMaze: If the algorithm cannot solve the maze due to the end not being reachable.
 
     Returns:
-        list[tuple[int, int]]: The path from the start to the end of the maze.
+        list[tuple[int, int]]: The path from the start to the end of the maze.  
     """
     self.maze[self.maze > 1] = 3
-    stack: list[tuple[int, int]] = [self.start]
+    queue: deque[tuple[int, int]] = deque([self.start])
     came_from: dict[tuple[int, int], tuple[int, int]] = {self.start: (0, 0)}
 
-    while stack:
-        current_cell = stack.pop(0)
+    while queue:
+        current_cell = queue.popleft()
         self.maze[current_cell] = 2
 
         if current_cell == self.end:
             self.pathfinder = "Breadth First Search"
             return reconstruct_path(self, came_from)
 
-        neighbors = maze.get_neighbors(
-            self, current_cell, directions=((-1, 0), (0, 1), (1, 0), (0, -1))
-        )
-        stack.extend(neighbor for neighbor, _ in neighbors)
-        came_from.update({neighbor: current_cell for neighbor, _ in neighbors})
+        for neighbor, _ in maze.get_neighbors(self, current_cell, directions=((-1, 0), (0, 1), (1, 0), (0, -1))):
+            if neighbor not in came_from:
+                queue.append(neighbor)
+                came_from[neighbor] = current_cell
+
 
     raise UnsolvableMaze("Breadth First Search", "End is not reachable.")
 
