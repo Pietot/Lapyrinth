@@ -402,8 +402,7 @@ def dead_end_filler(self: Maze) -> list[tuple[int, int]]:
     while stack:
         rows, columns = zip(*stack)
         self.maze[rows, columns] = 2
-        stack.clear()
-        stack.extend(get_dead_ends(self))
+        stack = get_dead_ends(self)
 
     self.pathfinder = "Dead End Filler"
     return get_path()
