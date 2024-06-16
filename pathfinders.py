@@ -431,11 +431,24 @@ def depth_first_search(self: Maze) -> list[tuple[int, int]]:
     Returns:
         list[tuple[int, int]]: The path from the start to the end of the maze.
     """
+
+    def get_direction_priority() -> tuple[tuple[int, int], ...]:
+        directions = [(-1, 0), (0, 1), (1, 0), (0, -1)]
+        # We reverse the list because we dfs will pop the last element
+        directions.sort(
+            key=lambda direction: abs(self.start[0] + direction[0] - self.end[0])
+            + abs(self.start[1] + direction[1] - self.end[1]),
+            reverse=True,
+        )
+        return tuple(directions)
+
     self.maze[self.maze > 1] = 3
     path: list[tuple[int, int]] = [self.start]
     stack: list[tuple[tuple[int, int], list[tuple[int, int]]]] = [
         (self.start, [self.start])
     ]
+
+    directions = get_direction_priority()
 
     while stack:
         current_cell, path = stack.pop()
@@ -451,9 +464,7 @@ def depth_first_search(self: Maze) -> list[tuple[int, int]]:
             self.pathfinder = "Depth First Search"
             return path
 
-        neighbors = maze.get_neighbors(
-            self, current_cell, directions=((-1, 0), (0, 1), (1, 0), (0, -1))
-        )
+        neighbors = maze.get_neighbors(self, current_cell, directions=directions)
 
         for chosen_neighbor, _ in neighbors:
             if self.maze[chosen_neighbor] == 3:
