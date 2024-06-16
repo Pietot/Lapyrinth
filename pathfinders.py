@@ -623,8 +623,7 @@ def a_star(self: Maze) -> list[tuple[int, int]]:
         )
 
         for neighbor, _ in neighbors:
-            cost = g_score[current_cell] + 1
-            tentative_g_score = g_score[current_cell] + cost
+            tentative_g_score = g_score[current_cell] + 1
 
             if neighbor not in g_score or tentative_g_score < g_score[neighbor]:
                 came_from[neighbor] = current_cell
