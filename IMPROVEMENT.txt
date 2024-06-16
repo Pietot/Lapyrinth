@@ -12,7 +12,6 @@ Here are ideas/tips to improve maze.py:
 Here are ideas/tips to improve pathfinder.py:
 
     Specific:
-        Use deque instead of list for specific algorithms
         Add Trémaux pathfinder (https://www.astrolog.org/labyrnth/algrithm.htm)
         Add Chain pathfinder (https://www.astrolog.org/labyrnth/algrithm.htm)
         Add Jump Point Search (https://zerowidth.com/2013/05/05/jump-point-search-explained.html)
