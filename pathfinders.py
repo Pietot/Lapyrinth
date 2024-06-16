@@ -819,7 +819,9 @@ def reconstruct_path(
 
 
 def generate_path(
-    self: Maze, path: list[tuple[int, int]], filename: str | None = None
+    self: Maze,
+    path: list[tuple[int, int]],
+    filename: str | None = None,
 ) -> None:
     """Generate a maze image from a maze object.
 
@@ -829,19 +831,20 @@ def generate_path(
         filename (str | None, optional): The filename. Defaults to None.
     """
     size = self.maze.shape
+    cell_size = 50
+    path_length = len(path)
+
     filename = (
         filename + ".png"
         if filename
         else f"Maze_{size[0]//2}x{size[1]//2}_{self.pathfinder}.png"
     )
-    cell_size = 50
 
     image = Image.new(
         "RGB", (size[0] * cell_size, size[1] * cell_size), (255, 255, 255)
     )
-    draw = ImageDraw.Draw(image)
 
-    path_length = len(path)
+    draw = ImageDraw.Draw(image)
 
     def get_color(step: int, total_steps: int) -> tuple[int, int, int]:
         # Adjust hue to go from red (0) to yellow (1/6)
