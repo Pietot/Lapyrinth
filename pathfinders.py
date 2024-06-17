@@ -46,10 +46,15 @@
 # End : N/A
 # Changelogs : Added Gready Best First Search pathfinder
 
-# v1.7 :
+# v1.8 :
 # Start : 08/06/2024 at 17h00 FR
-# End :  /06/2024 at 17h30 FR
+# End :  08/06/2024 at N/A FR
 # Changelogs : Added A* pathfinder
+
+# v1.9 :
+# Start : 17/06/2024 at 19h30 FR
+# End :  17/06/2024 at  21h50 FR
+# Changelogs : Added Dijkstra's pathfinder
 
 import colorsys
 import heapq
@@ -570,6 +575,45 @@ def greedy_best_first_search(self: Maze) -> list[tuple[int, int]]:
             came_from[neighbor] = current_cell
 
     raise UnsolvableMaze("Greedy Best First Search", "End is not reachable.")
+
+
+def dijkstra(self: Maze) -> list[tuple[int, int]]:
+    """
+    Finds the shortest path through the maze using Dijkstra's algorithm.
+
+    Args:
+        self: A Maze object representing the maze to be traversed.
+
+    Returns:
+        A list of tuples representing the coordinates of the shortest path,
+        or an empty list if no path is found.
+    """
+
+    infinity = np.iinfo(self.maze.dtype).max
+    self.maze[self.maze > 1] = infinity
+    came_from: dict[tuple[int, int], tuple[int, int]] = {}
+    g_score: dict[tuple[int, int], int] = {}
+    cell_to_explore: list[tuple[int, tuple[int, int]]] = []
+    g_score[self.start] = 0
+    heapq.heappush(cell_to_explore, (0, self.start))
+
+    while cell_to_explore:
+        current_distance, current_cell = heapq.heappop(cell_to_explore)
+
+        if current_cell == self.end:
+            return reconstruct_path(self, came_from)
+        neighbors = maze.get_neighbors(
+            self, current_cell, directions=((-1, 0), (0, 1), (1, 0), (0, -1))
+        )
+        for neighbor, _ in neighbors:
+            tentative_g_score = current_distance + self.maze[neighbor]
+
+            if neighbor not in g_score or tentative_g_score < g_score[neighbor]:
+                g_score[neighbor] = tentative_g_score
+                came_from[neighbor] = current_cell
+                heapq.heappush(cell_to_explore, (tentative_g_score, neighbor))
+
+    raise UnsolvableMaze("Dijkstra", "End is not reachable.")
 
 
 def a_star(self: Maze) -> list[tuple[int, int]]:
