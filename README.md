@@ -251,7 +251,7 @@ from maze import Maze
 import pathfinders
 
 maze = Maze(10)
-maze.prim()
+maze.iterative_division()
 path = pathfinders.depth_first_search(maze)
 # If you want to print the solved maze in the CLI
 pathfinders.print_path(maze, path)
@@ -259,21 +259,43 @@ pathfinders.print_path(maze, path)
 pathfinders.generate_path(maze, path)
 ```
 
-Example of a solved maze:
-
-<img src="assets/images/Maze_10x10_Depth First Search.png" width="300" style="border:solid white 1px"/><br>
-
 Here are all the pathfinders available:
 
 - Right Hand Rule
+
+<img src="assets/gifs/right_hand.gif" width="300" style="border:solid white 1px" alt="Animation showing the process of the Right Hand rule pathfinder"> <br><br>
+
 - Left Hand Rule
+
+<img src="assets/gifs/left_hand.gif" width="300" style="border:solid white 1px" alt="Animation showing the process of the Left Hand rule pathfinder"> <br><br>
+
 - Random Mouse
+
+<img src="assets/gifs/random_mouse.gif" width="300" style="border:solid white 1px" alt="Animation showing the process of the Random Mouse pathfinder"> <br><br>
+
 - Pledge
+
+<img src="assets/gifs/pledge.gif" width="300" style="border:solid white 1px" alt="Animation showing the process of Pledge's pathfinder"> <br><br>
+
 - Dead End Filler
+
+<img src="assets/gifs/dead_end_filler.gif" width="300" style="border:solid white 1px" alt="Animation showing the process of Dead End Filler pathfinder"> <br><br>
+
 - Depth First Search
+
+<img src="assets/gifs/dfs.gif" width="300" style="border:solid white 1px" alt="Animation showing the process of Deep First Search pathfinder"> <br><br>
+
 - Breadth First Search
+
+<img src="assets/gifs/bfs.gif" width="300" style="border:solid white 1px" alt="Animation showing the process of Breadth First Search pathfinder"> <br><br>
+
 - Greedy Best First Search
+
+<img src="assets/gifs/gbfs.gif" width="300" style="border:solid white 1px" alt="Animation showing the process of Greedy Best First Search pathfinder"> <br><br>
+
 - A\*
+
+<img src="assets/gifs/a_star.gif" width="300" style="border:solid white 1px" alt="Animation showing the process of A* pathfinder"> <br><br>
 
 ## 8 - Maze Generation Benchmarks
 
