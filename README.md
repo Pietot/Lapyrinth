@@ -29,6 +29,8 @@ This **Mazer Maker Solver** made entirely in Python is a program where you can g
 
 ### 9. [Pathfinders Benchmarks](#8---pathfinders-benchmarks)
 
+### 10. [Improve the project](#8---improve-the-project)
+
 ## 1 - Features
 
 - Generate any maze of any size
@@ -303,24 +305,26 @@ Wonder which algorithm is **faster**? Or which one is less **memory intensive**?
 
 Well.. I already did it for you! So here you are:
 
-<img src="assets/svg/Maze generation time depending on its size.svg">
-<img src="assets/svg/Maze generation memory location depending on the size.svg">
+<img src="assets/svg/">
+<img src="assets/svg/">
 
 > **Note**: For the generation time, Aldous-Broder and Wilson algorithms are truly random (""luck"" based in other words), so their times are very inconsistent on a generation to another.
 
 If you want the values of these graphs with Aldous-Broder and Wilson algorithms, watch this:
 
-<img src="assets/images/time_complexity.png">
-<a href="assets/csv/time_complexity.csv">Download csv here</a><br><br>
+<img src="assets/images/">
+<a href="assets/csv/v">Download csv here</a><br><br>
 
-<img src="assets/images/memory_complexity.png">
-<a href="assets/csv/memory_complexity.csv">Download csv here</a><br><br>
+<img src="assets/images/">
+<a href="assets/csv/">Download csv here</a><br><br>
 
 > **Note**: These values can change depending on the version of Python and your PC<br><br>
 > For these benchmarks, I used Python 3.12.0 on a ryzen 5 3600, rtx 2060 with 2\*8GB of RAM clocked at 3600Hz on Windows 10
 
-## 8 - Pathfinders Benchmarks
+## 9 - Pathfinders Benchmarks
 
 Wonder which pathfinder is the most **efficient**? Or which one is less **memory intensive**?
 
 Well.. I already did it for you! So here you are:
+
+## 9 - Improve the project
