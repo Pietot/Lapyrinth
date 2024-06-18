@@ -319,7 +319,7 @@ If you want the values of these graphs with Aldous-Broder and Wilson algorithms,
 <a href="assets/csv/">Download csv here</a><br><br>
 
 > **Note**: These values can change depending on the version of Python and your PC<br><br>
-> For these benchmarks, I used Python 3.12.0 on a ryzen 5 3600, rtx 2060 with 2\*8GB of RAM clocked at 3600Hz on Windows 10
+> For these benchmarks, I used Python 3.12.0 implemented with CPython on a ryzen 5 3600, rtx 2060 with 2\*8GB of RAM clocked at 3600Hz on Windows 10
 
 ## 9 - Pathfinders Benchmarks
 
