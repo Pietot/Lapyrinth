@@ -484,14 +484,12 @@ def breadth_first_search(self: Maze) -> list[tuple[int, int]]:
     It starts by converting all path cells to 3 (unvisited).\n
     Then it creates a queue with the start cell.\n
     It creates a dictionary to store the path from a cell to the cell it came from.\n
-    while the queue is not empty, it pops the first cell and get it as the current cell.\n
+    While the queue is not empty, it pops the first cell and get it as the current cell.\n
     It marks the current cell as visited.\n
-    If the current cell is the end, it ends the loop and tells the end was founds.\n
+    If the current cell is the end, it ends the loop and return the path.\n
     Else, it gets the neighbors of the current cell.\n
     Adds the neighbors to the queue and updates the came_from dictionary.\n
-    If the end is not found, it raises an UnsolvableMaze exception.\n
-    Finally, it reconstructs and return the path from the start to the end
-    using the came_from dictionary.
+    If the loop ends, it raises an UnsolvableMaze exception.\n
 
     Args:
         self (Maze): The maze object.
@@ -532,13 +530,11 @@ def greedy_best_first_search(self: Maze) -> list[tuple[int, int]]:
     It creates a dictionary to store the cell and the cell it came from.\n
     It creates a heuristic function to calculate the distance between a cell and the end.\n
     While the set is not empty, it get the current cell with the lowest heuristic value.\n
-    If the current cell is the end, it ends the loop and tells the end was founds.\n
+    If the current cell is the end, it ends the loop and return the path.\n
     Else, it marks the current cell as visited, remove it from the set
     and get the neighbors of the current cell.\n
     Adds the neighbors to the set and updates the came_from dictionary.\n
-    If the end is not found, it raises an UnsolvableMaze exception.\n
-    Finally, it reconstructs and return the path from the start to the end
-    using the came_from dictionary.
+    If the loop ends, it raises an UnsolvableMaze exception.\n
 
     Args:
         self (Maze): The maze object.
@@ -578,19 +574,27 @@ def greedy_best_first_search(self: Maze) -> list[tuple[int, int]]:
 
 
 def dijkstra(self: Maze) -> list[tuple[int, int]]:
-    """
-    Finds the shortest path through the maze using Dijkstra's algorithm.
+    """Solves the maze with the Best First Search pathfinder.
+
+    It starts by converting all path cells to 3 (unvisited).\n
+    Then, it creates a min-heap with the start cell.\n
+    It creates 2 dictionaries, first to store the cell and the cell it came from.\n
+    Second to store the g_score (cost from the start to the current cell).\n
+    While the min-heap is not empty, it get the current cell with the lowest g_score
+    If the current cell is the end, it ends the loop and return the path.\n
+    Else, for each neighbor, it calculates the cost to reach the neighbor.\n
+    If the neighbor is not in the g_score or the cost is lower than the previous one,
+    it updates the g_score and adds the neighbor to the min-heap.\n
+    If the loop ends, it raises an UnsolvableMaze exception.\n
 
     Args:
-        self: A Maze object representing the maze to be traversed.
+        self (Maze): The maze object.
 
     Returns:
-        A list of tuples representing the coordinates of the shortest path,
-        or an empty list if no path is found.
+        list[tuple[int, int]]: The path from the start to the end of the maze.
     """
 
-    infinity = np.iinfo(self.maze.dtype).max
-    self.maze[self.maze > 1] = infinity
+    self.maze[self.maze > 1] = 3
     came_from: dict[tuple[int, int], tuple[int, int]] = {}
     g_score: dict[tuple[int, int], int] = {}
     cell_to_explore: list[tuple[int, tuple[int, int]]] = []
@@ -606,7 +610,7 @@ def dijkstra(self: Maze) -> list[tuple[int, int]]:
             self, current_cell, directions=((-1, 0), (0, 1), (1, 0), (0, -1))
         )
         for neighbor, _ in neighbors:
-            tentative_g_score = current_distance + self.maze[neighbor]
+            tentative_g_score = current_distance + 1
 
             if neighbor not in g_score or tentative_g_score < g_score[neighbor]:
                 g_score[neighbor] = tentative_g_score
@@ -621,18 +625,16 @@ def a_star(self: Maze) -> list[tuple[int, int]]:
 
     It starts by converting all path cells to 3 (unvisited).\n
     Then it creates a min-heap with the start cell.\n
-    It creates 3 dictionary, first to store the cell and the cell it came from.\n
+    It creates 3 dictionaries, first to store the cell and the cell it came from.\n
     Second to store the g_score (cost from the start to the current cell).\n
     Third to store the f_score (g_score + heuristic).\n
     While the min-heap is not empty, it get the current cell with the lowest f_score
     and remove it from the min-heap.\n
-    If the current cell is the end, it ends the loop and tells the end was founds.\n
+    If the current cell is the end, it ends the loop and return the path.\n
     Else, for each neighbor, it calculates the cost to reach the neighbor.\n
     If the neighbor is not in the g_score or the cost is lower than the previous one,
     it updates the g_score, the f_score and adds the neighbor to the min-heap.\n
-    If the end is not found, it raises an UnsolvableMaze exception.\n
-    Finally, it reconstructs and return the path from the start to the end
-    using the came_from dictionary.
+    If the loop ends, it raises an UnsolvableMaze exception.\n
 
     Args:
         self (Maze): The maze object.
@@ -653,6 +655,7 @@ def a_star(self: Maze) -> list[tuple[int, int]]:
     came_from: dict[tuple[int, int], tuple[int, int]] = {self.start: (0, 0)}
     g_score = {self.start: 0}
     f_score = {self.start: heuristic(self.start)}
+    cost = 1
 
     while cell_to_explore:
         _, current_cell = heapq.heappop(cell_to_explore)
@@ -667,7 +670,7 @@ def a_star(self: Maze) -> list[tuple[int, int]]:
         )
 
         for neighbor, _ in neighbors:
-            tentative_g_score = g_score[current_cell] + 1
+            tentative_g_score = g_score[current_cell] + cost
 
             if neighbor not in g_score or tentative_g_score < g_score[neighbor]:
                 came_from[neighbor] = current_cell
@@ -676,6 +679,11 @@ def a_star(self: Maze) -> list[tuple[int, int]]:
                 heapq.heappush(cell_to_explore, (f_score[neighbor], neighbor))
 
     raise UnsolvableMaze("A*", "End is not reachable.")
+
+
+def jump_point_search(self: Maze) -> list[tuple[int, int]]:
+    open_set: list[tuple[int, tuple[int, int]]] = []
+    closedSet: set[tuple[int, tuple[int, int]]] = set()
 
 
 def turn_right(direction: tuple[int, int]) -> tuple[int, int]:
