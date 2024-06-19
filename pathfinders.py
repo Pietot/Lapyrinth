@@ -681,11 +681,6 @@ def a_star(self: Maze) -> list[tuple[int, int]]:
     raise UnsolvableMaze("A*", "End is not reachable.")
 
 
-def jump_point_search(self: Maze) -> list[tuple[int, int]]:
-    open_set: list[tuple[int, tuple[int, int]]] = []
-    closedSet: set[tuple[int, tuple[int, int]]] = set()
-
-
 def turn_right(direction: tuple[int, int]) -> tuple[int, int]:
     """Rotates a direction 90 degrees clockwise.
 
