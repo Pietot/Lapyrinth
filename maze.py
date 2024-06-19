@@ -1096,8 +1096,7 @@ def load_object(file_path: str) -> Maze:
 
 
 def curious_maze() -> Maze:
-    """ Don't run this function, it's only for curious people
-    """
+    """Don't run this function, it's only for curious people"""
     redflag = Maze()
     redflag.maze = np.array(
         [
