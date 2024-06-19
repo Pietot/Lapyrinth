@@ -1,0 +1,8 @@
+# Files no more used or unnecessary
+recurisve_maze.py
+test.py
+test2.py
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+
