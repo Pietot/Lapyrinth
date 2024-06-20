@@ -181,7 +181,7 @@ filename = "maze_object"
 maze.save_maze("pkl", filename)
 ```
 
-Benefits / Inconveniences:
+Pros / Cons:
 
 - Saves all the data of the maze
 - Can't be edited
@@ -196,7 +196,7 @@ filename = "maze_binary"
 maze.save_maze("npy", filename)
 ```
 
-Benefits / Inconveniences:
+Pros / Cons:
 
 - Only saves the maze's array
 - Can't be edited
@@ -211,7 +211,7 @@ filename = "maze_text"
 maze.save_maze("txt", filename)
 ```
 
-Benefits / Inconveniences:
+Pros / Cons:
 
 - Only saves the maze's array
 - Easy to read and edit
