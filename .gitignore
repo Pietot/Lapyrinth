@@ -1,7 +1,6 @@
 # Files no more used or unnecessary
 recursive_maze.py
 test.py
-test2.py
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
