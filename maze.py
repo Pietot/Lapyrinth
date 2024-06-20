@@ -779,7 +779,7 @@ class Maze:
         wall_color = (0, 0, 0)
 
         image = Image.new(
-            "RGB", (size[0] * cell_size, size[1] * cell_size), (255, 255, 255)
+            "RGB", (size[1] * cell_size, size[0] * cell_size), (255, 255, 255)
         )
         draw = ImageDraw.Draw(image)
 
