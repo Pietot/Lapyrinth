@@ -27,9 +27,9 @@ This **Mazer Maker Solver** made entirely in Python is a program where you can g
 
 ### 8. [Maze Generation Benchmarks](#8---maze-generation-benchmarks)
 
-### 9. [Pathfinders Benchmarks](#8---pathfinders-benchmarks)
+### 9. [Pathfinders Benchmarks](#9---pathfinders-benchmarks)
 
-### 10. [Improve the project](#8---improve-the-project)
+### 10. [Improve the project](#10---improve-the-project)
 
 ## 1 - Features
 
@@ -327,4 +327,15 @@ Wonder which pathfinder is the most **efficient**? Or which one is less **memory
 
 Well.. I already did it for you! So here you are:
 
-## 9 - Improve the project
+## 10 - Improve the project
+
+If you like this project and/or want to help or improve it, you can:
+
+- Create an issue if you find a bug or want to suggest a feature or any improvement (no matter how small it is).
+
+- Create a pull request if you want to add a feature, fix a bug or improve the code.
+
+- Contact me if you want to talk about the project or anything else (Discord: pietot).
+
+> **Note**: If you want to be guided/helped, you already have a file named "IMPROVEMENTS.TXT" in the project directory, where you can see all the improvements that can be made.
+
