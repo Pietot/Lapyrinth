@@ -1,4 +1,12 @@
-"""A program capable of solving mazes with different path-finding algorithms."""
+"""A program capable of solving mazes with different path-finding algorithms.
+
+Raises:
+    UnsolvableMaze: If the algorithm cannot solve the maze in the configuration given.
+    ValueError: If the following_direction is not 'left' or 'right'.
+    
+Returns:
+    list[tuple[int, int]]: The path from the start to the end of the maze.
+"""
 
 
 # By Pietot
