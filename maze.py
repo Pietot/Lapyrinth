@@ -619,7 +619,7 @@ class Maze:
         probability = probability if probability is not None else 1.0
         probability = min(1.0, max(0.0, probability))
         while cells:
-            chosen_cell = select_cell_by_mode(cells, mode, probability)
+            chosen_cell, index = select_cell_by_mode(cells, mode, probability)
             neighbors = get_neighbors(self, chosen_cell)
             if neighbors:
                 chosen_neighbor, direction = rdm.choice(neighbors)
@@ -631,7 +631,7 @@ class Maze:
                 self.maze[chosen_neighbor] = 2
                 cells.append(chosen_neighbor)
             else:
-                cells.remove(chosen_cell)
+                cells.pop(index)
         self.set_start_end()
         if probability != 1.0:
             probability = round(probability, 2)
@@ -1017,7 +1017,7 @@ def get_connection(
 
 def select_cell_by_mode(
     cells: list[tuple[int, int]], mode: str, probability: float
-) -> tuple[int, int]:
+) -> tuple[tuple[int, int], int]:
     """Choose a cell from a list depending on the selection mode.
 
     Args:
@@ -1033,50 +1033,61 @@ def select_cell_by_mode(
     """
     match mode:
         case "newest":
-            chosen_cell = cells[-1]
+            chosen_cell, index  = cells[-1], -1
         case "middle":
-            chosen_cell = cells[len(cells) // 2]
+            chosen_cell, index = cells[len(cells) // 2], len(cells) // 2
         case "oldest":
-            chosen_cell = cells[0]
+            chosen_cell, index = cells[0], 0
         case "random":
-            chosen_cell = rdm.choice(cells)
+            index = rdm.choice(range(len(cells)))
+            chosen_cell = cells[index]
         case "mixed":
             prob = rdm.random()
             if prob <= 0.25:
-                chosen_cell = cells[-1]
+                chosen_cell, index = cells[-1], -1
             elif prob <= 0.5:
-                chosen_cell = cells[len(cells) // 2]
+                chosen_cell, index = cells[len(cells) // 2], len(cells) // 2
             elif prob <= 0.75:
-                chosen_cell = cells[0]
+                chosen_cell, index = cells[0], 0
             else:
-                chosen_cell = rdm.choice(cells)
+                index = rdm.choice(range(len(cells)))
+                chosen_cell = cells[index]
         case "new/mid":
             if rdm.random() <= probability:
-                chosen_cell = cells[-1]
-            chosen_cell = cells[len(cells) // 2]
+                chosen_cell, index = cells[-1], -1
+            else:
+                chosen_cell, index = cells[len(cells) // 2], len(cells) // 2
         case "new/old":
             if rdm.random() <= probability:
-                chosen_cell = cells[-1]
-            chosen_cell = cells[0]
+                chosen_cell, index = cells[-1], -1
+            else:
+                chosen_cell, index = cells[0], 0
         case "new/rand":
             if rdm.random() <= probability:
-                chosen_cell = cells[-1]
-            chosen_cell = rdm.choice(cells)
+                chosen_cell, index = cells[-1], -1
+            else:
+                index = rdm.choice(range(len(cells)))
+                chosen_cell = cells[index]
         case "mid/old":
             if rdm.random() <= probability:
-                chosen_cell = cells[len(cells) // 2]
-            chosen_cell = cells[0]
+                chosen_cell, index = cells[len(cells) // 2], len(cells) // 2
+            else:
+                chosen_cell, index = cells[0], 0
         case "mid/rand":
             if rdm.random() <= probability:
-                chosen_cell = cells[len(cells) // 2]
-            chosen_cell = rdm.choice(cells)
+                chosen_cell, index = cells[len(cells) // 2], len(cells) // 2
+            else:
+                index = rdm.choice(range(len(cells)))
+                chosen_cell = cells[index]
         case "old/rand":
             if rdm.random() <= probability:
-                chosen_cell = cells[0]
-            chosen_cell = rdm.choice(cells)
+                chosen_cell, index = cells[0], 0
+            else:
+                index = rdm.choice(range(len(cells)))
+                chosen_cell = cells[index]
         case _:
             raise ValueError("Invalid mode")
-    return chosen_cell
+    return chosen_cell, index
 
 
 def load_object(file_path: str) -> Maze:
