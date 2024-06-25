@@ -301,7 +301,7 @@ Here are all the pathfinders available:
 
 ## 8 - Maze Generation Benchmarks
 
-Wonder which algorithm is **faster**? Or which one is less **memory intensive**?
+Wonder which algorithm is **faster**?
 
 Well.. I already did it for you! So here you are:
 
@@ -310,7 +310,7 @@ Well.. I already did it for you! So here you are:
 
 > **Note**: For the generation time, Aldous-Broder and Wilson algorithms are truly random (""luck"" based in other words), so their times are very inconsistent on a generation to another.
 
-If you want the values of these graphs with Aldous-Broder and Wilson algorithms, watch this:
+If you want the values of these graphs, watch this:
 
 <img src="assets/images/">
 <a href="assets/csv/v">Download csv here</a><br><br>
@@ -320,10 +320,11 @@ If you want the values of these graphs with Aldous-Broder and Wilson algorithms,
 
 > **Note**: These values can change depending on the version of Python and your PC<br><br>
 > For these benchmarks, I used Python 3.12.0 implemented with CPython on a ryzen 5 3600, rtx 2060 with 2\*8GB of RAM clocked at 3600Hz on Windows 10
+> These benchmarks were all tested at the same time (multiprocessing) so the results are higher than if they were tested one by one 
 
 ## 9 - Pathfinders Benchmarks
 
-Wonder which pathfinder is the most **efficient**? Or which one is less **memory intensive**?
+Wonder which pathfinder is the most **efficient**?
 
 Well.. I already did it for you! So here you are:
 
