@@ -3,7 +3,7 @@
 Raises:
     UnsolvableMaze: If the algorithm cannot solve the maze in the configuration given.
     ValueError: If the following_direction is not 'left' or 'right'.
-    
+
 Returns:
     list[tuple[int, int]]: The path from the start to the end of the maze.
 """
@@ -74,9 +74,9 @@ import numpy as np
 
 from PIL import Image, ImageDraw
 
-from maze import Maze
+from lapyrinth import Maze
 
-import maze
+import lapyrinth
 
 
 class UnsolvableMaze(Exception):
@@ -251,7 +251,7 @@ def random_mouse(self: Maze) -> list[tuple[int, int]]:
     banned_direction = None
 
     while current_cell != self.end:
-        neighbors = maze.get_neighbors(
+        neighbors = lapyrinth.get_neighbors(
             self, current_cell, directions=directions, return_visited=True
         )
 
@@ -260,7 +260,7 @@ def random_mouse(self: Maze) -> list[tuple[int, int]]:
                 neighbor for neighbor in neighbors if neighbor[1] != banned_direction
             ]
         if not neighbors:
-            neighbors = maze.get_neighbors(
+            neighbors = lapyrinth.get_neighbors(
                 self, current_cell, directions=directions, return_visited=True
             )
 
@@ -393,7 +393,7 @@ def dead_end_filler(self: Maze) -> list[tuple[int, int]]:
         path: list[tuple[int, int]] = [self.start]
 
         while current_cell != self.end:
-            neighbors = maze.get_neighbors(
+            neighbors = lapyrinth.get_neighbors(
                 self, current_cell, directions=((-1, 0), (0, 1), (1, 0), (0, -1))
             )
             if len(neighbors) > 1:
@@ -477,7 +477,7 @@ def depth_first_search(self: Maze) -> list[tuple[int, int]]:
             self.pathfinder = "Depth First Search"
             return path
 
-        neighbors = maze.get_neighbors(self, current_cell, directions=directions)
+        neighbors = lapyrinth.get_neighbors(self, current_cell, directions=directions)
 
         for chosen_neighbor, _ in neighbors:
             if self.maze[chosen_neighbor] == 3:
@@ -520,7 +520,7 @@ def breadth_first_search(self: Maze) -> list[tuple[int, int]]:
             self.pathfinder = "Breadth First Search"
             return reconstruct_path(self, came_from)
 
-        for neighbor, _ in maze.get_neighbors(
+        for neighbor, _ in lapyrinth.get_neighbors(
             self, current_cell, directions=((-1, 0), (0, 1), (1, 0), (0, -1))
         ):
             if neighbor not in came_from:
@@ -570,7 +570,7 @@ def greedy_best_first_search(self: Maze) -> list[tuple[int, int]]:
             return reconstruct_path(self, came_from)
 
         self.maze[current_cell] = 2
-        neighbors = maze.get_neighbors(
+        neighbors = lapyrinth.get_neighbors(
             self, current_cell, directions=((-1, 0), (0, 1), (1, 0), (0, -1))
         )
 
@@ -614,7 +614,7 @@ def dijkstra(self: Maze) -> list[tuple[int, int]]:
 
         if current_cell == self.end:
             return reconstruct_path(self, came_from)
-        neighbors = maze.get_neighbors(
+        neighbors = lapyrinth.get_neighbors(
             self, current_cell, directions=((-1, 0), (0, 1), (1, 0), (0, -1))
         )
         for neighbor, _ in neighbors:
@@ -673,7 +673,7 @@ def a_star(self: Maze) -> list[tuple[int, int]]:
             self.pathfinder = "A star"
             return reconstruct_path(self, came_from)
 
-        neighbors = maze.get_neighbors(
+        neighbors = lapyrinth.get_neighbors(
             self, current_cell, directions=((-1, 0), (0, 1), (1, 0), (0, -1))
         )
 
@@ -774,10 +774,10 @@ def get_dead_ends(self: Maze) -> list[tuple[int, int]]:
         list[tuple[int, int]]: A list on indexes of the dead ends.
     """
     dead_ends: list[tuple[int, int]] = []
-    start_neighbors = maze.get_neighbors(
+    start_neighbors = lapyrinth.get_neighbors(
         self, self.start, directions=((-1, 0), (0, 1), (1, 0), (0, -1))
     )
-    end_neighbors = maze.get_neighbors(
+    end_neighbors = lapyrinth.get_neighbors(
         self, self.end, directions=((-1, 0), (0, 1), (1, 0), (0, -1))
     )
     start_neighbors = [neighbor[0] for neighbor in start_neighbors]
@@ -792,7 +792,7 @@ def get_dead_ends(self: Maze) -> list[tuple[int, int]]:
         if (
             index in start_neighbors
             and len(
-                maze.get_neighbors(
+                lapyrinth.get_neighbors(
                     self, self.start, directions=((-1, 0), (0, 1), (1, 0), (0, -1))
                 )
             )
@@ -802,7 +802,7 @@ def get_dead_ends(self: Maze) -> list[tuple[int, int]]:
         if (
             index in end_neighbors
             and len(
-                maze.get_neighbors(
+                lapyrinth.get_neighbors(
                     self, self.end, directions=((-1, 0), (0, 1), (1, 0), (0, -1))
                 )
             )
@@ -810,7 +810,7 @@ def get_dead_ends(self: Maze) -> list[tuple[int, int]]:
         ):
             continue
 
-        neighbors = maze.get_neighbors(
+        neighbors = lapyrinth.get_neighbors(
             self, index, directions=((-1, 0), (0, 1), (1, 0), (0, -1))
         )
 
