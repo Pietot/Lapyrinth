@@ -289,7 +289,7 @@ Here are all the pathfinders available:
 <img src="assets/gifs/random_mouse.gif" width="49%"alt="Animation showing the process of the Random Mouse pathfinder"> <br><br>
 </p>
 
-- Pledge
+- Pledge (may vary depending on parameters)
 <p align="center">
 <img src="assets/gifs/pledge.gif" width="49%"alt="Animation showing the process of Pledge's pathfinder"> <br><br>
 </p>
