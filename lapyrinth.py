@@ -1033,7 +1033,7 @@ def select_cell_by_mode(
     """
     match mode:
         case "newest":
-            chosen_cell, index  = cells[-1], -1
+            chosen_cell, index = cells[-1], -1
         case "middle":
             chosen_cell, index = cells[len(cells) // 2], len(cells) // 2
         case "oldest":
