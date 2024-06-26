@@ -305,21 +305,31 @@ Wonder which algorithm is **faster**?
 
 Well.. I already did it for you! So here you are:
 
-<img src="assets/svg/">
-<img src="assets/svg/">
+- Chart for slow algorithms
 
-> **Note**: For the generation time, Aldous-Broder and Wilson algorithms are truly random (""luck"" based in other words), so their times are very inconsistent on a generation to another.
+<img src="assets/svg/slow.svg"><br>
+
+- Chart for moderately fast algorithms
+
+<img src="assets/svg/medium.svg"><br>
+
+- Chart for fast algorithms
+
+<img src="assets/svg/fast.svg"><br>
+
+- Chart for all algorithms
+
+<img src="assets/svg/full.svg"><br>
+
+> **Note**: Aldous-Broder and Wilson algorithms were not tested because they are truly random (""luck"" based in other words), so their times are very inconsistent on a generation to another. But for an idea, they are even slower than Kruskal's algorithm
 
 If you want the values of these graphs, watch this:
 
-<img src="assets/images/">
+<img src="assets/images/screenshot.png">
 <a href="assets/csv/v">Download csv here</a><br><br>
 
-<img src="assets/images/">
-<a href="assets/csv/">Download csv here</a><br><br>
-
 > **Note**: These values can change depending on the version of Python and your PC<br><br>
-> For these benchmarks, I used Python 3.12.0 implemented with CPython on a ryzen 5 3600, rtx 2060 with 2\*8GB of RAM clocked at 3600Hz on Windows 10
+> For these benchmarks, I used Python 3.12.0 implemented with CPython on a ryzen 5 3600, rtx 2060 with 2\*8GB of RAM clocked at 3600Hz on Windows 10.<br>
 > These benchmarks were all tested at the same time (multiprocessing) so the results are higher than if they were tested one by one 
 
 ## 9 - Pathfinders Benchmarks
