@@ -115,59 +115,70 @@ maze.generate_image()
 That's it. See, it's very simple. You can go with all of these algorithms:
 
 - Kruskal
-
-<img src="assets/images/kruskal.png" width="300" style="border:solid white 1px" alt="Image illustrating a maze after using Kruskal's algorithm">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-<img src="assets/gifs/kruskal.gif" width="300" style="border:solid white 1px" alt="Animation showing the process of Kruskal's algorithm"> <br><br>
+<p align="center">
+<img src="assets/images/kruskal.png" width="300" style="border:solid white 1px"  alt="Image illustrating a maze after using Kruskal's algorithm">
+<img src="assets/gifs/kruskal.gif" width="300" style="border:solid white 1px"  alt="Animation showing the process of Kruskal's algorithm"> <br><br>
+</p>
 
 - Randomized Depth First Search
-
-<img src="assets/images/rdfs.png" width="300" style="border:solid white 1px" alt="Image illustrating a maze after using Randomized Depth First Search algorithm"/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<p align="center">
+<img src="assets/images/rdfs.png" width="300" style="border:solid white 1px" alt="Image illustrating a maze after using Randomized Depth First Search algorithm"/>&nbsp;
 <img src="assets/gifs/rdfs.gif" width="300" style="border:solid white 1px" alt="Animation showing the process of Randomized Depth First Search algorithm"> <br><br>
+</p>
 
 - Prim
-
-<img src="assets/images/prim.png" width="300" style="border:solid white 1px" alt="Image illustrating a maze after using Prim's algorithm"/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<p align="center">
+<img src="assets/images/prim.png" width="300" style="border:solid white 1px" alt="Image illustrating a maze after using Prim's algorithm"/>&nbsp;
 <img src="assets/gifs/prim.gif" width="300" style="border:solid white 1px" alt="Animation showing the process of Prim's algorithm"> <br><br>
+</p>
 
 - Hunt and Kill
-
-<img src="assets/images/hunt_and_kill.png" width="300" style="border:solid white 1px" alt="Image illustrating a maze after using Hunt and Kill algorithm"/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<p align="center">
+<img src="assets/images/hunt_and_kill.png" width="300" style="border:solid white 1px" alt="Image illustrating a maze after using Hunt and Kill algorithm"/>&nbsp;
 <img src="assets/gifs/hunt_and_kill.gif" width="300" style="border:solid white 1px" alt="Animation showing the process of Hunt and Kill algorithm"> <br><br>
+</p>
 
 - Eller (may vary depending on parameters)
-
-<img src="assets/images/eller.png" width="300" style="border:solid white 1px" alt="Image illustrating a maze after using Eller's algorithm"/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<p align="center">
+<img src="assets/images/eller.png" width="300" style="border:solid white 1px" alt="Image illustrating a maze after using Eller's algorithm"/>&nbsp;
 <img src="assets/gifs/eller.gif" width="300" style="border:solid white 1px" alt="Animation showing the process of Eller's algorithm"> <br><br>
+</p>
 
 - Iterative Division
-
-<img src="assets/images/iterative_division.png" width="300" style="border:solid white 1px" alt="Image illustrating a maze after using Iterative Division algorithm"/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<p align="center">
+<img src="assets/images/iterative_division.png" width="300" style="border:solid white 1px" alt="Image illustrating a maze after using Iterative Division algorithm"/>&nbsp;
 <img src="assets/gifs/iterative_division.gif" width="300" style="border:solid white 1px" alt="Animation showing the process of Iterative Division algorithm"> <br><br>
+</p>
 
 - Binary Tree (may vary depending on parameters)
-
-<img src="assets/images/binary_tree.png" width="300" style="border:solid white 1px" alt="Image illustrating a maze after using Binary Tree algorithm"/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<p align="center">
+<img src="assets/images/binary_tree.png" width="300" style="border:solid white 1px" alt="Image illustrating a maze after using Binary Tree algorithm"/>&nbsp;
 <img src="assets/gifs/binary_tree.gif" width="300" style="border:solid white 1px" alt="Animation showing the process of Binary Tree algorithm"> <br><br>
+</p>
 
 - Sidewinder (may vary depending on parameters)
-
-<img src="assets/images/sidewinder.png" width="300" style="border:solid white 1px" alt="Image illustrating a maze after using Sidewinder algorithm"/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<p align="center">
+<img src="assets/images/sidewinder.png" width="300" style="border:solid white 1px" alt="Image illustrating a maze after using Sidewinder algorithm"/>&nbsp;
 <img src="assets/gifs/sidewinder.gif" width="300" style="border:solid white 1px" alt="Animation showing the process of Sidewinder algorithm"> <br><br>
+</p>
 
 - Growing Tree (may vary depending on parameters)
-
-<img src="assets/images/growing_tree.png" width="300" style="border:solid white 1px" alt="Image illustrating a maze after using Growing Tree algorithm"/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<p align="center">
+<img src="assets/images/growing_tree.png" width="300" style="border:solid white 1px" alt="Image illustrating a maze after using Growing Tree algorithm"/>&nbsp;
 <img src="assets/gifs/growing_tree.gif" width="300" style="border:solid white 1px" alt="Animation showing the process of Growing Tree algorithm"> <br><br>
+</p>
 
 - Aldous-Broder
-
-<img src="assets/images/aldous_broder.png" width="300" style="border:solid white 1px" alt="Image illustrating a maze after using Aldous-Broder algorithm"/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<p align="center">
+<img src="assets/images/aldous_broder.png" width="300" style="border:solid white 1px" alt="Image illustrating a maze after using Aldous-Broder algorithm"/>&nbsp;
 <img src="assets/gifs/aldous_broder.gif" width="300" style="border:solid white 1px" alt="Animation showing the process of Aldous-Broder algorithm"> <br><br>
+</p>
 
 - Wilson
-
-<img src="assets/images/wilson.png" width="300" style="border:solid white 1px" alt="Image illustrating a maze after using Wilson's algorithm"/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<p align="center">
+<img src="assets/images/wilson.png" width="300" style="border:solid white 1px" alt="Image illustrating a maze after using Wilson's algorithm"/>&nbsp;
 <img src="assets/gifs/wilson.gif" width="300" style="border:solid white 1px" alt="Animation showing the process of Wilson's algorithm"> <br><br>
+</p>
 
 ## 5 - Save a maze
 
@@ -326,11 +337,11 @@ Well.. I already did it for you! So here you are:
 If you want the values of these graphs, watch this:
 
 <img src="assets/images/screenshot.png">
-<a href="assets/csv/v">Download csv here</a><br><br>
+<a href="assets/csv/maze_generation_time.csv">Download csv here</a><br><br>
 
 > **Note**: These values can change depending on the version of Python and your PC<br><br>
 > For these benchmarks, I used Python 3.12.0 implemented with CPython on a ryzen 5 3600, rtx 2060 with 2\*8GB of RAM clocked at 3600Hz on Windows 10.<br>
-> These benchmarks were all tested at the same time (multiprocessing) so the results are higher than if they were tested one by one 
+> These benchmarks were all tested at the same time (multiprocessing) so the results are higher than if they were tested one by one
 
 ## 9 - Pathfinders Benchmarks
 
@@ -349,4 +360,3 @@ If you like this project and/or want to help or improve it, you can:
 - Contact me if you want to talk about the project or anything else (Discord: pietot).
 
 > **Note**: If you want to be guided/helped, you already have a file named "IMPROVEMENTS.TXT" in the project directory, where you can see all the improvements that can be made.
-
