@@ -19,4 +19,4 @@ Here are ideas/tips to improve pathfinder.py:
     General:
         Optimize algorithms
 
-ADD PACKAGE TO PIP
+Add stub file
