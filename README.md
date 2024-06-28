@@ -325,25 +325,25 @@ Well.. I already did it for you! So here you are:
 
 - Chart for slow algorithms:
 
-<img src="assets/svg/slow.svg"><br>
+<img src="assets/svg/generation_slow.svg"><br><br>
 
 - Chart for moderately fast algorithms:
 
-<img src="assets/svg/medium.svg"><br>
+<img src="assets/svg/generation_medium.svg"><br><br>
 
 - Chart for fast algorithms:
 
-<img src="assets/svg/fast.svg"><br>
+<img src="assets/svg/generation_fast.svg"><br><br>
 
 - Chart for all algorithms:
 
-<img src="assets/svg/full.svg"><br>
+<img src="assets/svg/generation_full.svg"><br><br>
 
 > **Note**: Aldous-Broder and Wilson algorithms were not tested because they are truly random (""luck"" based in other words), so their times are very inconsistent on a generation to another. But for an idea, they are even slower than Kruskal's algorithm
 
 If you want the values of these graphs, watch this:
 
-<img src="assets/images/screenshot.png">
+<img src="assets/images/csv_generation_screen.png">
 <p align="center">
 <br>
 <a href="assets/csv/maze_generation_time.csv">Download csv here
@@ -359,7 +359,25 @@ If you want the values of these graphs, watch this:
 
 Wonder which pathfinder is the most **efficient**?
 
-Well.. I already did it for you! So here you are:
+Well.. I also already did it for you! So here you are:
+
+> **Note** For better comparison, I used the same maze with default start/end for all pathfinders, for all size. Moreover, I used one set of mazes generated with RDFS (algorithm with the lowest dead-end rate) and another set of mazes generated with Kruskal (algorithm with the highest dead-ends rate).
+
+- Chart for fast pathfinders on RDFS mazes:
+
+<img src="assets/svg/pathfinder_fast_rdfs.svg"><br><br>
+
+- Chart for all pathfinders on RDFS mazes:
+
+<img src="assets/svg/pathfinder_full_rdfs.svg"><br><br>
+
+- Chart for fast pathfinders on Kruskal mazes:
+
+<img src="assets/svg/pathfinder_fast_kruskal.svg"><br><br>
+
+- Chart for all pathfinders on Kruskal mazes:
+
+<img src="assets/svg/pathfinder_full_kruskal.svg"><br><br>
 
 ## 10 - Improve the project
 
