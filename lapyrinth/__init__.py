@@ -1,3 +1,2 @@
-from .lapyrinth import Maze
-from . import lapyrinth
+from .lapyrinth import *
 from . import pathfinders
