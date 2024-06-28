@@ -1,0 +1,19 @@
+Metadata-Version: 2.1
+Name: lapyrinth
+Version: 1.13
+Summary: A program capable of creating mazes with many different algorithms and solving them with different pathfinders.
+Home-page: https://github.com/Pietot/Lapyrinth
+Author: Piétôt
+Author-email: baptiste.blasquez@gmail.com
+Maintainer: Piétôt
+Keywords: maze,pathfinding,algorithm,labyrinth,pathfinder,maze generator
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.10
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: numpy
+Requires-Dist: Pillow==10.2.0
+
+This Mazer Maker Solver made entirely in Python is a program where you can generate maze with many different algorithm and solving them with different pathfinders. Nothing more, nothing less. More info at https://github.com/Pietot/Lapyrinth
