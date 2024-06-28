@@ -43,6 +43,8 @@ This **Mazer Maker Solver** made entirely in Python is a program where you can g
 
 - Solve them with various pathfinders among 9 of them
 
+- Generate an image of the maze solved
+
 ## 2 - Installation
 
 To begin, download and uncompress the **[latest version](https://github.com/Pietot/Maze-Maker-Solver/archive/refs/heads/main.zip)** or clone it by using one of the following command:
