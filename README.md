@@ -43,8 +43,17 @@ This **Mazer Maker Solver** made entirely in Python is a program where you can g
 
 ## 2 - Installation
 
-To begin, download and uncompress the **[latest version](https://github.com/Pietot/Maze-Maker-Solver/archive/refs/heads/main.zip)** or clone it by using one of the following command:
+To begin, two options are available to you:
 
+The first and easiest way is to install the package with pip by writing this line in a CLI (command line interface).
+```
+pip install lapyrinth
+```
+And that's it, you're ready to go to step 3.
+
+---
+
+The second and harder way is download and uncompress the **[latest version](https://github.com/Pietot/Maze-Maker-Solver/archive/refs/heads/main.zip)**, or clone it by using one of the following command:
 ```
 https://github.com/Pietot/Maze-Maker-Solver.git
 ```
@@ -64,14 +73,16 @@ pip install -r requirements.txt
 
 ## 3 - Generate a maze
 
-To generate your first maze, write these lines at the end of <a href="https://github.com/Pietot/Maze-Maker-Solver/blob/main/maze.py">maze.py</a>:
+To generate your first maze, write these lines in any python file:
 
 ```python
+from lapyrinth import Maze
+
 # Optional
 start = (1, 7)
 end = (5, 9)
 # Or Maze(x) for a maze of x*x cells
-maze = Maze(x, y, start, end)
+maze = Maze(height, width, start=start, end=end)
 # Choose the algorithm you want below
 maze.binary_tree()
 # If you want to make a so-called imperfect maze.
@@ -83,28 +94,8 @@ print(maze)
 # If you want to generate a .png file of the maze
 maze.generate_image()
 ```
+If you've downloaded the project, write the same lines in a new python file inside <a href="https://github.com/Pietot/Lapyrinth/tree/main/lapyrinth">lapyrinth</a> folder:
 
-or write the same lines in another python file in the same directory as <a href="https://github.com/Pietot/Maze-Maker-Solver/blob/main/maze.py">maze.py</a> but with an import at the beginning of the file like this:
-
-```python
-from maze import Maze
-
-# Optional
-start = (1, 7)
-end = (5, 9)
-# Or Maze(x) for a maze of x*x cells
-maze = Maze(x, y, start=start, end=end)
-# Choose the algorithm you want below
-maze.binary_tree()
-# If you want to make a so-called imperfect maze.
-# You can specify the number of wall to removed
-# or the probability that a wall will be removed
-maze.make_imperfect_maze("number", 5)
-# If you want to print the maze in the CLI
-print(maze)
-# If you want to generate a .png file of the maze
-maze.generate_image()
-```
 
 > **Note**: Obviously, the larger the maze, the longer it will take to create and generate the image.
 
@@ -185,6 +176,11 @@ If you want to save the maze you've created, three options are available to you:
 #### - Save the entire object:
 
 ```py
+from lapyrinth import Maze
+
+maze = Maze(10)
+maze.prim()
+
 # Filename is optional
 filename = "maze_object"
 maze.save_maze("pkl", filename)
@@ -200,8 +196,13 @@ Pros / Cons:
 #### - Save the maze's array as a binary file:
 
 ```py
+from lapyrinth import Maze
+
+maze = Maze(10)
+maze.prim()
+
 # Filename is optional
-filename = "maze_binary"
+filename = "maze_prim"
 maze.save_maze("npy", filename)
 ```
 
@@ -215,6 +216,11 @@ Pros / Cons:
 #### - Save the maze's array as a text file:
 
 ```py
+from lapyrinth import Maze
+
+maze = Maze(10)
+maze.prim()
+
 # Filename is optional
 filename = "maze_text"
 maze.save_maze("txt", filename)
