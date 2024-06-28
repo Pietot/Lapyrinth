@@ -361,7 +361,7 @@ Wonder which pathfinder is the most **efficient**?
 
 Well.. I also already did it for you! So here you are:
 
-> **Note** For better comparison, I used the same maze with default start/end for all pathfinders, for all size. Moreover, I used one set of mazes generated with RDFS (algorithm with the lowest dead-end rate) and another set of mazes generated with Kruskal (algorithm with the highest dead-ends rate).
+> **Note** For better comparison, I used the same maze with default start/end for all pathfinders, for all size. Moreover, I used one set of mazes generated with RDFS (algorithm with the lowest dead-end rate) and another set of mazes generated with Kruskal (algorithm with the highest dead-ends rate). They're all available in the <a href="assets/pkl">pkl directory</a>.
 
 - Chart for fast pathfinders on RDFS mazes:
 
@@ -389,4 +389,4 @@ If you like this project and/or want to help or improve it, you can:
 
 - Contact me if you want to talk about the project or anything else (Discord: pietot).
 
-> **Note**: If you want to be guided/helped, you already have a file named "IMPROVEMENTS.TXT" in the project directory, where you can see all the improvements that can be made.
+> **Note**: If you want to be guided/helped, you already have a file named <a href="IMPROVEMENT.txt">IMPROVEMENTS.TXT</a> in the project directory, where you can see all the improvements that can be made.
