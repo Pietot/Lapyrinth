@@ -15,8 +15,7 @@
 # v1.2 :
 # Start : 21/03/2024 at 11h00 FR
 # End : 04/03/2024
-# Changelogs : Minor changes, just improved some code by optimizing it and/or refactoring it
-#              and implemented better logic
+# Changelogs : Minor changes, just improved some code by optimizing it and/or refactoring itand implemented better logic
 
 # v1.3 :
 # Start : 13/04/2024
