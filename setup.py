@@ -6,7 +6,7 @@ with open('requirements.txt') as f:
 long_description = "This Mazer Maker Solver made entirely in Python is a program where you can generate maze with many different algorithm and solving them with different pathfinders. Nothing more, nothing less. More info at https://github.com/Pietot/Lapyrinth"
     
 setup(
-    name="Lapyrinth",
+    name="lapyrinth",
     version="1.13",
     packages=find_packages(),
     install_requires=required,
