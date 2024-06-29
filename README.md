@@ -111,61 +111,61 @@ That's it. See, it's very simple. You can go with all of these algorithms:
 
 - Randomized Depth First Search
 <p align="center">
-<img src="assets/images/rdfs.png" width="49%"alt="Image illustrating a maze after using Randomized Depth First Search algorithm"/>&nbsp;
+<img src="assets/images/rdfs.png" width="49%"alt="Image illustrating a maze after using Randomized Depth First Search algorithm"/>
 <img src="assets/gifs/rdfs.gif" width="49%"alt="Animation showing the process of Randomized Depth First Search algorithm"> <br><br>
 </p>
 
 - Prim
 <p align="center">
-<img src="assets/images/prim.png" width="49%"alt="Image illustrating a maze after using Prim's algorithm"/>&nbsp;
+<img src="assets/images/prim.png" width="49%"alt="Image illustrating a maze after using Prim's algorithm"/>
 <img src="assets/gifs/prim.gif" width="49%"alt="Animation showing the process of Prim's algorithm"> <br><br>
 </p>
 
 - Hunt and Kill
 <p align="center">
-<img src="assets/images/hunt_and_kill.png" width="49%"alt="Image illustrating a maze after using Hunt and Kill algorithm"/>&nbsp;
+<img src="assets/images/hunt_and_kill.png" width="49%"alt="Image illustrating a maze after using Hunt and Kill algorithm"/>
 <img src="assets/gifs/hunt_and_kill.gif" width="49%"alt="Animation showing the process of Hunt and Kill algorithm"> <br><br>
 </p>
 
 - Eller (may vary depending on parameters)
 <p align="center">
-<img src="assets/images/eller.png" width="49%"alt="Image illustrating a maze after using Eller's algorithm"/>&nbsp;
+<img src="assets/images/eller.png" width="49%"alt="Image illustrating a maze after using Eller's algorithm"/>
 <img src="assets/gifs/eller.gif" width="49%"alt="Animation showing the process of Eller's algorithm"> <br><br>
 </p>
 
 - Iterative Division
 <p align="center">
-<img src="assets/images/iterative_division.png" width="49%"alt="Image illustrating a maze after using Iterative Division algorithm"/>&nbsp;
+<img src="assets/images/iterative_division.png" width="49%"alt="Image illustrating a maze after using Iterative Division algorithm"/>
 <img src="assets/gifs/iterative_division.gif" width="49%"alt="Animation showing the process of Iterative Division algorithm"> <br><br>
 </p>
 
 - Binary Tree (may vary depending on parameters)
 <p align="center">
-<img src="assets/images/binary_tree.png" width="49%"alt="Image illustrating a maze after using Binary Tree algorithm"/>&nbsp;
+<img src="assets/images/binary_tree.png" width="49%"alt="Image illustrating a maze after using Binary Tree algorithm"/>
 <img src="assets/gifs/binary_tree.gif" width="49%"alt="Animation showing the process of Binary Tree algorithm"> <br><br>
 </p>
 
 - Sidewinder (may vary depending on parameters)
 <p align="center">
-<img src="assets/images/sidewinder.png" width="49%"alt="Image illustrating a maze after using Sidewinder algorithm"/>&nbsp;
+<img src="assets/images/sidewinder.png" width="49%"alt="Image illustrating a maze after using Sidewinder algorithm"/>
 <img src="assets/gifs/sidewinder.gif" width="49%"alt="Animation showing the process of Sidewinder algorithm"> <br><br>
 </p>
 
 - Growing Tree (may vary depending on parameters)
 <p align="center">
-<img src="assets/images/growing_tree.png" width="49%"alt="Image illustrating a maze after using Growing Tree algorithm"/>&nbsp;
+<img src="assets/images/growing_tree.png" width="49%"alt="Image illustrating a maze after using Growing Tree algorithm"/>
 <img src="assets/gifs/growing_tree.gif" width="49%"alt="Animation showing the process of Growing Tree algorithm"> <br><br>
 </p>
 
 - Aldous-Broder
 <p align="center">
-<img src="assets/images/aldous_broder.png" width="49%"alt="Image illustrating a maze after using Aldous-Broder algorithm"/>&nbsp;
+<img src="assets/images/aldous_broder.png" width="49%"alt="Image illustrating a maze after using Aldous-Broder algorithm"/>
 <img src="assets/gifs/aldous_broder.gif" width="49%"alt="Animation showing the process of Aldous-Broder algorithm"> <br><br>
 </p>
 
 - Wilson
 <p align="center">
-<img src="assets/images/wilson.png" width="49%"alt="Image illustrating a maze after using Wilson's algorithm"/>&nbsp;
+<img src="assets/images/wilson.png" width="49%"alt="Image illustrating a maze after using Wilson's algorithm"/>
 <img src="assets/gifs/wilson.gif" width="49%"alt="Animation showing the process of Wilson's algorithm"> <br><br>
 </p>
 
@@ -240,7 +240,7 @@ If you want to load the maze you've saved, two options are available to you depe
 #### - Load a .pkl file:
 
 ```py
-from maze import load_object
+from lapyrinth import load_object
 
 maze = load_object("maze_object.pkl")
 ```
@@ -248,7 +248,7 @@ maze = load_object("maze_object.pkl")
 #### - Load a .npy or a .txt file:
 
 ```py
-from maze import Maze
+from lapyrinth import Maze
 
 maze = Maze()
 maze.load_maze("maze_binary.npy")
@@ -263,9 +263,7 @@ maze.load_maze("maze_text.txt")
 Here's the code to follow to solve a maze:
 
 ```py
-from maze import Maze
-
-import pathfinders
+from lapyrinth import Maze, pathfinders
 
 maze = Maze(10)
 maze.iterative_division()
