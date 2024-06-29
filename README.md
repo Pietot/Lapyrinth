@@ -55,13 +55,13 @@ And that's it, you're ready to go to step 3.
 
 The second and harder way is download and uncompress the **[latest version](https://github.com/Pietot/Maze-Maker-Solver/archive/refs/heads/main.zip)**, or clone it by using one of the following command:
 ```
-https://github.com/Pietot/Maze-Maker-Solver.git
+git clone https://github.com/Pietot/Maze-Maker-Solver.git
 ```
 
 or
 
 ```
-git@github.com:Pietot/Maze-Maker-Solver.git
+git clone git@github.com:Pietot/Maze-Maker-Solver.git
 ```
 
 Then, you need to install all dependencies by opening a CLI (command line interface) and write these lines
