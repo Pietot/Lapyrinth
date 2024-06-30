@@ -343,21 +343,19 @@ Well.. I already did it for you! So here you are:
 
 <img src="assets/svg/generation_full.svg"><br><br>
 
-> **Note**: Aldous-Broder and Wilson algorithms were not tested because they are truly random (""luck"" based in other words), so their times are very inconsistent on a generation to another. But for an idea, they are even slower than Kruskal's algorithm
+> **Note**: Aldous-Broder and Wilson algorithms were not tested because they are truly random (""luck"" based in other words), so their times are very inconsistent on a generation to another. But for an idea, they are even slower than Kruskal's algorithm.
 
 If you want the values of these graphs, watch this:
 
 <img src="assets/images/csv_generation_screen.png">
 <p align="center">
-<br>
 <a href="assets/csv/maze_generation_time.csv">Download csv here
 </a>
-<br>
 </p>
 
 > **Note**: These values can change depending on the version of Python and your PC<br><br>
 > For these benchmarks, I used Python 3.12.0 implemented with CPython on a ryzen 5 3600, rtx 2060 with 2\*8GB of RAM clocked at 3600Hz on Windows 10.<br>
-> These benchmarks were all tested at the same time (multiprocessing) so the results are higher than if they were tested one by one
+> These benchmarks were all tested at the same time (multiprocessing) so the results are higher than if they were tested one by one.
 
 ## 9 - Pathfinders Benchmarks
 
@@ -382,6 +380,17 @@ Well.. I also already did it for you! So here you are:
 - Chart for all pathfinders on Kruskal mazes:
 
 <img src="assets/svg/pathfinder_full_kruskal.svg"><br><br>
+
+If you want the values of these graphs, watch this:
+
+<img src="assets/images/csv_pathfinder_screen.png">
+<p align="center">
+<a href="assets/csv/pathfinder_time.csv">Download csv here
+</a>
+</p>
+
+> **Note**: These values can change depending on the version of Python and your PC<br><br>
+> For these benchmarks, I used Python 3.12.0 implemented with CPython on a ryzen 5 3600, rtx 2060 with 2\*8GB of RAM clocked at 3600Hz on Windows 10.
 
 ## 10 - Improve the project
 
