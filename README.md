@@ -37,7 +37,7 @@ This **Mazer Maker Solver** made entirely in Python is a program where you can g
 
 - Save the maze to load it later
 
-- Solve them with various pathfinders among 9 of them
+- Solve them with various pathfinders among 10 of them
 
 - Generate an image of the maze solved
 
@@ -306,7 +306,7 @@ Here are all the pathfinders available:
 <img src="assets/gifs/dfs.gif" width="49%"alt="Animation showing the process of Deep First Search pathfinder"> <br><br>
 </p>
 
-- Breadth First Search
+- Breadth First Search and Dijkstra
 <p align="center">
 <img src="assets/gifs/bfs.gif" width="49%"alt="Animation showing the process of Breadth First Search pathfinder"> <br><br>
 </p>
