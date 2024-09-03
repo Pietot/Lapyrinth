@@ -3,7 +3,7 @@
 ![Static Badge](https://img.shields.io/badge/made_in-France-red?labelColor=blue)
 ![Static Badge](https://img.shields.io/badge/language-Python-f7d54d?labelColor=4771a4)
 
-This **Mazer Maker Solver** made entirely in Python is a program where you can generate maze with many different algorithm and solving them with different pathfinders. Nothing more, nothing less.
+Lapyrinth is a package made entirely in Python where you can generate mazes with many different algorithms and solving them with different pathfinders. Nothing more, nothing less.
 
 ## Summary
 
