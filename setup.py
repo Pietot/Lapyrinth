@@ -1,6 +1,6 @@
 from setuptools import find_packages, setup
 
-with open("requirements.txt") as f:
+with open("requirements.txt", encoding="utf-8") as f:
     required = f.read().splitlines()
 
 long_description = "This Mazer Maker Solver made entirely in Python is a program where you can generate maze with many different algorithm and solving them with different pathfinders. Nothing more, nothing less. More info at https://github.com/Pietot/Lapyrinth"
