@@ -3,7 +3,7 @@
 ![Static Badge](https://img.shields.io/badge/made_in-France-red?labelColor=blue)
 ![Static Badge](https://img.shields.io/badge/language-Python-f7d54d?labelColor=4771a4)
 
-This **Mazer Maker Solver** made entirely in Python is a program where you can generate maze with many different algorithm and solving them with different pathfinders. Nothing more, nothing less.
+Lapyrinth is a package made entirely in Python where you can generate mazes with many different algorithms and solving them with different pathfinders. Nothing more, nothing less.
 
 ## Summary
 
@@ -37,7 +37,7 @@ This **Mazer Maker Solver** made entirely in Python is a program where you can g
 
 - Save the maze to load it later
 
-- Solve them with various pathfinders among 9 of them
+- Solve them with various pathfinders among 10 of them
 
 - Generate an image of the maze solved
 
@@ -306,7 +306,7 @@ Here are all the pathfinders available:
 <img src="assets/gifs/dfs.gif" width="49%"alt="Animation showing the process of Deep First Search pathfinder"> <br><br>
 </p>
 
-- Breadth First Search
+- Breadth First Search and Dijkstra
 <p align="center">
 <img src="assets/gifs/bfs.gif" width="49%"alt="Animation showing the process of Breadth First Search pathfinder"> <br><br>
 </p>
