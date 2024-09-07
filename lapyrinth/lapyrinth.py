@@ -15,7 +15,8 @@
 # v1.2 :
 # Start : 21/03/2024 at 11h00 FR
 # End : 04/03/2024
-# Changelogs : Minor changes, just improved some code by optimizing it and/or refactoring itand implemented better logic
+# Changelogs : Minor changes, just improved some code by optimizing it and/or refactoring it
+#              and implemented better logic
 
 # v1.3 :
 # Start : 13/04/2024
@@ -73,15 +74,17 @@
 # Changelogs : Added 3 ways to save the maze (pickle.dump, numpy.save and numpy.savetxt),
 #              added 2 way to load the maze (pickle.load, numpy.load) and added requirements.txt
 
+# v1.14 :
+# Start : 07/09/2024 at 23h00 FR
+# End : 08/09/2024 at 1h30 FR
+# Changelogs : Added origin shift algorithm
+
 import pickle
-
 import random as rdm
-
-from typing import Generator, Any
-from numpy import typing as npt
+from typing import Any, Generator
 
 import numpy as np
-
+from numpy import typing as npt
 from PIL import Image, ImageDraw
 
 
@@ -103,9 +106,7 @@ class Maze:
         self.have_value = False
         shape = self.maze.shape[0], self.maze.shape[1]
         self.start = verify_coordinates(start, shape) if start else (1, 0)
-        self.end = (
-            verify_coordinates(end, shape) if end else (shape[0] - 2, shape[1] - 1)
-        )
+        self.end = verify_coordinates(end, shape) if end else (shape[0] - 2, shape[1] - 1)
         self.sculpt_grid()
 
     def __str__(self) -> str:
@@ -177,9 +178,7 @@ class Maze:
         self.set_start_end()
         self.algorithm = "Kruskal"
 
-    def randomized_depth_first_search(
-        self, start: tuple[int, int] | None = None
-    ) -> None:
+    def randomized_depth_first_search(self, start: tuple[int, int] | None = None) -> None:
         """Applies the randomized version of the Depth First Search algorithm to generate a maze.
 
         It starts by choosing a random cell to start and marking it as visited.\n
@@ -195,11 +194,7 @@ class Maze:
             current_cell (tuple[int, int] | None, optional):
                 The current cell being visited. Defaults to None.
         """
-        current_cell = (
-            start
-            if start
-            else get_random_cell((self.maze.shape[0], self.maze.shape[1]))
-        )
+        current_cell = start if start else get_random_cell((self.maze.shape[0], self.maze.shape[1]))
         stack = [current_cell]
         self.maze[current_cell] = 2
 
@@ -237,11 +232,7 @@ class Maze:
                 Defaults to None, meaning a random starting cell will be chosen within the maze.
         """
         neighbors: list[tuple[tuple[int, int], tuple[int, int]]] = []
-        start = (
-            start
-            if start
-            else get_random_cell((self.maze.shape[0], self.maze.shape[1]))
-        )
+        start = start if start else get_random_cell((self.maze.shape[0], self.maze.shape[1]))
         self.maze[start] = 2
         neighbors.extend(get_neighbors(self, start))
         while neighbors:
@@ -272,11 +263,7 @@ class Maze:
             The starting cell for the algorithm.\n
             Defaults to None, which means a random cell will be chosen.
         """
-        cell = (
-            start
-            if start
-            else get_random_cell((self.maze.shape[0], self.maze.shape[1]))
-        )
+        cell = start if start else get_random_cell((self.maze.shape[0], self.maze.shape[1]))
 
         def hunt() -> tuple[int, int] | None:
             unvisited_cells = np.where(self.maze > 2)
@@ -339,9 +326,7 @@ class Maze:
         if not self.have_value:
             self.set_values()
             self.have_value = True
-        probability_carve_horizontally = min(
-            1.0, max(0.0, probability_carve_horizontally)
-        )
+        probability_carve_horizontally = min(1.0, max(0.0, probability_carve_horizontally))
         probability_carve_vertically = min(1.0, max(0.0, probability_carve_vertically))
         rows = self.maze[1:-1:2]
         for row_index, row in enumerate(rows):
@@ -350,10 +335,7 @@ class Maze:
                 values = row[value_index * 2 + 1], row[value_index * 2 + 3]
                 if last_row and values[0] != values[1]:
                     self.merge_values((row_index * 2 + 1, value_index * 2 + 2), values)
-                if (
-                    values[0] != values[1]
-                    and rdm.random() <= probability_carve_horizontally
-                ):
+                if values[0] != values[1] and rdm.random() <= probability_carve_horizontally:
                     self.merge_values((row_index * 2 + 1, value_index * 2 + 2), values)
             if last_row:
                 break
@@ -364,9 +346,7 @@ class Maze:
                 else:
                     values = row[value_index * 2 + 1], row[value_index * 2 + 3]
                 if (values[0] != values[1] and not carves) or (
-                    values[0] == values[1]
-                    and not carves
-                    and value_index == len(row[1:-1:2]) - 1
+                    values[0] == values[1] and not carves and value_index == len(row[1:-1:2]) - 1
                 ):
                     wall_coordinates = row_index * 2 + 2, value_index * 2 + 1
                     merge_values = (
@@ -421,9 +401,7 @@ class Maze:
                 ]
                 wall_column_index = rdm.choice(wall_columns)
                 self.maze[start_index[0] : end_index[0] + 1, wall_column_index] = 0
-                entries = [
-                    i for i in range(start_index[0], end_index[0] + 1) if i % 2 == 1
-                ]
+                entries = [i for i in range(start_index[0], end_index[0] + 1) if i % 2 == 1]
                 entry = rdm.choice(entries)
                 entry_coordinate = (entry, wall_column_index)
                 self.maze[entry, wall_column_index] = 3
@@ -450,9 +428,7 @@ class Maze:
                 ]
                 wall_row_index = rdm.choice(wall_rows)
                 self.maze[wall_row_index, start_index[1] : end_index[1] + 1] = 0
-                entries = [
-                    i for i in range(start_index[1], end_index[1] + 1) if i % 2 == 1
-                ]
+                entries = [i for i in range(start_index[1], end_index[1] + 1) if i % 2 == 1]
                 entry = rdm.choice(entries)
                 entry_coordinate = (wall_row_index, entry)
                 self.maze[wall_row_index, entry] = 3
@@ -475,9 +451,7 @@ class Maze:
         self.set_start_end()
         self.algorithm = "Iterative division"
 
-    def binary_tree(
-        self, user_biais: int = 0, probability_carve_vertically: float = 0.5
-    ) -> None:
+    def binary_tree(self, user_biais: int = 0, probability_carve_vertically: float = 0.5) -> None:
         """Applies the Binary Tree algorithm to generate a maze.
 
         It starts by iterating over the maze and checking if the cell is a path.\n
@@ -560,10 +534,7 @@ class Maze:
             if index[0] == 1 or value < 2:
                 continue
             set_cells.append(index)
-            if (
-                rdm.random() <= probability_carve_north
-                or index[1] == self.maze.shape[1] - 2
-            ):
+            if rdm.random() <= probability_carve_north or index[1] == self.maze.shape[1] - 2:
                 chosen_cell = rdm.choice(set_cells)
                 wall_coordinates = (
                     chosen_cell[0] + north_direction[0],
@@ -608,11 +579,7 @@ class Maze:
             the probability of the first mode te be chosen.\n
                 Defaults to None.
         """
-        start = (
-            start
-            if start
-            else get_random_cell((self.maze.shape[0], self.maze.shape[1]))
-        )
+        start = start if start else get_random_cell((self.maze.shape[0], self.maze.shape[1]))
         cells = [start]
         self.maze[start] = 2
         probability = probability if probability is not None else 1.0
@@ -653,11 +620,7 @@ class Maze:
             start (tuple[int, int] | None, optional): The starting cell for the algorithm.
                 Defaults to None.
         """
-        current_cell = (
-            start
-            if start
-            else get_random_cell((self.maze.shape[0], self.maze.shape[1]))
-        )
+        current_cell = start if start else get_random_cell((self.maze.shape[0], self.maze.shape[1]))
         height, width = self.maze.shape
         number_cell = (height // 2) * (width // 2)
         visited_cell = 1
@@ -725,6 +688,63 @@ class Maze:
         self.set_start_end()
         self.algorithm = "Wilson"
 
+    def origin_shift(self, nb_iter: int = 0) -> None:
+        """Applies the origin shift algorithm to generate a maze
+        (https://www.youtube.com/watch?v=zbXKcDVV4G0).
+
+        It start by designing a perfect maze by assigning each cell a value
+        representing the direction to the next cell.\n
+        2 for the origin, 3 for North, 4 for East, 5 for South, 6 for West.\n
+        Then all cells are assigned the value of 3
+        except the start last right colum witch has a value of 4.\n
+        Then a origin is chosen randomly or not.\n
+        For nb_iter, it moves the origin to a random neighbor,\n
+        The origin becomes a direction to the neighbor,\n
+        The neighbor becomes the new origin and the value of the origin is changed to 2.\n
+
+        Args:
+            nb_iter (int | None, optional): The number of iteration. Defaults to 0.
+        """
+        if not nb_iter:
+            nb_iter = (self.maze.shape[0] - 1) * (self.maze.shape[1] - 1) * 10
+
+        self.maze[1, 3:-1:2] = 6
+        self.maze[1][1] = 2
+        origin = (1, 1)
+
+        int_to_directions = {
+            np.uint16(3): (-1, 0),  # North
+            np.uint16(4): (0, 1),  # East
+            np.uint16(5): (1, 0),  # South
+            np.uint16(6): (0, -1),  # West
+        }
+
+        directions_to_int = {
+            (-2, 0): 3,  # North
+            (0, 2): 4,  # East
+            (2, 0): 5,  # South
+            (0, -2): 6,  # West
+        }
+
+        for _ in range(nb_iter):
+            neighbors = get_neighbors(self, origin)
+            new_origin, direction = rdm.choice(neighbors)
+            self.maze[origin] = directions_to_int[direction]
+            self.maze[new_origin] = 2
+            origin = new_origin
+
+        for index, value in self:
+            if value == 2:
+                continue
+            wall_to_break = (
+                index[0] + int_to_directions[value][0],
+                index[1] + int_to_directions[value][1],
+            )
+            self.maze[wall_to_break] = 2
+
+        self.set_start_end()
+        self.algorithm = "Origin Shift"
+
     def merge_values(
         self, wall_coordinate: tuple[int, int] | list[int], values: tuple[int, int]
     ) -> None:
@@ -749,9 +769,7 @@ class Maze:
         """
         breakable_walls_coordinates = get_breakable_walls(self)
         if float(mode[1]) == 0.0:
-            raise ValueError(
-                "The number of walls to remove or the probab must be greater than 0"
-            )
+            raise ValueError("The number of walls to remove or the probab must be greater than 0")
         if mode[0] == "number":
             # Force the number to be between 0 and the number of breakable walls
             number = max(0, min(int(mode[1]), len(breakable_walls_coordinates)))
@@ -777,9 +795,7 @@ class Maze:
         cell_size = 50
         wall_color = (0, 0, 0)
 
-        image = Image.new(
-            "RGB", (size[1] * cell_size, size[0] * cell_size), (255, 255, 255)
-        )
+        image = Image.new("RGB", (size[1] * cell_size, size[0] * cell_size), (255, 255, 255))
         draw = ImageDraw.Draw(image)
 
         for index, cell_value in np.ndenumerate(self.maze):
@@ -814,11 +830,7 @@ class Maze:
         """
         file_type = filename.split(".")[-1]
         size = self.maze.shape
-        filename = (
-            f"{filename}"
-            if filename
-            else f"Maze_{size[0]//2}x{size[1]//2}_{self.algorithm}"
-        )
+        filename = f"{filename}" if filename else f"Maze_{size[0]//2}x{size[1]//2}_{self.algorithm}"
         match file_type:
             case "pkl":
                 with open(filename, "wb") as file:
@@ -871,34 +883,34 @@ def cells_to_shape(*nb_cells_by_side: int) -> tuple[int, int]:
 
 
 def verify_coordinates(
-    end: Any | tuple[Any, ...], shape: tuple[int, int]
+    coordinates: Any | tuple[Any, ...], shape: tuple[int, int]
 ) -> tuple[int, int]:
-    """Verifies if the end coordinates are valid.
+    """Verifies if the coordinates coordinates are valid.
 
     Args:
-        end (Any): The end coordinates.
+        coordinates (Any): The coordinates coordinates.
         shape (tuple[int, int]): The shape of the maze.
 
     Returns:
-        bool: True if the end coordinates are valid, False otherwise.
+        bool: True if the coordinates coordinates are valid, False otherwise.
     """
-    if not isinstance(end, tuple):
+    if not isinstance(coordinates, tuple):
         raise ValueError(
-            "end must be a tuple of 2 ints corresponding to a point inside the maze"
+            "coordinates must be a tuple of 2 ints corresponding to a point inside the maze"
         )
-    if not len(end) == 2:
+    if not len(coordinates) == 2:
         raise ValueError(
-            "end must be a tuple of 2 ints corresponding to a point inside the maze"
+            "coordinates must be a tuple of 2 ints corresponding to a point inside the maze"
         )
-    if not all(isinstance(i, int) for i in end):
+    if not all(isinstance(i, int) for i in coordinates):
         raise ValueError(
-            "end must be a tuple of 2 ints corresponding to a point inside the maze"
+            "coordinates must be a tuple of 2 ints corresponding to a point inside the maze"
         )
-    if not (0 <= end[0] <= shape[0] and 0 <= end[1] <= shape[1]):
+    if not (0 <= coordinates[0] <= shape[0] and 0 <= coordinates[1] <= shape[1]):
         raise ValueError(
-            "end must be a tuple of 2 ints corresponding to a point inside the maze"
+            "coordinates must be a tuple of 2 ints corresponding to a point inside the maze"
         )
-    return end
+    return coordinates
 
 
 def verify_shape(shape: Any | tuple[Any, ...]) -> bool:
@@ -961,10 +973,7 @@ def get_neighbors(
     directions = directions if directions else ((-2, 0), (0, 2), (2, 0), (0, -2))
     for direction in directions:
         neighbor = cell[0] + direction[0], cell[1] + direction[1]
-        if (
-            1 <= neighbor[0] < self.maze.shape[0]
-            and 1 <= neighbor[1] < self.maze.shape[1]
-        ):
+        if 1 <= neighbor[0] < self.maze.shape[0] and 1 <= neighbor[1] < self.maze.shape[1]:
             if (return_visited and self.maze[neighbor] > 1) or self.maze[neighbor] > 2:
                 neighbors.append((neighbor, direction))
     return neighbors
@@ -983,9 +992,7 @@ def get_random_cell(shape: tuple[int, int]) -> tuple[int, int]:
     return (rdm.randrange(1, shape[0] - 2, 2), rdm.randrange(1, shape[1] - 2, 2))
 
 
-def get_connection(
-    self: Maze, index: tuple[int, int]
-) -> tuple[tuple[int, int], tuple[int, int]]:
+def get_connection(self: Maze, index: tuple[int, int]) -> tuple[tuple[int, int], tuple[int, int]]:
     """This method is used to get a connections of an unvisited cell to a visited cell in the maze.
 
     Args:
@@ -1004,10 +1011,7 @@ def get_connection(
     directions = ((-2, 0), (0, 2), (2, 0), (0, -2))
     for row, column in directions:
         neighbor = (index[0] + row, index[1] + column)
-        if (
-            not 0 <= neighbor[0] < self.maze.shape[0]
-            or not 0 <= neighbor[1] < self.maze.shape[1]
-        ):
+        if not 0 <= neighbor[0] < self.maze.shape[0] or not 0 <= neighbor[1] < self.maze.shape[1]:
             continue
         if self.maze[neighbor] == 2:
             neighbors.append((neighbor, (row, column)))
