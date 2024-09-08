@@ -785,7 +785,11 @@ class Maze:
             raise ValueError('mode must be "probability" or "number"')
 
     def generate_image(self, filename: str | None = None) -> None:
-        """Generate a maze image from a maze object."""
+        """Generate a maze image from a maze object.
+
+        Args:
+            filename (str | None, optional): The filename. Defaults to None.
+        """
         size = self.maze.shape
         filename = (
             filename + ".png"
