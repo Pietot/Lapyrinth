@@ -18,3 +18,5 @@ Here are ideas/tips to improve pathfinder.py:
 
     General:
         Optimize algorithms
+
+Fix stub file not found please
