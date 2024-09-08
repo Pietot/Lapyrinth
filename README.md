@@ -31,7 +31,7 @@ Lapyrinth is a package made entirely in Python where you can generate mazes with
 
 - Generate any maze of any size
 
-- Choose different algorithms from 11 of them (and more with different parameters)
+- Choose different algorithms from 12 of them (and more with different parameters)
 
 - Generate an image of the maze generated
 
@@ -167,6 +167,12 @@ That's it. See, it's very simple. You can go with all of these algorithms:
 <p align="center">
 <img src="assets/images/wilson.png" width="49%"alt="Image illustrating a maze after using Wilson's algorithm"/>
 <img src="assets/gifs/wilson.gif" width="49%"alt="Animation showing the process of Wilson's algorithm"> <br><br>
+</p>
+
+- Origin Shift
+<p align="center">
+<img src="assets/images/origin_shift.png" width="49%"alt="Image illustrating a maze after using Origin Shift algorithm"/>
+<img src="assets/gifs/origin_shift.gif" width="49%"alt="Animation showing the process of Origin Shift algorithm"> <br><br>
 </p>
 
 ## 5 - Save a maze
