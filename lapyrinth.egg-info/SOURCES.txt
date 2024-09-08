@@ -4,7 +4,9 @@ pyproject.toml
 setup.py
 lapyrinth/__init__.py
 lapyrinth/lapyrinth.py
+lapyrinth/lapyrinth.pyi
 lapyrinth/pathfinders.py
+lapyrinth/pathfinders.pyi
 lapyrinth/recursive_maze.py
 lapyrinth.egg-info/PKG-INFO
 lapyrinth.egg-info/SOURCES.txt
