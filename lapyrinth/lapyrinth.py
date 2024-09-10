@@ -79,6 +79,12 @@
 # End : 08/09/2024 at 1h30 FR
 # Changelogs : Added origin shift algorithm
 
+# v1.15 :
+# Start : 10/09/2024 at 20h25 FR
+# End : 10/09/2024 at  21h35FR
+# Changelogs : Added True Prim's algorithm (the previous one was the simplified version)
+
+import heapq
 import pickle
 import random as rdm
 from typing import Any, Generator
@@ -132,6 +138,13 @@ class Maze:
         """Set a unique value to each cell."""
         indices = np.where(self.maze == 3)
         self.maze[indices] = np.arange(3, 3 + len(indices[0]))
+
+    def set_random_values(self) -> None:
+        """Set a random value to each cell."""
+        indices = np.where(self.maze == 3)
+        flat_indices = np.ravel_multi_index(indices, self.maze.shape)
+        np.random.shuffle(flat_indices)
+        self.maze.flat[flat_indices] = np.arange(3, 3 + len(flat_indices))
 
     def set_start_end(self) -> None:
         """Set the entry and the exit of the maze."""
@@ -217,8 +230,8 @@ class Maze:
         self.set_start_end()
         self.algorithm = "Randomized Depth First Search"
 
-    def prim(self, start: tuple[int, int] | None = None) -> None:
-        """Applies Prim's algorithm to generate a maze.
+    def simplified_prim(self, start: tuple[int, int] | None = None) -> None:
+        """Applies the simplified version of Prim's algorithm to generate a maze.
 
         It starts by selecting a starting cell, either specified in parameter or chosen randomly.\n
         Then it lists all its neighbors and adds them to the list of cells to explore.\n
@@ -248,9 +261,49 @@ class Maze:
             neighbors.remove((neighbor, direction))
             neighbors.extend(get_neighbors(self, neighbor))
         self.set_start_end()
-        self.algorithm = "Prim"
+        self.algorithm = "Simplified Prim"
 
-    def hunt_and_kill(self, start: tuple[int, int] | None = None) -> None:
+    def true_prim(self, start: tuple[int, int] | None = None) -> None:
+        """Applies the true version of Prim's algorithm to generate a maze.
+
+        It start by assigning a random value (weight) to each cell.\n
+        Next, it selects a starting cell, either specified in parameter or chosen randomly.\n
+        Then it lists all its neighbors and adds them to a min heap based on their weights.\n
+        While there are neighbors to explore, it selects the one with the smallest weight
+        and if it was not explored, the wall between the two cells is destroyed.\n
+        Finally, it removes the neighbors from the list.
+
+        Args:
+            start (tuple[int, int] | None, optional):
+                The starting cell coordinates.\n
+                Defaults to None, meaning a random starting cell will be chosen within the maze.
+        """
+        self.set_random_values()
+        neighbors: list[tuple[int, tuple[int, int], tuple[int, int]]] = []
+        start = start if start else get_random_cell((self.maze.shape[0], self.maze.shape[1]))
+        self.maze[start] = 2
+        for neighbor, direction in get_neighbors(self, start):
+            weight = self.maze[neighbor]
+            heapq.heappush(neighbors, (weight, neighbor, direction))
+        while neighbors:
+            weight, neighbor, direction = heapq.heappop(neighbors)
+            if self.maze[neighbor] != 2:
+                self.maze[neighbor] = 2
+                wall_coordinates = (
+                    neighbor[0] - direction[0] // 2,
+                    neighbor[1] - direction[1] // 2,
+                )
+                self.maze[wall_coordinates] = 2
+                for next_neighbor, next_direction in get_neighbors(self, neighbor):
+                    weight = self.maze[next_neighbor]
+                    heapq.heappush(neighbors, (weight, next_neighbor, next_direction))
+        self.set_start_end()
+        self.algorithm = "True Prim"
+
+    def hunt_and_kill(
+        self,
+        start: tuple[int, int] | None = None,
+    ) -> None:
         """Applies Hunt and Kill algorithm to generate a maze.
 
         It starts at a random cell and carves a path to a random unvisited neighbor (kill phase).\n
