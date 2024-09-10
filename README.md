@@ -78,6 +78,8 @@ To generate your first maze, write these lines in any python file:
 ```python
 from lapyrinth import Maze
 
+height = 9
+width = 16
 # Optional
 start = (1, 7)
 end = (5, 9)
