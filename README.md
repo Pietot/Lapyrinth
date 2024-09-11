@@ -31,7 +31,7 @@ Lapyrinth is a package made entirely in Python where you can generate mazes with
 
 - Generate any maze of any size
 
-- Choose different algorithms from 12 of them (and more with different parameters)
+- Choose different algorithms from 13 of them (and more with different parameters)
 
 - Generate an image of the maze generated
 
@@ -117,10 +117,10 @@ That's it. See, it's very simple. You can go with all of these algorithms:
 <img src="assets/gifs/rdfs.gif" width="49%"alt="Animation showing the process of Randomized Depth First Search algorithm"> <br><br>
 </p>
 
-- Prim
+- True Prim / Simplified Prim
 <p align="center">
-<img src="assets/images/prim.png" width="49%"alt="Image illustrating a maze after using Prim's algorithm"/>
-<img src="assets/gifs/prim.gif" width="49%"alt="Animation showing the process of Prim's algorithm"> <br><br>
+<img src="assets/images/prim.png" width="49%"alt="Image illustrating a maze after using True /Simplified Prim's algorithm"/>
+<img src="assets/gifs/prim.gif" width="49%"alt="Animation showing the process of True /Simplified Prim's algorithm"> <br><br>
 </p>
 
 - Hunt and Kill
