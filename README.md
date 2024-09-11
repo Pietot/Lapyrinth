@@ -117,11 +117,16 @@ That's it. See, it's very simple. You can go with all of these algorithms:
 <img src="assets/gifs/rdfs.gif" width="49%"alt="Animation showing the process of Randomized Depth First Search algorithm"> <br><br>
 </p>
 
-- True Prim / Simplified Prim
+- Simplified Prim
 <p align="center">
-<img src="assets/images/prim.png" width="49%"alt="Image illustrating a maze after using True /Simplified Prim's algorithm"/>
-<img src="assets/gifs/prim.gif" width="49%"alt="Animation showing the process of True /Simplified Prim's algorithm"> <br><br>
+<img src="assets/images/simplified_prim.png" width="49%"alt="Image illustrating a maze after using Simplified Prim's algorithm"/>
+<img src="assets/gifs/simplified_prim.gif" width="49%"alt="Animation showing the process of Simplified Prim's algorithm"> <br><br>
 </p>
+
+True Prim:
+<p align="center">
+<img src="assets/images/true_prim.png" width="49%"alt="Image illustrating a maze after using True Prim's algorithm"/>
+<img src="assets/gifs/true_prim.gif" width="49%"alt="Animation showing the process of True Prim's algorithm"> <br><br>
 
 - Hunt and Kill
 <p align="center">
