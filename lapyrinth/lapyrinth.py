@@ -580,21 +580,21 @@ class Maze:
         probability_carve_north = min(1.0, max(0.0, probability_carve_north))
         east_direction = (0, 1)
         north_direction = (-1, 0)
-        set_cells: list[tuple[int, int]] = []
+        cells: list[tuple[int, int]] = []
         self.maze[1][1:-1] = 2
         for index, value in self:
             # If we are in the second row or if the cell is a wall
             if index[0] == 1 or value < 2:
                 continue
-            set_cells.append(index)
+            cells.append(index)
             if rdm.random() <= probability_carve_north or index[1] == self.maze.shape[1] - 2:
-                chosen_cell = rdm.choice(set_cells)
+                chosen_cell = rdm.choice(cells)
                 wall_coordinates = (
                     chosen_cell[0] + north_direction[0],
                     chosen_cell[1] + north_direction[1],
                 )
                 self.maze[wall_coordinates] = 2
-                set_cells.clear()
+                cells.clear()
             else:
                 wall_coordinates = (
                     index[0] + east_direction[0],
