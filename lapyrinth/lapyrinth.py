@@ -173,7 +173,7 @@ class Maze:
         if not self.have_value:
             self.set_values()
             self.have_value = True
-        breakable_walls = get_breakable_walls(self)
+        breakable_walls = self.get_breakable_walls(self.maze)
         random.shuffle(breakable_walls)
         while breakable_walls:
             coordinates = breakable_walls.pop()
@@ -207,13 +207,13 @@ class Maze:
             current_cell (tuple[int, int] | None, optional):
                 The current cell being visited. Defaults to None.
         """
-        current_cell = start if start else get_random_cell((self.maze.shape[0], self.maze.shape[1]))
+        current_cell = start if start else self.self.get_random_cell((self.maze.shape[0], self.maze.shape[1]))
         stack = [current_cell]
         self.maze[current_cell] = 2
 
         while stack:
             current_cell = stack[-1]
-            neighbors = get_neighbors(self, current_cell)
+            neighbors = self.self.get_neighbors(self.maze.maze, current_cell)
 
             if not neighbors:
                 stack.pop()
@@ -245,9 +245,9 @@ class Maze:
                 Defaults to None, meaning a random starting cell will be chosen within the maze.
         """
         neighbors: list[tuple[tuple[int, int], tuple[int, int]]] = []
-        start = start if start else get_random_cell((self.maze.shape[0], self.maze.shape[1]))
+        start = start if start else self.get_random_cell((self.maze.shape[0], self.maze.shape[1]))
         self.maze[start] = 2
-        neighbors.extend(get_neighbors(self, start))
+        neighbors.extend(self.self.get_neighbors(self.maze.maze, start))
         while neighbors:
             neighbor, direction = random.choice(neighbors)
             # Avoid overlapping, maybe this condition can be removed idk
@@ -259,7 +259,7 @@ class Maze:
                 )
                 self.maze[wall_coordinates] = 2
             neighbors.remove((neighbor, direction))
-            neighbors.extend(get_neighbors(self, neighbor))
+            neighbors.extend(self.self.get_neighbors(self.maze.maze, neighbor))
         self.set_start_end()
         self.algorithm = "Simplified Prim"
 
@@ -280,9 +280,9 @@ class Maze:
         """
         self.set_random_values()
         neighbors: list[tuple[int, tuple[int, int], tuple[int, int]]] = []
-        start = start if start else get_random_cell((self.maze.shape[0], self.maze.shape[1]))
+        start = start if start else self.get_random_cell((self.maze.shape[0], self.maze.shape[1]))
         self.maze[start] = 2
-        for neighbor, direction in get_neighbors(self, start):
+        for neighbor, direction in self.get_neighbors(self.maze, start):
             weight = self.maze[neighbor]
             heapq.heappush(neighbors, (weight, neighbor, direction))
         while neighbors:
@@ -294,7 +294,7 @@ class Maze:
                     neighbor[1] - direction[1] // 2,
                 )
                 self.maze[wall_coordinates] = 2
-                for next_neighbor, next_direction in get_neighbors(self, neighbor):
+                for next_neighbor, next_direction in self.get_neighbors(self.maze, neighbor):
                     weight = self.maze[next_neighbor]
                     heapq.heappush(neighbors, (weight, next_neighbor, next_direction))
         self.set_start_end()
@@ -316,7 +316,7 @@ class Maze:
             The starting cell for the algorithm.\n
             Defaults to None, which means a random cell will be chosen.
         """
-        cell = start if start else get_random_cell((self.maze.shape[0], self.maze.shape[1]))
+        cell = start if start else self.get_random_cell((self.maze.shape[0], self.maze.shape[1]))
 
         def hunt() -> tuple[int, int] | None:
             unvisited_cells = np.where(self.maze > 2)
@@ -324,7 +324,7 @@ class Maze:
                 return None
             unvisited_cells = np.transpose(np.asarray(unvisited_cells))
             for cell_index in unvisited_cells:
-                neighbor, direction = get_connection(self, cell_index)
+                neighbor, direction = self.get_connection(self.maze, cell_index)
                 if neighbor == (0, 0):
                     continue
                 self.maze[neighbor] = 2
@@ -339,7 +339,7 @@ class Maze:
 
         while cell:
             self.maze[cell] = 2
-            neighbors = get_neighbors(self, cell)
+            neighbors = self.get_neighbors(self.maze, cell)
 
             if neighbors:
                 neighbor, direction = random.choice(neighbors)
@@ -632,14 +632,14 @@ class Maze:
             the probability of the first mode te be chosen.\n
                 Defaults to None.
         """
-        start = start if start else get_random_cell((self.maze.shape[0], self.maze.shape[1]))
+        start = start if start else self.get_random_cell((self.maze.shape[0], self.maze.shape[1]))
         cells = [start]
         self.maze[start] = 2
         probability = probability if probability is not None else 1.0
         probability = min(1.0, max(0.0, probability))
         while cells:
-            chosen_cell, index = select_cell_by_mode(cells, mode, probability)
-            neighbors = get_neighbors(self, chosen_cell)
+            chosen_cell, index = self.select_cell_by_mode(cells, mode, probability)
+            neighbors = self.get_neighbors(self.maze, chosen_cell)
             if neighbors:
                 chosen_neighbor, direction = random.choice(neighbors)
                 wall_coordinates = (
@@ -673,14 +673,14 @@ class Maze:
             start (tuple[int, int] | None, optional): The starting cell for the algorithm.
                 Defaults to None.
         """
-        current_cell = start if start else get_random_cell((self.maze.shape[0], self.maze.shape[1]))
+        current_cell = start if start else self.get_random_cell((self.maze.shape[0], self.maze.shape[1]))
         height, width = self.maze.shape
         number_cell = (height // 2) * (width // 2)
         visited_cell = 1
         self.maze[current_cell] = 2
         while visited_cell < number_cell:
             random_neighbor, random_direction = random.choice(
-                get_neighbors(self, current_cell, return_visited=True)
+                self.get_neighbors(self.maze, current_cell, return_visited=True)
             )
             if self.maze[random_neighbor] != 2:
                 self.maze[random_neighbor] = 2
@@ -706,7 +706,7 @@ class Maze:
         all cells in the path are marked as visited and the walls between them are removed.\n
         This process is repeated until all cells have been visited.\n
         """
-        end = get_random_cell((self.maze.shape[0], self.maze.shape[1]))
+        end = self.get_random_cell((self.maze.shape[0], self.maze.shape[1]))
         self.maze[end] = 2
         while np.any(self.maze > 2):
             unvisited_cells = np.argwhere(self.maze > 2).tolist()
@@ -715,7 +715,7 @@ class Maze:
             path = [start]
             while self.maze[path[-1]] != 2:
                 current_cell = path[-1]
-                neighbors = get_neighbors(self, current_cell, return_visited=True)
+                neighbors = self.get_neighbors(self.maze, current_cell, return_visited=True)
                 neighbor, _ = random.choice(neighbors)
                 if len(path) > 1 and neighbor == path[-2]:
                     path.pop()
@@ -780,7 +780,7 @@ class Maze:
         }
 
         for _ in range(nb_iter):
-            neighbors = get_neighbors(self, origin)
+            neighbors = self.get_neighbors(self.maze, origin)
             new_origin, direction = random.choice(neighbors)
             self.maze[origin] = directions_to_int[direction]
             self.maze[new_origin] = 2
@@ -820,7 +820,7 @@ class Maze:
             The first element is the mode ('number' or 'probability').
             The second element is the number of walls to remove or the probability to remove a wall.
         """
-        breakable_walls_coordinates = get_breakable_walls(self)
+        breakable_walls_coordinates = self.get_breakable_walls(self)
         if float(mode[1]) == 0.0:
             raise ValueError("The number of walls to remove or the probab must be greater than 0")
         if mode[0] == "number":
@@ -836,6 +836,187 @@ class Maze:
                     self.maze[coordinates] = 2
         else:
             raise ValueError('mode must be "probability" or "number"')
+    
+    @staticmethod
+    def get_breakable_walls(maze: NDArray[np.uint16]) -> list[tuple[int, int]]:
+        """Gets all breakable walls coordinates.
+
+        Returns:
+            list[list[int, int]]: List of all breakable walls coordinates.
+        """
+        return list(zip(*np.where(maze == 1)))
+
+    @staticmethod
+    def get_neighbors(
+        maze: NDArray[np.uint16],
+        cell: tuple[int, int],
+        directions: tuple[tuple[int, int], ...] | None = None,
+        return_visited: bool = False,
+    ) -> list[tuple[tuple[int, int], tuple[int, int]]]:
+        """Returns a list of neighboring cells that are accessible from the given cell.
+
+        Args:
+            self (Maze): The maze object.
+            cell (tuple[int, int]): The coordinates of the cell.
+            directions (tuple[tuple[int, int], ...], optional): The directions to check.
+            Defaults to None.
+            return_visited (bool): If we want to return visited neighbors.
+            Defaults to False.
+
+        Returns:
+            list[tuple[tuple[int, int], tuple[int, int]]]:
+                A list of tuples representing neighboring cells along
+                with the direction from the given cell.
+        """
+        neighbors: list[tuple[tuple[int, int], tuple[int, int]]] = []
+        # North, East, South, West
+        directions = directions if directions else ((-2, 0), (0, 2), (2, 0), (0, -2))
+        for direction in directions:
+            neighbor = cell[0] + direction[0], cell[1] + direction[1]
+            if 1 <= neighbor[0] < maze.shape[0] and 1 <= neighbor[1] < maze.shape[1]:
+                if (return_visited and maze[neighbor] > 1) or maze[neighbor] > 2:
+                    neighbors.append((neighbor, direction))
+        return neighbors
+        
+    @staticmethod
+    def get_connection(maze: NDArray[np.uint16], index: tuple[int, int]) -> tuple[tuple[int, int], tuple[int, int]]:
+        """This method is used to get a connections of an unvisited cell to a visited cell in the maze.
+
+        Args:
+            self (Maze): An instance of the Maze class.
+            index (tuple[int, int]): A tuple containing the coordinates of the cell in the maze.
+
+        Returns:
+            tuple[tuple[int, int], tuple[int, int]]:
+            A tuple containing two tuples.\n
+            The first tuple is the coordinates of the visited cell.\n
+            The second tuple is the direction of the visited cell relative to the unvisited cell.\n
+            If no neighbor is connected, returns ((0, 0), (0, 0)).
+        """
+        neighbors: list[tuple[tuple[int, int], tuple[int, int]]] = []
+        # North, East, South, West
+        directions = ((-2, 0), (0, 2), (2, 0), (0, -2))
+        for row, column in directions:
+            neighbor = (index[0] + row, index[1] + column)
+            if not 0 <= neighbor[0] < maze.shape[0] or not 0 <= neighbor[1] < maze.shape[1]:
+                continue
+            if maze[neighbor] == 2:
+                neighbors.append((neighbor, (row, column)))
+        return random.choice(neighbors) if neighbors else ((0, 0), (0, 0))
+
+    @staticmethod
+    def verify_shape(shape: Any | tuple[Any, ...]) -> bool:
+        """Verifies if shape of the maze if an int greater than 5 and odd
+        or a tuple of 2 int greater than 5 and odd
+        """
+        if not isinstance(shape, tuple):
+            return False
+        if not len(shape) == 2:
+            return False
+        if not all(isinstance(i, int) for i in shape if i > 4 and i % 2 == 1):
+            return False
+        return True
+
+    @staticmethod
+    def verify_vales_maze(maze: NDArray[np.uint]) -> bool:
+        """Verifies if the all the values in the maze are ints greater or equal than 0.
+
+        Args:
+            maze (NDArray[np.uint]): The maze to verify.
+
+        Returns:
+            bool: True if all the values are valid, False otherwise.
+        """
+        return bool(np.issubdtype(maze.dtype, np.uint) and np.all(maze >= 0))
+
+    @staticmethod
+    def get_random_cell(shape: tuple[int, int]) -> tuple[int, int]:
+        """This function generates a random cell within a given shape.
+
+        Args:
+            shape (tuple[int, int]): A tuple representing the dimensions of the shape.
+            The first integer is the height and the second integer is the width.
+
+        Returns:
+            tuple[int, int]: A tuple representing the coordinates of the randomly generated cell.
+        """
+        return (random.randrange(1, shape[0] - 2, 2), random.randrange(1, shape[1] - 2, 2))
+
+    @staticmethod
+    def select_cell_by_mode(
+        cells: list[tuple[int, int]], mode: str, probability: float
+    ) -> tuple[tuple[int, int], int]:
+        """Choose a cell from a list depending on the selection mode.
+
+        Args:
+            cells (list[tuple[int, int]]): A list of cells to choose from.
+            mode (str): The selection mode.
+            probability (float): The probability to choose the first mode for 2 modes.
+
+        Raises:
+            ValueError: If the mod set doesn't exist.
+
+        Returns:
+            tuple[int, int]: The chosen cell.
+        """
+        match mode:
+            case "newest":
+                chosen_cell, index = cells[-1], -1
+            case "middle":
+                chosen_cell, index = cells[len(cells) // 2], len(cells) // 2
+            case "oldest":
+                chosen_cell, index = cells[0], 0
+            case "random":
+                index = random.choice(range(len(cells)))
+                chosen_cell = cells[index]
+            case "mixed":
+                prob = random.random()
+                if prob <= 0.25:
+                    chosen_cell, index = cells[-1], -1
+                elif prob <= 0.5:
+                    chosen_cell, index = cells[len(cells) // 2], len(cells) // 2
+                elif prob <= 0.75:
+                    chosen_cell, index = cells[0], 0
+                else:
+                    index = random.choice(range(len(cells)))
+                    chosen_cell = cells[index]
+            case "new/mid":
+                if random.random() <= probability:
+                    chosen_cell, index = cells[-1], -1
+                else:
+                    chosen_cell, index = cells[len(cells) // 2], len(cells) // 2
+            case "new/old":
+                if random.random() <= probability:
+                    chosen_cell, index = cells[-1], -1
+                else:
+                    chosen_cell, index = cells[0], 0
+            case "new/rand":
+                if random.random() <= probability:
+                    chosen_cell, index = cells[-1], -1
+                else:
+                    index = random.choice(range(len(cells)))
+                    chosen_cell = cells[index]
+            case "mid/old":
+                if random.random() <= probability:
+                    chosen_cell, index = cells[len(cells) // 2], len(cells) // 2
+                else:
+                    chosen_cell, index = cells[0], 0
+            case "mid/rand":
+                if random.random() <= probability:
+                    chosen_cell, index = cells[len(cells) // 2], len(cells) // 2
+                else:
+                    index = random.choice(range(len(cells)))
+                    chosen_cell = cells[index]
+            case "old/rand":
+                if random.random() <= probability:
+                    chosen_cell, index = cells[0], 0
+                else:
+                    index = random.choice(range(len(cells)))
+                    chosen_cell = cells[index]
+            case _:
+                raise ValueError("Invalid mode")
+        return chosen_cell, index
+
 
     def generate_image(self, filename: str | None = None) -> None:
         """Generate a maze image from a maze object.
@@ -914,7 +1095,7 @@ class Maze:
             loaded_maze = np.loadtxt(file, delimiter=",", dtype=np.uint)
         else:
             raise ValueError("file must be a '.npy' or '.txt' file")
-        if not verify_shape(loaded_maze.shape):
+        if not self.verify_shape(loaded_maze.shape):
             raise ValueError("The file contain an invalid maze shape")
         if not np.all(0 <= loaded_maze) and not np.all(loaded_maze == 1):
             raise ValueError("The file contain an invalid maze")
@@ -970,186 +1151,6 @@ def verify_coordinates(
     return coordinates
 
 
-def verify_shape(shape: Any | tuple[Any, ...]) -> bool:
-    """Verifies if shape of the maze if an int greater than 5 and odd
-    or a tuple of 2 int greater than 5 and odd
-    """
-    if not isinstance(shape, tuple):
-        return False
-    if not len(shape) == 2:
-        return False
-    if not all(isinstance(i, int) for i in shape if i > 4 and i % 2 == 1):
-        return False
-    return True
-
-
-def verify_values_maze(maze: NDArray[np.uint]) -> bool:
-    """Verifies if the all the values in the maze are ints greater or equal than 0.
-
-    Args:
-        maze (NDArray[np.uint]): The maze to verify.
-
-    Returns:
-        bool: True if all the values are valid, False otherwise.
-    """
-    return bool(np.issubdtype(maze.dtype, np.uint) and np.all(maze >= 0))
-
-
-def get_breakable_walls(self: Maze) -> list[tuple[int, int]]:
-    """Gets all breakable walls coordinates.
-
-    Returns:
-        list[list[int, int]]: List of all breakable walls coordinates.
-    """
-    return list(zip(*np.where(self.maze == 1)))
-
-
-def get_neighbors(
-    self: Maze,
-    cell: tuple[int, int],
-    directions: tuple[tuple[int, int], ...] | None = None,
-    return_visited: bool = False,
-) -> list[tuple[tuple[int, int], tuple[int, int]]]:
-    """Returns a list of neighboring cells that are accessible from the given cell.
-
-    Args:
-        self (Maze): The maze object.
-        cell (tuple[int, int]): The coordinates of the cell.
-        directions (tuple[tuple[int, int], ...], optional): The directions to check.
-        Defaults to None.
-        return_visited (bool): If we want to return visited neighbors.
-        Defaults to False.
-
-    Returns:
-        list[tuple[tuple[int, int], tuple[int, int]]]:
-            A list of tuples representing neighboring cells along
-            with the direction from the given cell.
-    """
-    neighbors: list[tuple[tuple[int, int], tuple[int, int]]] = []
-    # North, East, South, West
-    directions = directions if directions else ((-2, 0), (0, 2), (2, 0), (0, -2))
-    for direction in directions:
-        neighbor = cell[0] + direction[0], cell[1] + direction[1]
-        if 1 <= neighbor[0] < self.maze.shape[0] and 1 <= neighbor[1] < self.maze.shape[1]:
-            if (return_visited and self.maze[neighbor] > 1) or self.maze[neighbor] > 2:
-                neighbors.append((neighbor, direction))
-    return neighbors
-
-
-def get_random_cell(shape: tuple[int, int]) -> tuple[int, int]:
-    """This function generates a random cell within a given shape.
-
-    Args:
-        shape (tuple[int, int]): A tuple representing the dimensions of the shape.
-        The first integer is the height and the second integer is the width.
-
-    Returns:
-        tuple[int, int]: A tuple representing the coordinates of the randomly generated cell.
-    """
-    return (random.randrange(1, shape[0] - 2, 2), random.randrange(1, shape[1] - 2, 2))
-
-
-def get_connection(self: Maze, index: tuple[int, int]) -> tuple[tuple[int, int], tuple[int, int]]:
-    """This method is used to get a connections of an unvisited cell to a visited cell in the maze.
-
-    Args:
-        self (Maze): An instance of the Maze class.
-        index (tuple[int, int]): A tuple containing the coordinates of the cell in the maze.
-
-    Returns:
-        tuple[tuple[int, int], tuple[int, int]]:
-        A tuple containing two tuples.\n
-        The first tuple is the coordinates of the visited cell.\n
-        The second tuple is the direction of the visited cell relative to the unvisited cell.\n
-        If no neighbor is connected, returns ((0, 0), (0, 0)).
-    """
-    neighbors: list[tuple[tuple[int, int], tuple[int, int]]] = []
-    # North, East, South, West
-    directions = ((-2, 0), (0, 2), (2, 0), (0, -2))
-    for row, column in directions:
-        neighbor = (index[0] + row, index[1] + column)
-        if not 0 <= neighbor[0] < self.maze.shape[0] or not 0 <= neighbor[1] < self.maze.shape[1]:
-            continue
-        if self.maze[neighbor] == 2:
-            neighbors.append((neighbor, (row, column)))
-    return random.choice(neighbors) if neighbors else ((0, 0), (0, 0))
-
-
-def select_cell_by_mode(
-    cells: list[tuple[int, int]], mode: str, probability: float
-) -> tuple[tuple[int, int], int]:
-    """Choose a cell from a list depending on the selection mode.
-
-    Args:
-        cells (list[tuple[int, int]]): A list of cells to choose from.
-        mode (str): The selection mode.
-        probability (float): The probability to choose the first mode for 2 modes.
-
-    Raises:
-        ValueError: If the mod set doesn't exist.
-
-    Returns:
-        tuple[int, int]: The chosen cell.
-    """
-    match mode:
-        case "newest":
-            chosen_cell, index = cells[-1], -1
-        case "middle":
-            chosen_cell, index = cells[len(cells) // 2], len(cells) // 2
-        case "oldest":
-            chosen_cell, index = cells[0], 0
-        case "random":
-            index = random.choice(range(len(cells)))
-            chosen_cell = cells[index]
-        case "mixed":
-            prob = random.random()
-            if prob <= 0.25:
-                chosen_cell, index = cells[-1], -1
-            elif prob <= 0.5:
-                chosen_cell, index = cells[len(cells) // 2], len(cells) // 2
-            elif prob <= 0.75:
-                chosen_cell, index = cells[0], 0
-            else:
-                index = random.choice(range(len(cells)))
-                chosen_cell = cells[index]
-        case "new/mid":
-            if random.random() <= probability:
-                chosen_cell, index = cells[-1], -1
-            else:
-                chosen_cell, index = cells[len(cells) // 2], len(cells) // 2
-        case "new/old":
-            if random.random() <= probability:
-                chosen_cell, index = cells[-1], -1
-            else:
-                chosen_cell, index = cells[0], 0
-        case "new/rand":
-            if random.random() <= probability:
-                chosen_cell, index = cells[-1], -1
-            else:
-                index = random.choice(range(len(cells)))
-                chosen_cell = cells[index]
-        case "mid/old":
-            if random.random() <= probability:
-                chosen_cell, index = cells[len(cells) // 2], len(cells) // 2
-            else:
-                chosen_cell, index = cells[0], 0
-        case "mid/rand":
-            if random.random() <= probability:
-                chosen_cell, index = cells[len(cells) // 2], len(cells) // 2
-            else:
-                index = random.choice(range(len(cells)))
-                chosen_cell = cells[index]
-        case "old/rand":
-            if random.random() <= probability:
-                chosen_cell, index = cells[0], 0
-            else:
-                index = random.choice(range(len(cells)))
-                chosen_cell = cells[index]
-        case _:
-            raise ValueError("Invalid mode")
-    return chosen_cell, index
-
-
 def load_object(file_path: str) -> Maze:
     """Load a maze object from a pkl file.
 
@@ -1161,7 +1162,7 @@ def load_object(file_path: str) -> Maze:
     """
     with open(file_path, "rb") as file:
         self = pickle.load(file)
-    if verify_shape(self.maze.shape) and verify_values_maze(self.maze):
+    if self.verify_shape(self.maze.shape) and self.verify_vales_maze(self.maze):
         return self
     raise ValueError("The file contain an invalid maze")
 
