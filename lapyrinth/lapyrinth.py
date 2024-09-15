@@ -86,11 +86,11 @@
 
 import heapq
 import pickle
-import random as rdm
+import random
 from typing import Any, Generator
 
 import numpy as np
-from numpy import typing as npt
+from numpy.typing import NDArray
 from PIL import Image, ImageDraw
 
 
@@ -174,7 +174,7 @@ class Maze:
             self.set_values()
             self.have_value = True
         breakable_walls = get_breakable_walls(self)
-        rdm.shuffle(breakable_walls)
+        random.shuffle(breakable_walls)
         while breakable_walls:
             coordinates = breakable_walls.pop()
             if coordinates[0] % 2 == 0:
@@ -218,7 +218,7 @@ class Maze:
             if not neighbors:
                 stack.pop()
             else:
-                chosen_neighbor, direction = rdm.choice(neighbors)
+                chosen_neighbor, direction = random.choice(neighbors)
                 wall_coordinates = (
                     current_cell[0] + direction[0] // 2,
                     current_cell[1] + direction[1] // 2,
@@ -249,7 +249,7 @@ class Maze:
         self.maze[start] = 2
         neighbors.extend(get_neighbors(self, start))
         while neighbors:
-            neighbor, direction = rdm.choice(neighbors)
+            neighbor, direction = random.choice(neighbors)
             # Avoid overlapping, maybe this condition can be removed idk
             if self.maze[neighbor] != 2:
                 self.maze[neighbor] = 2
@@ -342,7 +342,7 @@ class Maze:
             neighbors = get_neighbors(self, cell)
 
             if neighbors:
-                neighbor, direction = rdm.choice(neighbors)
+                neighbor, direction = random.choice(neighbors)
                 wall_coordinates = (
                     cell[0] + direction[0] // 2,
                     cell[1] + direction[1] // 2,
@@ -388,7 +388,7 @@ class Maze:
                 values = row[value_index * 2 + 1], row[value_index * 2 + 3]
                 if last_row and values[0] != values[1]:
                     self.merge_values((row_index * 2 + 1, value_index * 2 + 2), values)
-                if values[0] != values[1] and rdm.random() <= probability_carve_horizontally:
+                if values[0] != values[1] and random.random() <= probability_carve_horizontally:
                     self.merge_values((row_index * 2 + 1, value_index * 2 + 2), values)
             if last_row:
                 break
@@ -408,7 +408,7 @@ class Maze:
                     )
                     self.merge_values(wall_coordinates, merge_values)
                     carves += 1
-                elif rdm.random() <= probability_carve_vertically:
+                elif random.random() <= probability_carve_vertically:
                     wall_coordinates = row_index * 2 + 2, value_index * 2 + 1
                     merge_values = (
                         values[0],
@@ -431,7 +431,7 @@ class Maze:
         """
 
         def divide_vertically(width: int, height: int) -> int:
-            return width > height if width != height else rdm.getrandbits(1)
+            return width > height if width != height else random.getrandbits(1)
 
         self.remove_walls()
         stack: list[tuple[tuple[int, int], tuple[int, int], tuple[int, int]]] = [
@@ -452,10 +452,10 @@ class Maze:
                     for i in range(start_index[1], end_index[1] + 1)
                     if i not in (start_index[1], ban[1], end_index[1]) and i % 2 == 0
                 ]
-                wall_column_index = rdm.choice(wall_columns)
+                wall_column_index = random.choice(wall_columns)
                 self.maze[start_index[0] : end_index[0] + 1, wall_column_index] = 0
                 entries = [i for i in range(start_index[0], end_index[0] + 1) if i % 2 == 1]
-                entry = rdm.choice(entries)
+                entry = random.choice(entries)
                 entry_coordinate = (entry, wall_column_index)
                 self.maze[entry, wall_column_index] = 3
 
@@ -479,10 +479,10 @@ class Maze:
                     for i in range(start_index[0], end_index[0] + 1)
                     if i not in (start_index[0], ban[0], end_index[0]) and i % 2 == 0
                 ]
-                wall_row_index = rdm.choice(wall_rows)
+                wall_row_index = random.choice(wall_rows)
                 self.maze[wall_row_index, start_index[1] : end_index[1] + 1] = 0
                 entries = [i for i in range(start_index[1], end_index[1] + 1) if i % 2 == 1]
-                entry = rdm.choice(entries)
+                entry = random.choice(entries)
                 entry_coordinate = (wall_row_index, entry)
                 self.maze[wall_row_index, entry] = 3
 
@@ -542,14 +542,14 @@ class Maze:
             case 3:
                 nb_rotation = 1
             case 4:
-                nb_rotation = rdm.choice([0, 1, 2, -1])
+                nb_rotation = random.choice([0, 1, 2, -1])
             case _:
                 raise ValueError("biais must be between 1 and 4")
         self.maze[1][1:-1] = 2
         self.maze[1:-1, 1] = 2
         north_biais, west_biais = (1, 1)
         for index, _ in np.ndenumerate(self.maze[3:-1:2, 3:-1:2]):
-            if rdm.random() <= probability_carve_vertically:
+            if random.random() <= probability_carve_vertically:
                 wall_coordinates = (index[0] * 2 + 3 - north_biais, index[1] * 2 + 3)
                 self.maze[wall_coordinates] = 2
             else:
@@ -587,8 +587,8 @@ class Maze:
             if index[0] == 1 or value < 2:
                 continue
             cells.append(index)
-            if rdm.random() <= probability_carve_north or index[1] == self.maze.shape[1] - 2:
-                chosen_cell = rdm.choice(cells)
+            if random.random() <= probability_carve_north or index[1] == self.maze.shape[1] - 2:
+                chosen_cell = random.choice(cells)
                 wall_coordinates = (
                     chosen_cell[0] + north_direction[0],
                     chosen_cell[1] + north_direction[1],
@@ -641,7 +641,7 @@ class Maze:
             chosen_cell, index = select_cell_by_mode(cells, mode, probability)
             neighbors = get_neighbors(self, chosen_cell)
             if neighbors:
-                chosen_neighbor, direction = rdm.choice(neighbors)
+                chosen_neighbor, direction = random.choice(neighbors)
                 wall_coordinates = (
                     chosen_cell[0] + direction[0] // 2,
                     chosen_cell[1] + direction[1] // 2,
@@ -679,18 +679,18 @@ class Maze:
         visited_cell = 1
         self.maze[current_cell] = 2
         while visited_cell < number_cell:
-            rdm_neighbor, rdm_direction = rdm.choice(
+            random_neighbor, random_direction = random.choice(
                 get_neighbors(self, current_cell, return_visited=True)
             )
-            if self.maze[rdm_neighbor] != 2:
-                self.maze[rdm_neighbor] = 2
+            if self.maze[random_neighbor] != 2:
+                self.maze[random_neighbor] = 2
                 wall_coordinates = (
-                    current_cell[0] + rdm_direction[0] // 2,
-                    current_cell[1] + rdm_direction[1] // 2,
+                    current_cell[0] + random_direction[0] // 2,
+                    current_cell[1] + random_direction[1] // 2,
                 )
                 self.maze[wall_coordinates] = 2
                 visited_cell += 1
-            current_cell = rdm_neighbor
+            current_cell = random_neighbor
         self.set_start_end()
         self.algorithm = "Aldous-Broder"
 
@@ -710,13 +710,13 @@ class Maze:
         self.maze[end] = 2
         while np.any(self.maze > 2):
             unvisited_cells = np.argwhere(self.maze > 2).tolist()
-            start = rdm.choice(unvisited_cells)
+            start = random.choice(unvisited_cells)
             start = (start[0], start[1])
             path = [start]
             while self.maze[path[-1]] != 2:
                 current_cell = path[-1]
                 neighbors = get_neighbors(self, current_cell, return_visited=True)
-                neighbor, _ = rdm.choice(neighbors)
+                neighbor, _ = random.choice(neighbors)
                 if len(path) > 1 and neighbor == path[-2]:
                     path.pop()
                 elif neighbor in path:
@@ -781,7 +781,7 @@ class Maze:
 
         for _ in range(nb_iter):
             neighbors = get_neighbors(self, origin)
-            new_origin, direction = rdm.choice(neighbors)
+            new_origin, direction = random.choice(neighbors)
             self.maze[origin] = directions_to_int[direction]
             self.maze[new_origin] = 2
             origin = new_origin
@@ -826,13 +826,13 @@ class Maze:
         if mode[0] == "number":
             # Force the number to be between 0 and the number of breakable walls
             number = max(0, min(int(mode[1]), len(breakable_walls_coordinates)))
-            for coordinates in rdm.sample(breakable_walls_coordinates, number):
+            for coordinates in random.sample(breakable_walls_coordinates, number):
                 self.maze[coordinates] = 2
         elif mode[0] == "probability":
             # Force the probability to be between 0 and 1
             probability = max(0, min(1, mode[1]))
             for coordinates in breakable_walls_coordinates:
-                if 0 < rdm.uniform(0, 1) <= probability:
+                if 0 < random.uniform(0, 1) <= probability:
                     self.maze[coordinates] = 2
         else:
             raise ValueError('mode must be "probability" or "number"')
@@ -983,11 +983,11 @@ def verify_shape(shape: Any | tuple[Any, ...]) -> bool:
     return True
 
 
-def verify_values_maze(maze: npt.NDArray[np.uint]) -> bool:
+def verify_values_maze(maze: NDArray[np.uint]) -> bool:
     """Verifies if the all the values in the maze are ints greater or equal than 0.
 
     Args:
-        maze (npt.NDArray[np.uint]): The maze to verify.
+        maze (NDArray[np.uint]): The maze to verify.
 
     Returns:
         bool: True if all the values are valid, False otherwise.
@@ -1046,7 +1046,7 @@ def get_random_cell(shape: tuple[int, int]) -> tuple[int, int]:
     Returns:
         tuple[int, int]: A tuple representing the coordinates of the randomly generated cell.
     """
-    return (rdm.randrange(1, shape[0] - 2, 2), rdm.randrange(1, shape[1] - 2, 2))
+    return (random.randrange(1, shape[0] - 2, 2), random.randrange(1, shape[1] - 2, 2))
 
 
 def get_connection(self: Maze, index: tuple[int, int]) -> tuple[tuple[int, int], tuple[int, int]]:
@@ -1072,7 +1072,7 @@ def get_connection(self: Maze, index: tuple[int, int]) -> tuple[tuple[int, int],
             continue
         if self.maze[neighbor] == 2:
             neighbors.append((neighbor, (row, column)))
-    return rdm.choice(neighbors) if neighbors else ((0, 0), (0, 0))
+    return random.choice(neighbors) if neighbors else ((0, 0), (0, 0))
 
 
 def select_cell_by_mode(
@@ -1099,10 +1099,10 @@ def select_cell_by_mode(
         case "oldest":
             chosen_cell, index = cells[0], 0
         case "random":
-            index = rdm.choice(range(len(cells)))
+            index = random.choice(range(len(cells)))
             chosen_cell = cells[index]
         case "mixed":
-            prob = rdm.random()
+            prob = random.random()
             if prob <= 0.25:
                 chosen_cell, index = cells[-1], -1
             elif prob <= 0.5:
@@ -1110,40 +1110,40 @@ def select_cell_by_mode(
             elif prob <= 0.75:
                 chosen_cell, index = cells[0], 0
             else:
-                index = rdm.choice(range(len(cells)))
+                index = random.choice(range(len(cells)))
                 chosen_cell = cells[index]
         case "new/mid":
-            if rdm.random() <= probability:
+            if random.random() <= probability:
                 chosen_cell, index = cells[-1], -1
             else:
                 chosen_cell, index = cells[len(cells) // 2], len(cells) // 2
         case "new/old":
-            if rdm.random() <= probability:
+            if random.random() <= probability:
                 chosen_cell, index = cells[-1], -1
             else:
                 chosen_cell, index = cells[0], 0
         case "new/rand":
-            if rdm.random() <= probability:
+            if random.random() <= probability:
                 chosen_cell, index = cells[-1], -1
             else:
-                index = rdm.choice(range(len(cells)))
+                index = random.choice(range(len(cells)))
                 chosen_cell = cells[index]
         case "mid/old":
-            if rdm.random() <= probability:
+            if random.random() <= probability:
                 chosen_cell, index = cells[len(cells) // 2], len(cells) // 2
             else:
                 chosen_cell, index = cells[0], 0
         case "mid/rand":
-            if rdm.random() <= probability:
+            if random.random() <= probability:
                 chosen_cell, index = cells[len(cells) // 2], len(cells) // 2
             else:
-                index = rdm.choice(range(len(cells)))
+                index = random.choice(range(len(cells)))
                 chosen_cell = cells[index]
         case "old/rand":
-            if rdm.random() <= probability:
+            if random.random() <= probability:
                 chosen_cell, index = cells[0], 0
             else:
-                index = rdm.choice(range(len(cells)))
+                index = random.choice(range(len(cells)))
                 chosen_cell = cells[index]
         case _:
             raise ValueError("Invalid mode")
