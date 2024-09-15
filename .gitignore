@@ -4,3 +4,6 @@ recursive_maze.py
 # Byte-compiled / optimized / DLL files
 __pycache__/
 
+# Virual environment
+.env
+.venv
