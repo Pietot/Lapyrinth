@@ -812,7 +812,7 @@ class Maze:
         self.maze[self.maze == value_to_replace] = selected_value
         self.maze[wall_coordinate] = selected_value
 
-    def make_imperfect_maze(self, mode: tuple[str, int | float]) -> None:
+    def make_imperfect(self, mode: tuple[str, int | float]) -> None:
         """Make the maze more complex by removing some walls randomly.
 
         Args:
@@ -836,7 +836,69 @@ class Maze:
                     self.maze[coordinates] = 2
         else:
             raise ValueError('mode must be "probability" or "number"')
-    
+        
+    def generate_image(self, filename: str | None = None) -> None:
+        """Generate a maze image from a maze object.
+
+        Args:
+            filename (str | None, optional): The filename. Defaults to None.
+        """
+        size = self.maze.shape
+        filename = (
+            filename + ".png"
+            if filename
+            else f"Maze_{size[0]//2}x{size[1]//2}_{self.algorithm}.png"
+        )
+        cell_size = 50
+        wall_color = (0, 0, 0)
+
+        image = Image.new("RGB", (size[1] * cell_size, size[0] * cell_size), (255, 255, 255))
+        draw = ImageDraw.Draw(image)
+
+        for index, cell_value in np.ndenumerate(self.maze):
+            x1 = index[1] * cell_size
+            y1 = index[0] * cell_size
+            x2 = (index[1] + 1) * cell_size
+            y2 = (index[0] + 1) * cell_size
+
+            if index == self.start:
+                draw.rectangle((x1, y1 + 1, x2, y2), fill=(255, 0, 0))
+            elif index == self.end:
+                draw.rectangle((x1, y1 + 1, x2, y2), fill=(255, 255, 0))
+            elif int(cell_value) < 2:
+                draw.rectangle((x1, y1, x2, y2), fill=wall_color)
+
+        image.save(filename)
+
+    def save(self, filename: str) -> None:
+        """Save the maze to a pickle file or a binary file or a txt file.
+
+        Pickle file is recommanded because it saves the object with all its attributes
+        and it's easier to load.\n
+        Binary file is used to only store the array of the because it saves and loads faster.\n
+        Additionally, it stores the maze without loss of accuracy.\n
+        Text file is useful for editing and compatibility and it takes less space.
+
+        Args:
+            filename (str | None): The name of the file. Defaults to None.
+
+        Raises:
+            ValueError: file_type must be 'npy' or 'txt'.
+        """
+        file_type = filename.split(".")[-1]
+        size = self.maze.shape
+        filename = f"{filename}" if filename else f"Maze_{size[0]//2}x{size[1]//2}_{self.algorithm}"
+        match file_type:
+            case "pkl":
+                with open(filename, "wb") as file:
+                    pickle.dump(self, file)
+            case "npy":
+                np.save(filename, self.maze)
+            case "txt":
+                np.savetxt(filename, self.maze, fmt="%d", delimiter=",")
+            case _:
+                raise ValueError("filename must end with 'pkl' or 'npy' or 'txt'")
+
     @staticmethod
     def get_breakable_walls(maze: NDArray[np.uint16]) -> list[tuple[int, int]]:
         """Gets all breakable walls coordinates.
@@ -879,7 +941,10 @@ class Maze:
         return neighbors
         
     @staticmethod
-    def get_connection(maze: NDArray[np.uint16], index: tuple[int, int]) -> tuple[tuple[int, int], tuple[int, int]]:
+    def get_connection(
+        maze: NDArray[np.uint16], 
+        index: tuple[int, int]
+    ) -> tuple[tuple[int, int], tuple[int, int]]:
         """This method is used to get a connections of an unvisited cell to a visited cell in the maze.
 
         Args:
@@ -918,7 +983,7 @@ class Maze:
         return True
 
     @staticmethod
-    def verify_vales_maze(maze: NDArray[np.uint]) -> bool:
+    def verify_maze_values(maze: NDArray[np.uint]) -> bool:
         """Verifies if the all the values in the maze are ints greater or equal than 0.
 
         Args:
@@ -1017,89 +1082,57 @@ class Maze:
                 raise ValueError("Invalid mode")
         return chosen_cell, index
 
-
-    def generate_image(self, filename: str | None = None) -> None:
-        """Generate a maze image from a maze object.
-
-        Args:
-            filename (str | None, optional): The filename. Defaults to None.
-        """
-        size = self.maze.shape
-        filename = (
-            filename + ".png"
-            if filename
-            else f"Maze_{size[0]//2}x{size[1]//2}_{self.algorithm}.png"
-        )
-        cell_size = 50
-        wall_color = (0, 0, 0)
-
-        image = Image.new("RGB", (size[1] * cell_size, size[0] * cell_size), (255, 255, 255))
-        draw = ImageDraw.Draw(image)
-
-        for index, cell_value in np.ndenumerate(self.maze):
-            x1 = index[1] * cell_size
-            y1 = index[0] * cell_size
-            x2 = (index[1] + 1) * cell_size
-            y2 = (index[0] + 1) * cell_size
-
-            if index == self.start:
-                draw.rectangle((x1, y1 + 1, x2, y2), fill=(255, 0, 0))
-            elif index == self.end:
-                draw.rectangle((x1, y1 + 1, x2, y2), fill=(255, 255, 0))
-            elif int(cell_value) < 2:
-                draw.rectangle((x1, y1, x2, y2), fill=wall_color)
-
-        image.save(filename)
-
-    def save_maze(self, filename: str) -> None:
-        """Save the maze to a pickle file or a binary file or a txt file.
-
-        Pickle file is recommanded because it saves the object with all its attributes
-        and it's easier to load.\n
-        Binary file is used to only store the array of the because it saves and loads faster.\n
-        Additionally, it stores the maze without loss of accuracy.\n
-        Texte file is useful for editing and compatibility and it takes less space.
-
-        Args:
-            filename (str | None): The name of the file. Defaults to None.
-
-        Raises:
-            ValueError: file_type must be 'npy' or 'txt'.
-        """
-        file_type = filename.split(".")[-1]
-        size = self.maze.shape
-        filename = f"{filename}" if filename else f"Maze_{size[0]//2}x{size[1]//2}_{self.algorithm}"
-        match file_type:
-            case "pkl":
-                with open(filename, "wb") as file:
-                    pickle.dump(self, file)
-            case "npy":
-                np.save(filename, self.maze)
-            case "txt":
-                np.savetxt(filename, self.maze, fmt="%d", delimiter=",")
-            case _:
-                raise ValueError("filename must end with 'pkl' or 'npy' or 'txt'")
-
-    def load_maze(self, file: str) -> None:
-        """Load a maze from a binary file or a txt file.
+    @classmethod
+    def from_file(cls, file_path: str):
+        """Load a maze from these file types: pkl, npy, txt.
 
         Args:
             file (str): The location of the file.
 
         Raises:
-            ValueError: file must be a '.npy' or '.txt' file.
+            ValueError: File must be a '.npy' or '.txt' file.
+            ValueError: The file contain an invalid maze atribute.
         """
-        if file.endswith(".npy"):
-            loaded_maze = np.load(file)
-        elif file.endswith(".txt"):
-            loaded_maze = np.loadtxt(file, delimiter=",", dtype=np.uint)
-        else:
-            raise ValueError("file must be a '.npy' or '.txt' file")
-        if not self.verify_shape(loaded_maze.shape):
-            raise ValueError("The file contain an invalid maze shape")
-        if not np.all(0 <= loaded_maze) and not np.all(loaded_maze == 1):
-            raise ValueError("The file contain an invalid maze")
-        self.maze = loaded_maze
+        file_type = file_path.split(".")[-1]
+        match file_type:
+            case "npy":
+                saved_obj = cls()
+                saved_obj.maze = np.load(file_path)
+                saved_obj.algorithm = "Undefined"
+                return saved_obj
+            case "txt":
+                saved_obj = cls()
+                saved_obj = np.loadtxt(file, delimiter=",", dtype=np.uint)
+                saved_obj.algorithm = "Undefined"
+                return saved_obj
+            case "pkl" | "pickle":
+                with open(file_path, "rb") as file:
+                    saved_obj = pickle.load(file)
+                if saved_obj.verify_shape(saved_obj.maze.shape) and saved_obj.verify_maze_values(saved_obj.maze):
+                    return saved_obj
+                raise ValueError("The file contain an invalid maze atribute.")
+        raise ValueError("File must be a '.npy' or '.txt' file.")
+            
+
+    @classmethod
+    def curious_maze(cls):
+        """Don't run this function, it's only for curious people"""
+        redflag = cls()
+        redflag.maze = np.array(
+            [
+                [0, 0, 0, 0, 0, 0, 0, 0, 0],
+                [3, 3, 3, 3, 3, 3, 3, 3, 0],
+                [0, 3, 0, 3, 0, 1, 0, 3, 0],
+                [0, 3, 1, 3, 1, 3, 3, 3, 0],
+                [0, 3, 0, 1, 0, 1, 0, 3, 0],
+                [0, 3, 3, 3, 1, 3, 1, 3, 0],
+                [0, 3, 0, 1, 0, 3, 0, 3, 0],
+                [0, 3, 3, 3, 3, 3, 3, 3, 3],
+                [0, 0, 0, 0, 0, 0, 0, 0, 0],
+            ]
+        )
+        print("Oups... My algorithm generated a curious maze... How did you find it?")
+        return redflag
 
 
 def cells_to_shape(*nb_cells_by_side: int) -> tuple[int, int]:
@@ -1149,40 +1182,3 @@ def verify_coordinates(
             "coordinates must be a tuple of 2 ints corresponding to a point inside the maze"
         )
     return coordinates
-
-
-def load_object(file_path: str) -> Maze:
-    """Load a maze object from a pkl file.
-
-    Args:
-        file (str): The location of the file.
-
-    Returns:
-        Maze: The loaded maze object.
-    """
-    with open(file_path, "rb") as file:
-        self = pickle.load(file)
-    if self.verify_shape(self.maze.shape) and self.verify_vales_maze(self.maze):
-        return self
-    raise ValueError("The file contain an invalid maze")
-
-
-def curious_maze() -> Maze:
-    """Don't run this function, it's only for curious people"""
-    redflag = Maze()
-    redflag.maze = np.array(
-        [
-            [0, 0, 0, 0, 0, 0, 0, 0, 0],
-            [3, 3, 3, 3, 3, 3, 3, 3, 0],
-            [0, 3, 0, 3, 0, 1, 0, 3, 0],
-            [0, 3, 1, 3, 1, 3, 3, 3, 0],
-            [0, 3, 0, 1, 0, 1, 0, 3, 0],
-            [0, 3, 3, 3, 1, 3, 1, 3, 0],
-            [0, 3, 0, 1, 0, 3, 0, 3, 0],
-            [0, 3, 3, 3, 3, 3, 3, 3, 3],
-            [0, 0, 0, 0, 0, 0, 0, 0, 0],
-        ]
-    )
-    print(redflag)
-    print("Oups... My algorithm generated a curious maze... How do you find it?")
-    return redflag
