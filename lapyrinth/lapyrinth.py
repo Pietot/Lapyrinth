@@ -985,7 +985,7 @@ class Maze:
     def verify_shape(shape: Any | tuple[Any, ...]) -> bool:
         """Verifies if shape of the maze if an int greater than 5 and odd
         or a tuple of 2 int greater than 5 and odd.
-        
+
         Args:
             shape (Any | tuple[Any, ...]): The shape to verify.
         """
@@ -1158,7 +1158,7 @@ class Maze:
 
 def cells_to_shape(*nb_cells_by_side: int) -> tuple[int, int]:
     """Convert the number of cells of each dimension (height, width) to the shape of the maze.
-    
+
     Args:
         nb_cells_by_side (int): The number of cells of each dimension (height, width).
 
