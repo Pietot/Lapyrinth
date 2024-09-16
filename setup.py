@@ -9,7 +9,7 @@ Nothing more, nothing less. More info at https://github.com/Pietot/Lapyrinth"
 
 setup(
     name="lapyrinth",
-    version="1.15.1",
+    version="1.16.0",
     packages=find_packages(),
     package_data={
         "": ["*.pyi"],
