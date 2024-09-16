@@ -66,17 +66,13 @@ Returns:
 
 import colorsys
 import heapq
-
+import random as rdm
 from collections import deque
 
-import random as rdm
 import numpy as np
-
 from PIL import Image, ImageDraw
 
 from lapyrinth import Maze
-
-import lapyrinth
 
 
 class UnsolvableMaze(Exception):
@@ -89,16 +85,14 @@ class UnsolvableMaze(Exception):
     def __init__(self, algorithm: str, error_message: str = "") -> None:
         if error_message:
             error_message = ":\n" + error_message
-        self.message = (
-            f"{algorithm} cannot solve this maze in this configuration" + error_message
-        )
+        self.message = f"{algorithm} cannot solve this maze in this configuration" + error_message
         super().__init__(self.message)
 
     def __str__(self) -> str:
         return self.message
 
 
-def left_hand(self: Maze) -> list[tuple[int, int]]:
+def left_hand(maze_obj: Maze) -> list[tuple[int, int]]:
     """Solves the maze with the left hand rule.
 
     It start by knowing if the left cell relative to the current direction is a wall or not.\n
@@ -110,7 +104,7 @@ def left_hand(self: Maze) -> list[tuple[int, int]]:
     To save the path, it will save the direction of the cell in a dictionary.
 
     Args:
-        self (Maze): The maze object.
+        maze_obj (Maze): The maze object.
 
     Returns:
         list[tuple[int, int]]: The path from the start to the end of the maze.
@@ -121,15 +115,15 @@ def left_hand(self: Maze) -> list[tuple[int, int]]:
         (0, -1): (1, 0),
         (1, 0): (0, 1),
     }
-    current_cell: tuple[int, int] = self.start
+    current_cell: tuple[int, int] = maze_obj.start
     cell_with_directions: dict[tuple[int, int], list[tuple[int, int]]] = {}
     direction = next(iter(direction_to_left))
 
-    while current_cell != self.end:
+    while current_cell != maze_obj.end:
         left_cell_col = current_cell[1] + direction_to_left[direction][1]
         left_cell_row = current_cell[0] + direction_to_left[direction][0]
 
-        if self.maze[left_cell_row, left_cell_col] > 1:
+        if maze_obj.maze[left_cell_row, left_cell_col] > 1:
             direction = turn_left(direction)
             update_cell_directions(
                 cell_with_directions,
@@ -144,7 +138,7 @@ def left_hand(self: Maze) -> list[tuple[int, int]]:
         front_cell_row = current_cell[0] + direction[0]
         front_cell_col = current_cell[1] + direction[1]
 
-        if self.maze[front_cell_row, front_cell_col] > 1:
+        if maze_obj.maze[front_cell_row, front_cell_col] > 1:
             update_cell_directions(
                 cell_with_directions,
                 current_cell,
@@ -163,11 +157,11 @@ def left_hand(self: Maze) -> list[tuple[int, int]]:
             )
             direction = turn_right(direction)
 
-    self.pathfinder = "Left Hand Rule"
-    return directions_to_path(self, cell_with_directions)
+    maze_obj.pathfinder = "Left Hand Rule"
+    return directions_to_path(maze_obj, cell_with_directions)
 
 
-def right_hand(self: Maze) -> list[tuple[int, int]]:
+def right_hand(maze_obj: Maze) -> list[tuple[int, int]]:
     """Solves the maze with the right hand rule.
 
     It start by knowing if the right cell relative to the current direction is a wall or not.\n
@@ -187,15 +181,15 @@ def right_hand(self: Maze) -> list[tuple[int, int]]:
         (0, -1): (-1, 0),
         (-1, 0): (0, 1),
     }
-    current_cell: tuple[int, int] = self.start
+    current_cell: tuple[int, int] = maze_obj.start
     cell_with_directions: dict[tuple[int, int], list[tuple[int, int]]] = {}
     direction = next(iter(direction_to_right))
 
-    while current_cell != self.end:
+    while current_cell != maze_obj.end:
         left_cell_col = current_cell[1] + direction_to_right[direction][1]
         left_cell_row = current_cell[0] + direction_to_right[direction][0]
 
-        if self.maze[left_cell_row, left_cell_col] > 1:
+        if maze_obj.maze[left_cell_row, left_cell_col] > 1:
             direction = turn_right(direction)
             update_cell_directions(
                 cell_with_directions,
@@ -210,7 +204,7 @@ def right_hand(self: Maze) -> list[tuple[int, int]]:
         front_cell_row = current_cell[0] + direction[0]
         front_cell_col = current_cell[1] + direction[1]
 
-        if self.maze[front_cell_row, front_cell_col] > 1:
+        if maze_obj.maze[front_cell_row, front_cell_col] > 1:
             update_cell_directions(
                 cell_with_directions,
                 current_cell,
@@ -229,39 +223,37 @@ def right_hand(self: Maze) -> list[tuple[int, int]]:
             )
             direction = turn_left(direction)
 
-    self.pathfinder = "Right Hand Rule"
-    return directions_to_path(self, cell_with_directions)
+    maze_obj.pathfinder = "Right Hand Rule"
+    return directions_to_path(maze_obj, cell_with_directions)
 
 
-def random_mouse(self: Maze) -> list[tuple[int, int]]:
+def random_mouse(maze_obj: Maze) -> list[tuple[int, int]]:
     """Solves the maze with the random mouse pathfinder.
 
     It will randomly choose a direction to move to until it reaches the end of the maze.\n
     For performance reasons, it will not choose the opposite direction until it's forced.\n
 
     Args:
-        self (Maze): The maze object.
+        maze_obj (Maze): The maze object.
 
     Returns:
         list[tuple[int, int]]: The path from the start to the end of the maze.
     """
-    current_cell = self.start
+    current_cell = maze_obj.start
     path: list[tuple[int, int]] = [current_cell]
     directions = ((-1, 0), (0, 1), (1, 0), (0, -1))
     banned_direction = None
 
-    while current_cell != self.end:
-        neighbors = lapyrinth.get_neighbors(
-            self, current_cell, directions=directions, return_visited=True
+    while current_cell != maze_obj.end:
+        neighbors = Maze.get_neighbors(
+            maze_obj.maze, current_cell, directions=directions, return_visited=True
         )
 
         if banned_direction:
-            neighbors = [
-                neighbor for neighbor in neighbors if neighbor[1] != banned_direction
-            ]
+            neighbors = [neighbor for neighbor in neighbors if neighbor[1] != banned_direction]
         if not neighbors:
-            neighbors = lapyrinth.get_neighbors(
-                self, current_cell, directions=directions, return_visited=True
+            neighbors = Maze.get_neighbors(
+                maze_obj.maze, current_cell, directions=directions, return_visited=True
             )
 
         next_cell, direction = rdm.choice(neighbors)
@@ -269,11 +261,11 @@ def random_mouse(self: Maze) -> list[tuple[int, int]]:
         path = update_path(path, next_cell)
         current_cell = next_cell
 
-    self.pathfinder = "Random Mouse"
+    maze_obj.pathfinder = "Random Mouse"
     return path
 
 
-def pledge(self: Maze, following_direction: str) -> list[tuple[int, int]]:
+def pledge(maze_obj: Maze, following_direction: str) -> list[tuple[int, int]]:
     """Solves the maze with the Pledge pathfinder.
 
     While the end is not reached, the pathfinder go straightforward.\n
@@ -282,7 +274,7 @@ def pledge(self: Maze, following_direction: str) -> list[tuple[int, int]]:
     If the counter reaches 0, it will go back to moving straightforward and the cycle restart.
 
     Args:
-        self (Maze): The maze object.
+        maze_obj (Maze): The maze object.
         following_direction (str): The direction to follow the wall (left or right).
 
     Raises:
@@ -309,31 +301,29 @@ def pledge(self: Maze, following_direction: str) -> list[tuple[int, int]]:
         case _:
             raise ValueError("Invalid following_direction (must be 'left' or 'right')")
 
-    current_cell: tuple[int, int] = self.start
+    current_cell: tuple[int, int] = maze_obj.start
     direction = next(iter(direction_to_turn))
     path: list[tuple[int, int]] = [current_cell]
     nb_rotations = 0
 
-    while current_cell != self.end:
+    while current_cell != maze_obj.end:
         front_neighbor = (
             current_cell[0] + direction[0],
             current_cell[1] + direction[1],
         )
 
         if nb_rotations == 0:
-            if self.maze[front_neighbor] > 1:
+            if maze_obj.maze[front_neighbor] > 1:
                 current_cell = (
                     current_cell[0] + direction[0],
                     current_cell[1] + direction[1],
                 )
                 path = update_path(path, current_cell)
             else:
-                direction = direction_to_turn[
-                    direction_to_turn[direction_to_turn[direction]]
-                ]
+                direction = direction_to_turn[direction_to_turn[direction_to_turn[direction]]]
                 nb_rotations += 1
         else:
-            while nb_rotations != 0 and current_cell != self.end:
+            while nb_rotations != 0 and current_cell != maze_obj.end:
                 front_neighbor = (
                     current_cell[0] + direction[0],
                     current_cell[1] + direction[1],
@@ -343,7 +333,7 @@ def pledge(self: Maze, following_direction: str) -> list[tuple[int, int]]:
                     current_cell[1] + direction_to_turn[direction][1],
                 )
 
-                if self.maze[side_to_follow] > 1:
+                if maze_obj.maze[side_to_follow] > 1:
                     direction = direction_to_turn[direction]
                     nb_rotations -= 1
                     current_cell = (
@@ -351,11 +341,9 @@ def pledge(self: Maze, following_direction: str) -> list[tuple[int, int]]:
                         current_cell[1] + direction[1],
                     )
                     path = update_path(path, current_cell)
-                elif self.maze[front_neighbor] < 2:
+                elif maze_obj.maze[front_neighbor] < 2:
                     # Turning to one side equals turning to the other side 3 times
-                    direction = direction_to_turn[
-                        direction_to_turn[direction_to_turn[direction]]
-                    ]
+                    direction = direction_to_turn[direction_to_turn[direction_to_turn[direction]]]
                     nb_rotations += 1
                 else:
                     current_cell = (
@@ -364,14 +352,14 @@ def pledge(self: Maze, following_direction: str) -> list[tuple[int, int]]:
                     )
                     path = update_path(path, current_cell)
 
-        if current_cell == self.start and nb_rotations == 0:
+        if current_cell == maze_obj.start and nb_rotations == 0:
             raise UnsolvableMaze("Pledge", "End is not reachable.")
 
-    self.pathfinder = "Pledge"
+    maze_obj.pathfinder = "Pledge"
     return path
 
 
-def dead_end_filler(self: Maze) -> list[tuple[int, int]]:
+def dead_end_filler(maze_obj: Maze) -> list[tuple[int, int]]:
     """Solves the maze with the Dead End Filler pathfinder.
 
     It start by converting all path cells to 2.\n
@@ -382,19 +370,19 @@ def dead_end_filler(self: Maze) -> list[tuple[int, int]]:
     it will raise an UnsolvableMaze exception.
 
     Args:
-        self (Maze): The maze object.
+        maze_obj (Maze): The maze object.
 
     Returns:
         list[tuple[int, int]]: The path from the start to the end of the maze.
     """
 
     def get_path() -> list[tuple[int, int]]:
-        current_cell: tuple[int, int] = self.start
-        path: list[tuple[int, int]] = [self.start]
+        current_cell: tuple[int, int] = maze_obj.start
+        path: list[tuple[int, int]] = [maze_obj.start]
 
-        while current_cell != self.end:
-            neighbors = lapyrinth.get_neighbors(
-                self, current_cell, directions=((-1, 0), (0, 1), (1, 0), (0, -1))
+        while current_cell != maze_obj.end:
+            neighbors = Maze.get_neighbors(
+                maze_obj.maze, current_cell, directions=((-1, 0), (0, 1), (1, 0), (0, -1))
             )
             if len(neighbors) > 1:
                 raise UnsolvableMaze(
@@ -403,25 +391,25 @@ def dead_end_filler(self: Maze) -> list[tuple[int, int]]:
                 )
             if len(neighbors) == 0:
                 raise UnsolvableMaze("Dead End Filler", "End is not reachable.")
-            self.maze[current_cell] = 2
+            maze_obj.maze[current_cell] = 2
             current_cell = neighbors[0][0]
             path.append(current_cell)
 
         return path
 
-    self.maze[self.maze > 1] = 3
-    stack = get_dead_ends(self)
+    maze_obj.maze[maze_obj.maze > 1] = 3
+    stack = get_dead_ends(maze_obj)
 
     while stack:
         rows, columns = zip(*stack)
-        self.maze[rows, columns] = 2
-        stack = get_dead_ends(self)
+        maze_obj.maze[rows, columns] = 2
+        stack = get_dead_ends(maze_obj)
 
-    self.pathfinder = "Dead End Filler"
+    maze_obj.pathfinder = "Dead End Filler"
     return get_path()
 
 
-def depth_first_search(self: Maze) -> list[tuple[int, int]]:
+def depth_first_search(maze_obj: Maze) -> list[tuple[int, int]]:
     """Solve the maze with the Depth First Search pathfinder.
 
     It starts by converting all path cells to 3 (unvisited).
@@ -436,7 +424,7 @@ def depth_first_search(self: Maze) -> list[tuple[int, int]]:
     If the algorithm cannot find the end, it raises an UnsolvableMaze exception.
 
     Args:
-        self (Maze): The maze object.
+        maze_obj (Maze): The maze object.
 
     Raises:
         UnsolvableMaze: If the algorithm cannot solve the maze due to the end not being reachable.
@@ -449,44 +437,44 @@ def depth_first_search(self: Maze) -> list[tuple[int, int]]:
         directions = [(-1, 0), (0, 1), (1, 0), (0, -1)]
         # We reverse the list because we dfs will pop the last element
         directions.sort(
-            key=lambda direction: abs(self.start[0] + direction[0] - self.end[0])
-            + abs(self.start[1] + direction[1] - self.end[1]),
+            key=lambda direction: abs(maze_obj.start[0] + direction[0] - maze_obj.end[0])
+            + abs(maze_obj.start[1] + direction[1] - maze_obj.end[1]),
             reverse=True,
         )
         return tuple(directions)
 
-    self.maze[self.maze > 1] = 3
-    path: list[tuple[int, int]] = [self.start]
+    maze_obj.maze[maze_obj.maze > 1] = 3
+    path: list[tuple[int, int]] = [maze_obj.start]
     stack: list[tuple[tuple[int, int], list[tuple[int, int]]]] = [
-        (self.start, [self.start])
+        (maze_obj.start, [maze_obj.start])
     ]
 
     directions = get_direction_priority()
 
     while stack:
         current_cell, path = stack.pop()
-        self.maze[current_cell] = 2
+        maze_obj.maze[current_cell] = 2
 
-        if current_cell == self.end:
-            self.pathfinder = "Depth First Search"
+        if current_cell == maze_obj.end:
+            maze_obj.pathfinder = "Depth First Search"
             return path
 
         # Condition to optimize the search
-        if current_cell == (self.end[0], self.end[1] - 1):
-            path.append(self.end)
-            self.pathfinder = "Depth First Search"
+        if current_cell == (maze_obj.end[0], maze_obj.end[1] - 1):
+            path.append(maze_obj.end)
+            maze_obj.pathfinder = "Depth First Search"
             return path
 
-        neighbors = lapyrinth.get_neighbors(self, current_cell, directions=directions)
+        neighbors = Maze.get_neighbors(maze_obj.maze, current_cell, directions=directions)
 
         for chosen_neighbor, _ in neighbors:
-            if self.maze[chosen_neighbor] == 3:
+            if maze_obj.maze[chosen_neighbor] == 3:
                 stack.append((chosen_neighbor, path + [chosen_neighbor]))
 
     raise UnsolvableMaze("Depth First Search", "End is not reachable.")
 
 
-def breadth_first_search(self: Maze) -> list[tuple[int, int]]:
+def breadth_first_search(maze_obj: Maze) -> list[tuple[int, int]]:
     """Solves the maze with the Breadth First Search pathfinder.
 
     It starts by converting all path cells to 3 (unvisited).\n
@@ -500,7 +488,7 @@ def breadth_first_search(self: Maze) -> list[tuple[int, int]]:
     If the loop ends, it raises an UnsolvableMaze exception.\n
 
     Args:
-        self (Maze): The maze object.
+        maze_obj (Maze): The maze object.
 
     Raises:
         UnsolvableMaze: If the algorithm cannot solve the maze due to the end not being reachable.
@@ -508,20 +496,20 @@ def breadth_first_search(self: Maze) -> list[tuple[int, int]]:
     Returns:
         list[tuple[int, int]]: The path from the start to the end of the maze.
     """
-    self.maze[self.maze > 1] = 3
-    queue: deque[tuple[int, int]] = deque([self.start])
-    came_from: dict[tuple[int, int], tuple[int, int]] = {self.start: (0, 0)}
+    maze_obj.maze[maze_obj.maze > 1] = 3
+    queue: deque[tuple[int, int]] = deque([maze_obj.start])
+    came_from: dict[tuple[int, int], tuple[int, int]] = {maze_obj.start: (0, 0)}
 
     while queue:
         current_cell = queue.popleft()
-        self.maze[current_cell] = 2
+        maze_obj.maze[current_cell] = 2
 
-        if current_cell == self.end:
-            self.pathfinder = "Breadth First Search"
-            return reconstruct_path(self, came_from)
+        if current_cell == maze_obj.end:
+            maze_obj.pathfinder = "Breadth First Search"
+            return reconstruct_path(maze_obj, came_from)
 
-        for neighbor, _ in lapyrinth.get_neighbors(
-            self, current_cell, directions=((-1, 0), (0, 1), (1, 0), (0, -1))
+        for neighbor, _ in Maze.get_neighbors(
+            maze_obj.maze, current_cell, directions=((-1, 0), (0, 1), (1, 0), (0, -1))
         ):
             if neighbor not in came_from:
                 queue.append(neighbor)
@@ -530,7 +518,7 @@ def breadth_first_search(self: Maze) -> list[tuple[int, int]]:
     raise UnsolvableMaze("Breadth First Search", "End is not reachable.")
 
 
-def greedy_best_first_search(self: Maze) -> list[tuple[int, int]]:
+def greedy_best_first_search(maze_obj: Maze) -> list[tuple[int, int]]:
     """Solves the maze with the Best First Search pathfinder.
 
     It starts by converting all path cells to 3 (unvisited).\n
@@ -545,7 +533,7 @@ def greedy_best_first_search(self: Maze) -> list[tuple[int, int]]:
     If the loop ends, it raises an UnsolvableMaze exception.\n
 
     Args:
-        self (Maze): The maze object.
+        maze_obj (Maze): The maze object.
 
     Raises:
         UnsolvableMaze: If the algorithm cannot solve the maze due to the end not being reachable.
@@ -555,23 +543,23 @@ def greedy_best_first_search(self: Maze) -> list[tuple[int, int]]:
     """
 
     def heuristic(cell: tuple[int, int]) -> int:
-        return abs(cell[0] - self.end[0]) + abs(cell[1] - self.end[1])
+        return abs(cell[0] - maze_obj.end[0]) + abs(cell[1] - maze_obj.end[1])
 
-    self.maze[self.maze > 1] = 3
+    maze_obj.maze[maze_obj.maze > 1] = 3
     cell_to_explore: list[tuple[int, tuple[int, int]]] = []
-    heapq.heappush(cell_to_explore, (0, self.start))
-    came_from: dict[tuple[int, int], tuple[int, int]] = {self.start: (0, 0)}
+    heapq.heappush(cell_to_explore, (0, maze_obj.start))
+    came_from: dict[tuple[int, int], tuple[int, int]] = {maze_obj.start: (0, 0)}
 
     while cell_to_explore:
         _, current_cell = heapq.heappop(cell_to_explore)
 
-        if current_cell == self.end:
-            self.pathfinder = "Greedy Best First Search"
-            return reconstruct_path(self, came_from)
+        if current_cell == maze_obj.end:
+            maze_obj.pathfinder = "Greedy Best First Search"
+            return reconstruct_path(maze_obj, came_from)
 
-        self.maze[current_cell] = 2
-        neighbors = lapyrinth.get_neighbors(
-            self, current_cell, directions=((-1, 0), (0, 1), (1, 0), (0, -1))
+        maze_obj.maze[current_cell] = 2
+        neighbors = Maze.get_neighbors(
+            maze_obj.maze, current_cell, directions=((-1, 0), (0, 1), (1, 0), (0, -1))
         )
 
         for neighbor, _ in neighbors:
@@ -581,7 +569,7 @@ def greedy_best_first_search(self: Maze) -> list[tuple[int, int]]:
     raise UnsolvableMaze("Greedy Best First Search", "End is not reachable.")
 
 
-def dijkstra(self: Maze) -> list[tuple[int, int]]:
+def dijkstra(maze_obj: Maze) -> list[tuple[int, int]]:
     """Solves the maze with the Best First Search pathfinder.
 
     It starts by converting all path cells to 3 (unvisited).\n
@@ -596,26 +584,26 @@ def dijkstra(self: Maze) -> list[tuple[int, int]]:
     If the loop ends, it raises an UnsolvableMaze exception.\n
 
     Args:
-        self (Maze): The maze object.
+        maze_obj (Maze): The maze object.
 
     Returns:
         list[tuple[int, int]]: The path from the start to the end of the maze.
     """
 
-    self.maze[self.maze > 1] = 3
+    maze_obj.maze[maze_obj.maze > 1] = 3
     came_from: dict[tuple[int, int], tuple[int, int]] = {}
     g_score: dict[tuple[int, int], int] = {}
     cell_to_explore: list[tuple[int, tuple[int, int]]] = []
-    g_score[self.start] = 0
-    heapq.heappush(cell_to_explore, (0, self.start))
+    g_score[maze_obj.start] = 0
+    heapq.heappush(cell_to_explore, (0, maze_obj.start))
 
     while cell_to_explore:
         current_distance, current_cell = heapq.heappop(cell_to_explore)
 
-        if current_cell == self.end:
-            return reconstruct_path(self, came_from)
-        neighbors = lapyrinth.get_neighbors(
-            self, current_cell, directions=((-1, 0), (0, 1), (1, 0), (0, -1))
+        if current_cell == maze_obj.end:
+            return reconstruct_path(maze_obj, came_from)
+        neighbors = Maze.get_neighbors(
+            maze_obj.maze, current_cell, directions=((-1, 0), (0, 1), (1, 0), (0, -1))
         )
         for neighbor, _ in neighbors:
             tentative_g_score = current_distance + 1
@@ -628,7 +616,7 @@ def dijkstra(self: Maze) -> list[tuple[int, int]]:
     raise UnsolvableMaze("Dijkstra", "End is not reachable.")
 
 
-def a_star(self: Maze) -> list[tuple[int, int]]:
+def a_star(maze_obj: Maze) -> list[tuple[int, int]]:
     """Solves the maze with the A* pathfinder.
 
     It starts by converting all path cells to 3 (unvisited).\n
@@ -645,7 +633,7 @@ def a_star(self: Maze) -> list[tuple[int, int]]:
     If the loop ends, it raises an UnsolvableMaze exception.\n
 
     Args:
-        self (Maze): The maze object.
+        maze_obj (Maze): The maze object.
 
     Raises:
         UnsolvableMaze: If the algorithm cannot solve the maze due to the end not being reachable.
@@ -655,26 +643,26 @@ def a_star(self: Maze) -> list[tuple[int, int]]:
     """
 
     def heuristic(cell: tuple[int, int]) -> int:
-        return abs(cell[0] - self.end[0]) + abs(cell[1] - self.end[1])
+        return abs(cell[0] - maze_obj.end[0]) + abs(cell[1] - maze_obj.end[1])
 
-    self.maze[self.maze > 1] = 3
+    maze_obj.maze[maze_obj.maze > 1] = 3
     cell_to_explore: list[tuple[int, tuple[int, int]]] = []
-    heapq.heappush(cell_to_explore, (0, self.start))
-    came_from: dict[tuple[int, int], tuple[int, int]] = {self.start: (0, 0)}
-    g_score = {self.start: 0}
-    f_score = {self.start: heuristic(self.start)}
+    heapq.heappush(cell_to_explore, (0, maze_obj.start))
+    came_from: dict[tuple[int, int], tuple[int, int]] = {maze_obj.start: (0, 0)}
+    g_score = {maze_obj.start: 0}
+    f_score = {maze_obj.start: heuristic(maze_obj.start)}
     cost = 1
 
     while cell_to_explore:
         _, current_cell = heapq.heappop(cell_to_explore)
-        self.maze[current_cell] = 2
+        maze_obj.maze[current_cell] = 2
 
-        if current_cell == self.end:
-            self.pathfinder = "A star"
-            return reconstruct_path(self, came_from)
+        if current_cell == maze_obj.end:
+            maze_obj.pathfinder = "A star"
+            return reconstruct_path(maze_obj, came_from)
 
-        neighbors = lapyrinth.get_neighbors(
-            self, current_cell, directions=((-1, 0), (0, 1), (1, 0), (0, -1))
+        neighbors = Maze.get_neighbors(
+            maze_obj.maze, current_cell, directions=((-1, 0), (0, 1), (1, 0), (0, -1))
         )
 
         for neighbor, _ in neighbors:
@@ -715,9 +703,7 @@ def turn_left(direction: tuple[int, int]) -> tuple[int, int]:
     return (-column, row)
 
 
-def update_path(
-    path: list[tuple[int, int]], new_cell: tuple[int, int]
-) -> list[tuple[int, int]]:
+def update_path(path: list[tuple[int, int]], new_cell: tuple[int, int]) -> list[tuple[int, int]]:
     """Updates the path with the new cell.
 
     Args:
@@ -763,37 +749,37 @@ def update_cell_directions(
     directions.append(direction)
 
 
-def get_dead_ends(self: Maze) -> list[tuple[int, int]]:
+def get_dead_ends(maze_obj: Maze) -> list[tuple[int, int]]:
     """Get the dead ends of the maze. Meaning the cells with only one neighbor.
 
 
     Args:
-        self (Maze): The maze object.
+        maze_obj (Maze): The maze object.
 
     Returns:
         list[tuple[int, int]]: A list on indexes of the dead ends.
     """
     dead_ends: list[tuple[int, int]] = []
-    start_neighbors = lapyrinth.get_neighbors(
-        self, self.start, directions=((-1, 0), (0, 1), (1, 0), (0, -1))
+    start_neighbors = Maze.get_neighbors(
+        maze_obj.maze, maze_obj.start, directions=((-1, 0), (0, 1), (1, 0), (0, -1))
     )
-    end_neighbors = lapyrinth.get_neighbors(
-        self, self.end, directions=((-1, 0), (0, 1), (1, 0), (0, -1))
+    end_neighbors = Maze.get_neighbors(
+        maze_obj.maze, maze_obj.end, directions=((-1, 0), (0, 1), (1, 0), (0, -1))
     )
     start_neighbors = [neighbor[0] for neighbor in start_neighbors]
     end_neighbors = [neighbor[0] for neighbor in end_neighbors]
-    unvisited_cells = list(zip(*np.where(self.maze > 2)))
+    unvisited_cells = list(zip(*np.where(maze_obj.maze > 2)))
     for index in unvisited_cells:
         # Skip the start and the end because they are not dead ends.
-        if index in (self.start, self.end):
+        if index in (maze_obj.start, maze_obj.end):
             continue
         # We also skip the neighbors of the start and the end
         # because we can't reach the start and the end as a neighbor.
         if (
             index in start_neighbors
             and len(
-                lapyrinth.get_neighbors(
-                    self, self.start, directions=((-1, 0), (0, 1), (1, 0), (0, -1))
+                Maze.get_neighbors(
+                    maze_obj.maze, maze_obj.start, directions=((-1, 0), (0, 1), (1, 0), (0, -1))
                 )
             )
             == 1
@@ -802,16 +788,16 @@ def get_dead_ends(self: Maze) -> list[tuple[int, int]]:
         if (
             index in end_neighbors
             and len(
-                lapyrinth.get_neighbors(
-                    self, self.end, directions=((-1, 0), (0, 1), (1, 0), (0, -1))
+                Maze.get_neighbors(
+                    maze_obj.maze, maze_obj.end, directions=((-1, 0), (0, 1), (1, 0), (0, -1))
                 )
             )
             == 1
         ):
             continue
 
-        neighbors = lapyrinth.get_neighbors(
-            self, index, directions=((-1, 0), (0, 1), (1, 0), (0, -1))
+        neighbors = Maze.get_neighbors(
+            maze_obj.maze, index, directions=((-1, 0), (0, 1), (1, 0), (0, -1))
         )
 
         if len(neighbors) == 1:
@@ -825,22 +811,22 @@ def get_dead_ends(self: Maze) -> list[tuple[int, int]]:
 
 
 def directions_to_path(
-    self: Maze, cell_with_directions: dict[tuple[int, int], list[tuple[int, int]]]
+    maze_obj: Maze, cell_with_directions: dict[tuple[int, int], list[tuple[int, int]]]
 ) -> list[tuple[int, int]]:
     """Convert the cell_with_directions dictionary to a path.
 
     Args:
-        self (Maze): The maze object.
+        maze_obj (Maze): The maze object.
         cell_with_directions (dict[tuple[int, int], list[tuple[int, int]]]):
             The dictionary to convert.
 
     Returns:
         list[tuple[int, int]]: The path from the start to the end of the maze.
     """
-    path: list[tuple[int, int]] = [self.start]
-    current_cell = self.start
+    path: list[tuple[int, int]] = [maze_obj.start]
+    current_cell = maze_obj.start
 
-    while current_cell != self.end:
+    while current_cell != maze_obj.end:
         current_cell = (
             current_cell[0] + cell_with_directions[current_cell][-1][0],
             current_cell[1] + cell_with_directions[current_cell][-1][1],
@@ -851,21 +837,21 @@ def directions_to_path(
 
 
 def reconstruct_path(
-    self: Maze, came_from: dict[tuple[int, int], tuple[int, int]]
+    maze_obj: Maze, came_from: dict[tuple[int, int], tuple[int, int]]
 ) -> list[tuple[int, int]]:
     """Reconstruct the path from the start to the end of the maze.
 
     Args:
-        self (Maze): The maze object.
+        maze_obj (Maze): The maze object.
         came_from (dict[tuple[int, int], tuple[int, int]]): The dictionary to reconstruct the path.
 
     Returns:
         list[tuple[int, int]]: The path from the start to the end of the maze.
     """
-    path: deque[tuple[int, int]] = deque([self.end])
-    current_cell = self.end
+    path: deque[tuple[int, int]] = deque([maze_obj.end])
+    current_cell = maze_obj.end
 
-    while current_cell != self.start:
+    while current_cell != maze_obj.start:
         current_cell = came_from[current_cell]
         path.appendleft(current_cell)
 
@@ -873,30 +859,28 @@ def reconstruct_path(
 
 
 def generate_path(
-    self: Maze,
+    maze_obj: Maze,
     path: list[tuple[int, int]],
     filename: str | None = None,
 ) -> None:
     """Generate a maze image from a maze object.
 
     Args:
-        self (Maze): The maze object.
+        maze_obj (Maze): The maze object.
         path (list[tuple[int, int]]): The path to draw.
         filename (str | None, optional): The filename. Defaults to None.
     """
-    size = self.maze.shape
+    size = maze_obj.maze.shape
     cell_size = 50
     path_length = len(path)
 
     filename = (
         filename + ".png"
         if filename
-        else f"Maze_{size[0]//2}x{size[1]//2}_{self.pathfinder}.png"
+        else f"Maze_{size[0]//2}x{size[1]//2}_{maze_obj.pathfinder}.png"
     )
 
-    image = Image.new(
-        "RGB", (size[1] * cell_size, size[0] * cell_size), (255, 255, 255)
-    )
+    image = Image.new("RGB", (size[1] * cell_size, size[0] * cell_size), (255, 255, 255))
 
     draw = ImageDraw.Draw(image)
 
@@ -907,7 +891,7 @@ def generate_path(
         return int(r * 255), int(g * 255), int(b * 255)
 
     def draw_path() -> None:
-        for index, cell_value in np.ndenumerate(self.maze):
+        for index, cell_value in np.ndenumerate(maze_obj.maze):
             x1 = index[1] * cell_size
             y1 = index[0] * cell_size
             x2 = (index[1] + 1) * cell_size
@@ -924,14 +908,14 @@ def generate_path(
     image.save(filename)
 
 
-def print_path(self: Maze, path: list[tuple[int, int]]) -> None:
+def print_path(maze_obj: Maze, path: list[tuple[int, int]]) -> None:
     """Print the path of the maze.
 
     Args:
         maze (Maze): The maze object.
         path (list[tuple[int, int]]): The path to print.
     """
-    for index, value in np.ndenumerate(self.maze):
+    for index, value in np.ndenumerate(maze_obj.maze):
         if index in path:
             print("o ", end="")
         elif value < 2:
@@ -939,5 +923,5 @@ def print_path(self: Maze, path: list[tuple[int, int]]) -> None:
         else:
             print("  ", end="")
 
-        if index[1] == self.maze.shape[1] - 1:
+        if index[1] == maze_obj.maze.shape[1] - 1:
             print()
