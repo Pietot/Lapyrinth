@@ -84,13 +84,16 @@
 # End : 10/09/2024 at  21h35FR
 # Changelogs : Added True Prim's algorithm (the previous one was the simplified version)
 
+# v1.16 :
+# Changelogs : Added staticmethod and classmethod to the Maze class + pther stuff
+
 import heapq
 import pickle
-import random
+import random as rdm
 from typing import Any, Generator
 
 import numpy as np
-from numpy.typing import NDArray
+from numpy import typing as npt
 from PIL import Image, ImageDraw
 
 
@@ -174,7 +177,7 @@ class Maze:
             self.set_values()
             self.have_value = True
         breakable_walls = self.get_breakable_walls(self.maze)
-        random.shuffle(breakable_walls)
+        rdm.shuffle(breakable_walls)
         while breakable_walls:
             coordinates = breakable_walls.pop()
             if coordinates[0] % 2 == 0:
@@ -207,18 +210,20 @@ class Maze:
             current_cell (tuple[int, int] | None, optional):
                 The current cell being visited. Defaults to None.
         """
-        current_cell = start if start else self.self.get_random_cell((self.maze.shape[0], self.maze.shape[1]))
+        current_cell = (
+            start if start else self.get_random_cell((self.maze.shape[0], self.maze.shape[1]))
+        )
         stack = [current_cell]
         self.maze[current_cell] = 2
 
         while stack:
             current_cell = stack[-1]
-            neighbors = self.self.get_neighbors(self.maze.maze, current_cell)
+            neighbors = self.get_neighbors(self.maze, current_cell)
 
             if not neighbors:
                 stack.pop()
             else:
-                chosen_neighbor, direction = random.choice(neighbors)
+                chosen_neighbor, direction = rdm.choice(neighbors)
                 wall_coordinates = (
                     current_cell[0] + direction[0] // 2,
                     current_cell[1] + direction[1] // 2,
@@ -247,9 +252,9 @@ class Maze:
         neighbors: list[tuple[tuple[int, int], tuple[int, int]]] = []
         start = start if start else self.get_random_cell((self.maze.shape[0], self.maze.shape[1]))
         self.maze[start] = 2
-        neighbors.extend(self.self.get_neighbors(self.maze.maze, start))
+        neighbors.extend(self.get_neighbors(self.maze, start))
         while neighbors:
-            neighbor, direction = random.choice(neighbors)
+            neighbor, direction = rdm.choice(neighbors)
             # Avoid overlapping, maybe this condition can be removed idk
             if self.maze[neighbor] != 2:
                 self.maze[neighbor] = 2
@@ -259,7 +264,7 @@ class Maze:
                 )
                 self.maze[wall_coordinates] = 2
             neighbors.remove((neighbor, direction))
-            neighbors.extend(self.self.get_neighbors(self.maze.maze, neighbor))
+            neighbors.extend(self.get_neighbors(self.maze, neighbor))
         self.set_start_end()
         self.algorithm = "Simplified Prim"
 
@@ -342,7 +347,7 @@ class Maze:
             neighbors = self.get_neighbors(self.maze, cell)
 
             if neighbors:
-                neighbor, direction = random.choice(neighbors)
+                neighbor, direction = rdm.choice(neighbors)
                 wall_coordinates = (
                     cell[0] + direction[0] // 2,
                     cell[1] + direction[1] // 2,
@@ -388,7 +393,7 @@ class Maze:
                 values = row[value_index * 2 + 1], row[value_index * 2 + 3]
                 if last_row and values[0] != values[1]:
                     self.merge_values((row_index * 2 + 1, value_index * 2 + 2), values)
-                if values[0] != values[1] and random.random() <= probability_carve_horizontally:
+                if values[0] != values[1] and rdm.random() <= probability_carve_horizontally:
                     self.merge_values((row_index * 2 + 1, value_index * 2 + 2), values)
             if last_row:
                 break
@@ -408,7 +413,7 @@ class Maze:
                     )
                     self.merge_values(wall_coordinates, merge_values)
                     carves += 1
-                elif random.random() <= probability_carve_vertically:
+                elif rdm.random() <= probability_carve_vertically:
                     wall_coordinates = row_index * 2 + 2, value_index * 2 + 1
                     merge_values = (
                         values[0],
@@ -431,7 +436,7 @@ class Maze:
         """
 
         def divide_vertically(width: int, height: int) -> int:
-            return width > height if width != height else random.getrandbits(1)
+            return width > height if width != height else rdm.getrandbits(1)
 
         self.remove_walls()
         stack: list[tuple[tuple[int, int], tuple[int, int], tuple[int, int]]] = [
@@ -452,10 +457,10 @@ class Maze:
                     for i in range(start_index[1], end_index[1] + 1)
                     if i not in (start_index[1], ban[1], end_index[1]) and i % 2 == 0
                 ]
-                wall_column_index = random.choice(wall_columns)
+                wall_column_index = rdm.choice(wall_columns)
                 self.maze[start_index[0] : end_index[0] + 1, wall_column_index] = 0
                 entries = [i for i in range(start_index[0], end_index[0] + 1) if i % 2 == 1]
-                entry = random.choice(entries)
+                entry = rdm.choice(entries)
                 entry_coordinate = (entry, wall_column_index)
                 self.maze[entry, wall_column_index] = 3
 
@@ -479,10 +484,10 @@ class Maze:
                     for i in range(start_index[0], end_index[0] + 1)
                     if i not in (start_index[0], ban[0], end_index[0]) and i % 2 == 0
                 ]
-                wall_row_index = random.choice(wall_rows)
+                wall_row_index = rdm.choice(wall_rows)
                 self.maze[wall_row_index, start_index[1] : end_index[1] + 1] = 0
                 entries = [i for i in range(start_index[1], end_index[1] + 1) if i % 2 == 1]
-                entry = random.choice(entries)
+                entry = rdm.choice(entries)
                 entry_coordinate = (wall_row_index, entry)
                 self.maze[wall_row_index, entry] = 3
 
@@ -542,14 +547,14 @@ class Maze:
             case 3:
                 nb_rotation = 1
             case 4:
-                nb_rotation = random.choice([0, 1, 2, -1])
+                nb_rotation = rdm.choice([0, 1, 2, -1])
             case _:
                 raise ValueError("biais must be between 1 and 4")
         self.maze[1][1:-1] = 2
         self.maze[1:-1, 1] = 2
         north_biais, west_biais = (1, 1)
         for index, _ in np.ndenumerate(self.maze[3:-1:2, 3:-1:2]):
-            if random.random() <= probability_carve_vertically:
+            if rdm.random() <= probability_carve_vertically:
                 wall_coordinates = (index[0] * 2 + 3 - north_biais, index[1] * 2 + 3)
                 self.maze[wall_coordinates] = 2
             else:
@@ -587,8 +592,8 @@ class Maze:
             if index[0] == 1 or value < 2:
                 continue
             cells.append(index)
-            if random.random() <= probability_carve_north or index[1] == self.maze.shape[1] - 2:
-                chosen_cell = random.choice(cells)
+            if rdm.random() <= probability_carve_north or index[1] == self.maze.shape[1] - 2:
+                chosen_cell = rdm.choice(cells)
                 wall_coordinates = (
                     chosen_cell[0] + north_direction[0],
                     chosen_cell[1] + north_direction[1],
@@ -641,7 +646,7 @@ class Maze:
             chosen_cell, index = self.select_cell_by_mode(cells, mode, probability)
             neighbors = self.get_neighbors(self.maze, chosen_cell)
             if neighbors:
-                chosen_neighbor, direction = random.choice(neighbors)
+                chosen_neighbor, direction = rdm.choice(neighbors)
                 wall_coordinates = (
                     chosen_cell[0] + direction[0] // 2,
                     chosen_cell[1] + direction[1] // 2,
@@ -673,13 +678,15 @@ class Maze:
             start (tuple[int, int] | None, optional): The starting cell for the algorithm.
                 Defaults to None.
         """
-        current_cell = start if start else self.get_random_cell((self.maze.shape[0], self.maze.shape[1]))
+        current_cell = (
+            start if start else self.get_random_cell((self.maze.shape[0], self.maze.shape[1]))
+        )
         height, width = self.maze.shape
         number_cell = (height // 2) * (width // 2)
         visited_cell = 1
         self.maze[current_cell] = 2
         while visited_cell < number_cell:
-            random_neighbor, random_direction = random.choice(
+            random_neighbor, random_direction = rdm.choice(
                 self.get_neighbors(self.maze, current_cell, return_visited=True)
             )
             if self.maze[random_neighbor] != 2:
@@ -710,13 +717,13 @@ class Maze:
         self.maze[end] = 2
         while np.any(self.maze > 2):
             unvisited_cells = np.argwhere(self.maze > 2).tolist()
-            start = random.choice(unvisited_cells)
+            start = rdm.choice(unvisited_cells)
             start = (start[0], start[1])
             path = [start]
             while self.maze[path[-1]] != 2:
                 current_cell = path[-1]
                 neighbors = self.get_neighbors(self.maze, current_cell, return_visited=True)
-                neighbor, _ = random.choice(neighbors)
+                neighbor, _ = rdm.choice(neighbors)
                 if len(path) > 1 and neighbor == path[-2]:
                     path.pop()
                 elif neighbor in path:
@@ -781,7 +788,7 @@ class Maze:
 
         for _ in range(nb_iter):
             neighbors = self.get_neighbors(self.maze, origin)
-            new_origin, direction = random.choice(neighbors)
+            new_origin, direction = rdm.choice(neighbors)
             self.maze[origin] = directions_to_int[direction]
             self.maze[new_origin] = 2
             origin = new_origin
@@ -812,7 +819,7 @@ class Maze:
         self.maze[self.maze == value_to_replace] = selected_value
         self.maze[wall_coordinate] = selected_value
 
-    def make_imperfect(self, mode: tuple[str, int | float]) -> None:
+    def make_imperfect_maze(self, mode: tuple[str, int | float]) -> None:
         """Make the maze more complex by removing some walls randomly.
 
         Args:
@@ -820,23 +827,23 @@ class Maze:
             The first element is the mode ('number' or 'probability').
             The second element is the number of walls to remove or the probability to remove a wall.
         """
-        breakable_walls_coordinates = self.get_breakable_walls(self)
+        breakable_walls_coordinates = self.get_breakable_walls(self.maze)
         if float(mode[1]) == 0.0:
             raise ValueError("The number of walls to remove or the probab must be greater than 0")
         if mode[0] == "number":
             # Force the number to be between 0 and the number of breakable walls
             number = max(0, min(int(mode[1]), len(breakable_walls_coordinates)))
-            for coordinates in random.sample(breakable_walls_coordinates, number):
+            for coordinates in rdm.sample(breakable_walls_coordinates, number):
                 self.maze[coordinates] = 2
         elif mode[0] == "probability":
             # Force the probability to be between 0 and 1
             probability = max(0, min(1, mode[1]))
             for coordinates in breakable_walls_coordinates:
-                if 0 < random.uniform(0, 1) <= probability:
+                if 0 < rdm.uniform(0, 1) <= probability:
                     self.maze[coordinates] = 2
         else:
             raise ValueError('mode must be "probability" or "number"')
-        
+
     def generate_image(self, filename: str | None = None) -> None:
         """Generate a maze image from a maze object.
 
@@ -870,7 +877,7 @@ class Maze:
 
         image.save(filename)
 
-    def save(self, filename: str) -> None:
+    def save(self, filename: str | None = None) -> None:
         """Save the maze to a pickle file or a binary file or a txt file.
 
         Pickle file is recommanded because it saves the object with all its attributes
@@ -883,11 +890,13 @@ class Maze:
             filename (str | None): The name of the file. Defaults to None.
 
         Raises:
-            ValueError: file_type must be 'npy' or 'txt'.
+            ValueError: filename must end with 'pkl' or 'npy' or 'txt'"
         """
-        file_type = filename.split(".")[-1]
         size = self.maze.shape
-        filename = f"{filename}" if filename else f"Maze_{size[0]//2}x{size[1]//2}_{self.algorithm}"
+        filename = (
+            f"{filename}" if filename else f"Maze_{size[0]//2}x{size[1]//2}_{self.algorithm}.pkl"
+        )
+        file_type = filename.split(".")[-1]
         match file_type:
             case "pkl":
                 with open(filename, "wb") as file:
@@ -900,8 +909,11 @@ class Maze:
                 raise ValueError("filename must end with 'pkl' or 'npy' or 'txt'")
 
     @staticmethod
-    def get_breakable_walls(maze: NDArray[np.uint16]) -> list[tuple[int, int]]:
+    def get_breakable_walls(maze: npt.NDArray[np.uint16]) -> list[tuple[int, int]]:
         """Gets all breakable walls coordinates.
+
+        Args:
+            maze (NDArray[np.uint16]): The maze to get the breakable walls from.
 
         Returns:
             list[list[int, int]]: List of all breakable walls coordinates.
@@ -910,7 +922,7 @@ class Maze:
 
     @staticmethod
     def get_neighbors(
-        maze: NDArray[np.uint16],
+        maze: npt.NDArray[np.uint16],
         cell: tuple[int, int],
         directions: tuple[tuple[int, int], ...] | None = None,
         return_visited: bool = False,
@@ -918,12 +930,12 @@ class Maze:
         """Returns a list of neighboring cells that are accessible from the given cell.
 
         Args:
-            self (Maze): The maze object.
+            maze (NDArray[np.uint16]): The maze to get the neighbors from.
             cell (tuple[int, int]): The coordinates of the cell.
             directions (tuple[tuple[int, int], ...], optional): The directions to check.
-            Defaults to None.
+                Defaults to None.
             return_visited (bool): If we want to return visited neighbors.
-            Defaults to False.
+                Defaults to False.
 
         Returns:
             list[tuple[tuple[int, int], tuple[int, int]]]:
@@ -939,16 +951,16 @@ class Maze:
                 if (return_visited and maze[neighbor] > 1) or maze[neighbor] > 2:
                     neighbors.append((neighbor, direction))
         return neighbors
-        
+
     @staticmethod
     def get_connection(
-        maze: NDArray[np.uint16], 
-        index: tuple[int, int]
+        maze: npt.NDArray[np.uint16], index: tuple[int, int]
     ) -> tuple[tuple[int, int], tuple[int, int]]:
-        """This method is used to get a connections of an unvisited cell to a visited cell in the maze.
+        """This method is used to get a connections of an unvisited cell
+        to a visited cell in the maze.
 
         Args:
-            self (Maze): An instance of the Maze class.
+            maze (NDArray[np.uint16]): The maze to get the connection from.
             index (tuple[int, int]): A tuple containing the coordinates of the cell in the maze.
 
         Returns:
@@ -967,12 +979,15 @@ class Maze:
                 continue
             if maze[neighbor] == 2:
                 neighbors.append((neighbor, (row, column)))
-        return random.choice(neighbors) if neighbors else ((0, 0), (0, 0))
+        return rdm.choice(neighbors) if neighbors else ((0, 0), (0, 0))
 
     @staticmethod
     def verify_shape(shape: Any | tuple[Any, ...]) -> bool:
         """Verifies if shape of the maze if an int greater than 5 and odd
-        or a tuple of 2 int greater than 5 and odd
+        or a tuple of 2 int greater than 5 and odd.
+        
+        Args:
+            shape (Any | tuple[Any, ...]): The shape to verify.
         """
         if not isinstance(shape, tuple):
             return False
@@ -983,7 +998,7 @@ class Maze:
         return True
 
     @staticmethod
-    def verify_maze_values(maze: NDArray[np.uint]) -> bool:
+    def verify_maze_values(maze: npt.NDArray[np.uint]) -> bool:
         """Verifies if the all the values in the maze are ints greater or equal than 0.
 
         Args:
@@ -1005,7 +1020,7 @@ class Maze:
         Returns:
             tuple[int, int]: A tuple representing the coordinates of the randomly generated cell.
         """
-        return (random.randrange(1, shape[0] - 2, 2), random.randrange(1, shape[1] - 2, 2))
+        return (rdm.randrange(1, shape[0] - 2, 2), rdm.randrange(1, shape[1] - 2, 2))
 
     @staticmethod
     def select_cell_by_mode(
@@ -1032,10 +1047,10 @@ class Maze:
             case "oldest":
                 chosen_cell, index = cells[0], 0
             case "random":
-                index = random.choice(range(len(cells)))
+                index = rdm.choice(range(len(cells)))
                 chosen_cell = cells[index]
             case "mixed":
-                prob = random.random()
+                prob = rdm.random()
                 if prob <= 0.25:
                     chosen_cell, index = cells[-1], -1
                 elif prob <= 0.5:
@@ -1043,79 +1058,85 @@ class Maze:
                 elif prob <= 0.75:
                     chosen_cell, index = cells[0], 0
                 else:
-                    index = random.choice(range(len(cells)))
+                    index = rdm.choice(range(len(cells)))
                     chosen_cell = cells[index]
             case "new/mid":
-                if random.random() <= probability:
+                if rdm.random() <= probability:
                     chosen_cell, index = cells[-1], -1
                 else:
                     chosen_cell, index = cells[len(cells) // 2], len(cells) // 2
             case "new/old":
-                if random.random() <= probability:
+                if rdm.random() <= probability:
                     chosen_cell, index = cells[-1], -1
                 else:
                     chosen_cell, index = cells[0], 0
             case "new/rand":
-                if random.random() <= probability:
+                if rdm.random() <= probability:
                     chosen_cell, index = cells[-1], -1
                 else:
-                    index = random.choice(range(len(cells)))
+                    index = rdm.choice(range(len(cells)))
                     chosen_cell = cells[index]
             case "mid/old":
-                if random.random() <= probability:
+                if rdm.random() <= probability:
                     chosen_cell, index = cells[len(cells) // 2], len(cells) // 2
                 else:
                     chosen_cell, index = cells[0], 0
             case "mid/rand":
-                if random.random() <= probability:
+                if rdm.random() <= probability:
                     chosen_cell, index = cells[len(cells) // 2], len(cells) // 2
                 else:
-                    index = random.choice(range(len(cells)))
+                    index = rdm.choice(range(len(cells)))
                     chosen_cell = cells[index]
             case "old/rand":
-                if random.random() <= probability:
+                if rdm.random() <= probability:
                     chosen_cell, index = cells[0], 0
                 else:
-                    index = random.choice(range(len(cells)))
+                    index = rdm.choice(range(len(cells)))
                     chosen_cell = cells[index]
             case _:
                 raise ValueError("Invalid mode")
         return chosen_cell, index
 
     @classmethod
-    def from_file(cls, file_path: str):
+    def load(cls, file_path: str) -> "Maze":
         """Load a maze from these file types: pkl, npy, txt.
 
         Args:
-            file (str): The location of the file.
+            file_path (str): The path of the file.
 
         Raises:
-            ValueError: File must be a '.npy' or '.txt' file.
+            ValueError: File must be a '.pkl' or '.npy' or '.txt'file.
+            AttributeError: The file does not contain a Maze object.
             ValueError: The file contain an invalid maze atribute.
         """
         file_type = file_path.split(".")[-1]
         match file_type:
             case "npy":
-                saved_obj = cls()
-                saved_obj.maze = np.load(file_path)
-                saved_obj.algorithm = "Undefined"
-                return saved_obj
+                new_object = cls()
+                new_object.maze = np.load(file_path)
+                new_object.algorithm = "Undefined"
+                return new_object
             case "txt":
-                saved_obj = cls()
-                saved_obj = np.loadtxt(file, delimiter=",", dtype=np.uint)
-                saved_obj.algorithm = "Undefined"
-                return saved_obj
+                new_object = cls()
+                new_object.maze = np.loadtxt(file_path, delimiter=",", dtype=np.uint)
+                new_object.algorithm = "Undefined"
+                return new_object
             case "pkl" | "pickle":
                 with open(file_path, "rb") as file:
-                    saved_obj = pickle.load(file)
-                if saved_obj.verify_shape(saved_obj.maze.shape) and saved_obj.verify_maze_values(saved_obj.maze):
-                    return saved_obj
-                raise ValueError("The file contain an invalid maze atribute.")
-        raise ValueError("File must be a '.npy' or '.txt' file.")
-            
+                    new_object = pickle.load(file)
+                try:
+                    if new_object.verify_shape(
+                        new_object.maze.shape
+                    ) and new_object.verify_maze_values(new_object.maze):
+                        return new_object
+                    raise ValueError("The file contain an invalid maze atribute.")
+                except AttributeError as e:
+                    raise AttributeError("The file does not contain a Maze object.") from e
+            case _:
+                raise ValueError("File must be a '.pkl' or '.npy' or '.txt'file.")
 
     @classmethod
-    def curious_maze(cls):
+    def curious_maze(cls) -> "Maze":
         """Don't run this function, it's only for curious people"""
         redflag = cls()
         redflag.maze = np.array(
@@ -1137,6 +1158,9 @@ class Maze:
 
 def cells_to_shape(*nb_cells_by_side: int) -> tuple[int, int]:
     """Convert the number of cells of each dimension (height, width) to the shape of the maze.
+    
+    Args:
+        nb_cells_by_side (int): The number of cells of each dimension (height, width).
 
     Raises:
         ValueError: nb_cells_by_side must be an one or two int greater or equal to 2.
