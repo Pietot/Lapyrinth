@@ -7,7 +7,6 @@ lapyrinth/lapyrinth.py
 lapyrinth/lapyrinth.pyi
 lapyrinth/pathfinders.py
 lapyrinth/pathfinders.pyi
-lapyrinth/recursive_maze.py
 lapyrinth.egg-info/PKG-INFO
 lapyrinth.egg-info/SOURCES.txt
 lapyrinth.egg-info/dependency_links.txt
