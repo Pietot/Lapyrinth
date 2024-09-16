@@ -195,8 +195,8 @@ maze = Maze(10)
 maze.prim()
 
 # Filename is optional
-filename = "maze_object"
-maze.save_maze("pkl", filename)
+filename = "maze_object.pkl"
+maze.save(filename)
 ```
 
 Pros / Cons:
@@ -215,8 +215,8 @@ maze = Maze(10)
 maze.prim()
 
 # Filename is optional
-filename = "maze_prim"
-maze.save_maze("npy", filename)
+filename = "maze_numpy.npy"
+maze.save(filename)
 ```
 
 Pros / Cons:
@@ -235,8 +235,8 @@ maze = Maze(10)
 maze.prim()
 
 # Filename is optional
-filename = "maze_text"
-maze.save_maze("txt", filename)
+filename = "maze_text.txt"
+maze.save(filename)
 ```
 
 Pros / Cons:
@@ -248,25 +248,16 @@ Pros / Cons:
 
 ## 6 - Load a maze
 
-If you want to load the maze you've saved, two options are available to you depending on the file format:
-
-#### - Load a .pkl file:
-
-```py
-from lapyrinth import load_object
-
-maze = load_object("maze_object.pkl")
-```
-
-#### - Load a .npy or a .txt file:
+If you want to load the maze you've saved, follow the code below:
 
 ```py
 from lapyrinth import Maze
 
-maze = Maze()
-maze.load_maze("maze_binary.npy")
+maze_object = Maze.load("maze_object.pkl")
 # Or
-maze.load_maze("maze_text.txt")
+maze_numpy = Maze.load("maze_numpy.npy")
+# Or
+maze_text = Maze.load("maze_text.txt")
 ```
 
 > **Note**: The file must be in the same directory as the script or you must specify the path to the file.
@@ -369,6 +360,7 @@ If you want the values of these graphs, watch this:
 > **Note**: These values can change depending on the version of Python and your PC<br><br>
 > For these benchmarks, I used Python 3.12.0 implemented with CPython on a ryzen 5 3600, rtx 2060 with 2\*8GB of RAM clocked at 3600Hz on Windows 10.<br>
 > These benchmarks were all tested at the same time (multiprocessing) so the results are higher than if they were tested one by one.
+> Benchmarks were made on the version 1.15
 
 ## 9 - Pathfinders Benchmarks
 
