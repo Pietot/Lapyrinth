@@ -5,6 +5,7 @@ Here are ideas/tips to improve maze.py:
         Add Blob Division algorithm (https://weblog.jamisbuck.org/2015/1/15/better-recursive-division-algorithm.html)
         Set private values
         Maybe optimize kruskal by using a dict/list containing all the indices for each values so we don't have to loop through the whole maze each time we want to replace a value
+        Maybe remove directions and calulate it directly with the current cell and it neighbor
 
     General:
         Optimize algorithms (especially using numpy instead of tuple and list maybe)
