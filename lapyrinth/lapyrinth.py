@@ -991,9 +991,9 @@ class Maze:
         """
         if not isinstance(shape, tuple):
             return False
-        if not len(shape) == 2:
+        if not len(shape) == 2: # type: ignore
             return False
-        if not all(isinstance(i, int) for i in shape if i > 4 and i % 2 == 1):
+        if not all(isinstance(i, int) for i in shape if i > 4 and i % 2 == 1): # type: ignore
             return False
         return True
 
@@ -1193,11 +1193,11 @@ def verify_coordinates(
         raise ValueError(
             "coordinates must be a tuple of 2 ints corresponding to a point inside the maze"
         )
-    if not len(coordinates) == 2:
+    if not len(coordinates) == 2: # type: ignore
         raise ValueError(
             "coordinates must be a tuple of 2 ints corresponding to a point inside the maze"
         )
-    if not all(isinstance(i, int) for i in coordinates):
+    if not all(isinstance(i, int) for i in coordinates): # type: ignore
         raise ValueError(
             "coordinates must be a tuple of 2 ints corresponding to a point inside the maze"
         )
@@ -1205,4 +1205,4 @@ def verify_coordinates(
         raise ValueError(
             "coordinates must be a tuple of 2 ints corresponding to a point inside the maze"
         )
-    return coordinates
+    return coordinates # type: ignore
