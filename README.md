@@ -1,7 +1,7 @@
 # Lapyrinth
 
-![Static Badge](https://img.shields.io/badge/made_in-France-red?labelColor=blue)
-![Static Badge](https://img.shields.io/badge/language-Python-f7d54d?labelColor=4771a4)
+![Localisation](https://img.shields.io/badge/Made_in-France-red?labelColor=blue)
+![Language](https://img.shields.io/badge/Language-Python-f7d54d?labelColor=4771a4)
 
 Lapyrinth is a package made entirely in Python where you can generate mazes with many different algorithms and solving them with different pathfinders. Nothing more, nothing less.
 
