@@ -854,7 +854,7 @@ class Maze:
         filename = (
             filename + ".png"
             if filename
-            else f"Maze_{size[0]//2}x{size[1]//2}_{self.algorithm}.png"
+            else f"Maze_{size[0] // 2}x{size[1] // 2}_{self.algorithm}.png"
         )
         cell_size = 50
         wall_color = (0, 0, 0)
@@ -894,7 +894,9 @@ class Maze:
         """
         size = self.maze.shape
         filename = (
-            f"{filename}" if filename else f"Maze_{size[0]//2}x{size[1]//2}_{self.algorithm}.pkl"
+            f"{filename}"
+            if filename
+            else f"Maze_{size[0] // 2}x{size[1] // 2}_{self.algorithm}.pkl"
         )
         file_type = filename.split(".")[-1]
         match file_type:
@@ -991,9 +993,9 @@ class Maze:
         """
         if not isinstance(shape, tuple):
             return False
-        if not len(shape) == 2: # type: ignore
+        if not len(shape) == 2:  # type: ignore
             return False
-        if not all(isinstance(i, int) for i in shape if i > 4 and i % 2 == 1): # type: ignore
+        if not all(isinstance(i, int) for i in shape if i > 4 and i % 2 == 1):  # type: ignore
             return False
         return True
 
@@ -1193,11 +1195,11 @@ def verify_coordinates(
         raise ValueError(
             "coordinates must be a tuple of 2 ints corresponding to a point inside the maze"
         )
-    if not len(coordinates) == 2: # type: ignore
+    if not len(coordinates) == 2:  # type: ignore
         raise ValueError(
             "coordinates must be a tuple of 2 ints corresponding to a point inside the maze"
         )
-    if not all(isinstance(i, int) for i in coordinates): # type: ignore
+    if not all(isinstance(i, int) for i in coordinates):  # type: ignore
         raise ValueError(
             "coordinates must be a tuple of 2 ints corresponding to a point inside the maze"
         )
@@ -1205,4 +1207,4 @@ def verify_coordinates(
         raise ValueError(
             "coordinates must be a tuple of 2 ints corresponding to a point inside the maze"
         )
-    return coordinates # type: ignore
+    return coordinates  # type: ignore
