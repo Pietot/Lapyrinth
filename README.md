@@ -31,7 +31,7 @@ Lapyrinth is a package made entirely in Python where you can generate mazes with
 
 - Generate any maze of any size
 
-- Choose different algorithms from 13 of them (and more with different parameters)
+- Choose different algorithms from 14 of them (and more with different parameters)
 
 - Generate an image of the maze generated
 
@@ -46,14 +46,17 @@ Lapyrinth is a package made entirely in Python where you can generate mazes with
 To begin, two options are available to you:
 
 The first and easiest way is to install the package with pip by writing this line in a CLI (command line interface).
+
 ```
 pip install lapyrinth
 ```
+
 And that's it, you're ready to go to step 3.
 
 ---
 
 The second and harder way is download and uncompress the **[latest version](https://github.com/Pietot/Maze-Maker-Solver/archive/refs/heads/main.zip)**, or clone it by using one of the following command:
+
 ```
 git clone https://github.com/Pietot/Maze-Maker-Solver.git
 ```
@@ -96,8 +99,8 @@ print(maze)
 # If you want to generate a .png file of the maze
 maze.generate_image()
 ```
-If you've downloaded the project, write the same lines in a new python file inside <a href="https://github.com/Pietot/Lapyrinth/tree/main/lapyrinth">lapyrinth</a> folder:
 
+If you've downloaded the project, write the same lines in a new python file inside <a href="https://github.com/Pietot/Lapyrinth/tree/main/lapyrinth">lapyrinth</a> folder:
 
 > **Note**: Obviously, the larger the maze, the longer it will take to create and generate the image.
 
@@ -105,81 +108,116 @@ If you've downloaded the project, write the same lines in a new python file insi
 
 That's it. See, it's very simple. You can go with all of these algorithms:
 
-- Kruskal
+- Aldous-Broder
 <p align="center">
-<img src="assets/images/kruskal.png" width="49%" alt="Image illustrating a maze after using Kruskal's algorithm">
-<img src="assets/gifs/kruskal.gif" width="49%" alt="Animation showing the process of Kruskal's algorithm"> <br><br>
-</p>
-
-- Randomized Depth First Search
-<p align="center">
-<img src="assets/images/rdfs.png" width="49%"alt="Image illustrating a maze after using Randomized Depth First Search algorithm"/>
-<img src="assets/gifs/rdfs.gif" width="49%"alt="Animation showing the process of Randomized Depth First Search algorithm"> <br><br>
-</p>
-
-- Simplified Prim
-<p align="center">
-<img src="assets/images/simplified_prim.png" width="49%"alt="Image illustrating a maze after using Simplified Prim's algorithm"/>
-<img src="assets/gifs/simplified_prim.gif" width="49%"alt="Animation showing the process of Simplified Prim's algorithm"> <br><br>
-</p>
-
-True Prim:
-<p align="center">
-<img src="assets/images/true_prim.png" width="49%"alt="Image illustrating a maze after using True Prim's algorithm"/>
-<img src="assets/gifs/true_prim.gif" width="49%"alt="Animation showing the process of True Prim's algorithm"> <br><br>
-
-- Hunt and Kill
-<p align="center">
-<img src="assets/images/hunt_and_kill.png" width="49%"alt="Image illustrating a maze after using Hunt and Kill algorithm"/>
-<img src="assets/gifs/hunt_and_kill.gif" width="49%"alt="Animation showing the process of Hunt and Kill algorithm"> <br><br>
-</p>
-
-- Eller (may vary depending on parameters)
-<p align="center">
-<img src="assets/images/eller.png" width="49%"alt="Image illustrating a maze after using Eller's algorithm"/>
-<img src="assets/gifs/eller.gif" width="49%"alt="Animation showing the process of Eller's algorithm"> <br><br>
-</p>
-
-- Iterative Division
-<p align="center">
-<img src="assets/images/iterative_division.png" width="49%"alt="Image illustrating a maze after using Iterative Division algorithm"/>
-<img src="assets/gifs/iterative_division.gif" width="49%"alt="Animation showing the process of Iterative Division algorithm"> <br><br>
+    <img src="assets/images/aldous_broder.png" width="49%"alt="Image illustrating a maze after using Aldous-Broder algorithm"/>
+    <img src="assets/gifs/aldous_broder.gif" width="49%"alt="Animation showing the process of Aldous-Broder algorithm">
+    <br>
+    <br>
 </p>
 
 - Binary Tree (may vary depending on parameters)
 <p align="center">
-<img src="assets/images/binary_tree.png" width="49%"alt="Image illustrating a maze after using Binary Tree algorithm"/>
-<img src="assets/gifs/binary_tree.gif" width="49%"alt="Animation showing the process of Binary Tree algorithm"> <br><br>
+    <img src="assets/images/binary_tree.png" width="49%"alt="Image illustrating a maze after using Binary Tree algorithm"/>
+    <img src="assets/gifs/binary_tree.gif" width="49%"alt="Animation showing the process of Binary Tree algorithm">
+    <br>
+    <br>
 </p>
 
-- Sidewinder (may vary depending on parameters)
+- Eller (may vary depending on parameters)
 <p align="center">
-<img src="assets/images/sidewinder.png" width="49%"alt="Image illustrating a maze after using Sidewinder algorithm"/>
-<img src="assets/gifs/sidewinder.gif" width="49%"alt="Animation showing the process of Sidewinder algorithm"> <br><br>
+    <img src="assets/images/eller.png" width="49%"alt="Image illustrating a maze after using Eller's algorithm"/>
+    <img src="assets/gifs/eller.gif" width="49%"alt="Animation showing the process of Eller's algorithm">
+    <br>
+    <br>
 </p>
 
 - Growing Tree (may vary depending on parameters)
 <p align="center">
-<img src="assets/images/growing_tree.png" width="49%"alt="Image illustrating a maze after using Growing Tree algorithm"/>
-<img src="assets/gifs/growing_tree.gif" width="49%"alt="Animation showing the process of Growing Tree algorithm"> <br><br>
+    <img src="assets/images/growing_tree.png" width="49%"alt="Image illustrating a maze after using Growing Tree algorithm"/>
+    <img src="assets/gifs/growing_tree.gif" width="49%"alt="Animation showing the process of Growing Tree algorithm">
+    <br>
+    <br>
 </p>
 
-- Aldous-Broder
+- Hunt and Kill
 <p align="center">
-<img src="assets/images/aldous_broder.png" width="49%"alt="Image illustrating a maze after using Aldous-Broder algorithm"/>
-<img src="assets/gifs/aldous_broder.gif" width="49%"alt="Animation showing the process of Aldous-Broder algorithm"> <br><br>
+    <img src="assets/images/hunt_and_kill.png" width="49%"alt="Image illustrating a maze after using Hunt and Kill algorithm"/>
+    <img src="assets/gifs/hunt_and_kill.gif" width="49%"alt="Animation showing the process of Hunt and Kill algorithm">
+    <br>
+    <br>
 </p>
 
-- Wilson
+- Iterative Division
 <p align="center">
-<img src="assets/images/wilson.png" width="49%"alt="Image illustrating a maze after using Wilson's algorithm"/>
-<img src="assets/gifs/wilson.gif" width="49%"alt="Animation showing the process of Wilson's algorithm"> <br><br>
+    <img src="assets/images/iterative_division.png" width="49%"alt="Image illustrating a maze after using Iterative Division algorithm"/>
+    <img src="assets/gifs/iterative_division.gif" width="49%"alt="Animation showing the process of Iterative Division algorithm">
+    <br>
+    <br>
+</p>
+
+- Kruskal
+<p align="center">
+    <img src="assets/images/kruskal.png" width="49%" alt="Image illustrating a maze after using Kruskal's algorithm">
+    <img src="assets/gifs/kruskal.gif" width="49%" alt="Animation showing the process of Kruskal's algorithm">
+    <br>
+    <br>
+</p>
+
+- Modified Prim
+<p align="center">
+    <img src="assets/images/modified_prim.png" width="49%"alt="Image illustrating a maze after using Modified Prim's algorithm"/>
+    <img src="assets/gifs/modified_prim.gif" width="49%"alt="Animation showing the process of Modified Prim's algorithm">
+    <br>
+    <br>
+</p>
+
+- Randomized Depth First Search
+<p align="center">
+    <img src="assets/images/rdfs.png" width="49%"alt="Image illustrating a maze after using Randomized Depth First Search algorithm"/>
+    <img src="assets/gifs/rdfs.gif" width="49%"alt="Animation showing the process of Randomized Depth First Search algorithm">
+    <br>
+    <br>
+</p>
+
+- Sidewinder (may vary depending on parameters)
+<p align="center">
+    <img src="assets/images/sidewinder.png" width="49%"alt="Image illustrating a maze after using Sidewinder algorithm"/>
+    <img src="assets/gifs/sidewinder.gif" width="49%"alt="Animation showing the process of Sidewinder algorithm">
+    <br>
+    <br>
+</p>
+
+- Simplified Prim
+<p align="center">
+    <img src="assets/images/simplified_prim.png" width="49%"alt="Image illustrating a maze after using Simplified Prim's algorithm"/>
+    <img src="assets/gifs/simplified_prim.gif" width="49%"alt="Animation showing the process of Simplified Prim's algorithm">
+    <br>
+    <br>
+</p>
+
+- True Prim
+<p align="center">
+    <img src="assets/images/true_prim.png" width="49%"alt="Image illustrating a maze after using True Prim's algorithm"/>
+    <img src="assets/gifs/true_prim.gif" width="49%"alt="Animation showing the process of True Prim's algorithm">
+    <br>
+    <br>
 </p>
 
 - Origin Shift
 <p align="center">
-<img src="assets/images/origin_shift.png" width="49%"alt="Image illustrating a maze after using Origin Shift algorithm"/>
-<img src="assets/gifs/origin_shift.gif" width="49%"alt="Animation showing the process of Origin Shift algorithm"> <br><br>
+    <img src="assets/images/origin_shift.png" width="49%"alt="Image illustrating a maze after using Origin Shift algorithm"/>
+    <img src="assets/gifs/origin_shift.gif" width="49%"alt="Animation showing the process of Origin Shift algorithm">
+    <br>
+    <br>
+</p>
+
+- Wilson
+<p align="center">
+    <img src="assets/images/wilson.png" width="49%"alt="Image illustrating a maze after using Wilson's algorithm"/>
+    <img src="assets/gifs/wilson.gif" width="49%"alt="Animation showing the process of Wilson's algorithm">
+    <br>
+    <br>
 </p>
 
 ## 5 - Save a maze
@@ -282,47 +320,65 @@ Here are all the pathfinders available:
 
 - Right Hand Rule
 <p align="center">
-<img src="assets/gifs/right_hand.gif" width="49%"alt="Animation showing the process of the Right Hand rule pathfinder"> <br><br>
+    <img src="assets/gifs/right_hand.gif" width="49%"alt="Animation showing the process of the Right Hand rule pathfinder"> 
+    <br>
+    <br>
 </p>
 
 - Left Hand Rule
 <p align="center">
-<img src="assets/gifs/left_hand.gif" width="49%"alt="Animation showing the process of the Left Hand rule pathfinder"> <br><br>
+    <img src="assets/gifs/left_hand.gif" width="49%"alt="Animation showing the process of the Left Hand rule pathfinder"> 
+    <br>
+    <br>
 </p>
 
 - Random Mouse
 <p align="center">
-<img src="assets/gifs/random_mouse.gif" width="49%"alt="Animation showing the process of the Random Mouse pathfinder"> <br><br>
+    <img src="assets/gifs/random_mouse.gif" width="49%"alt="Animation showing the process of the Random Mouse pathfinder"> 
+    <br>
+    <br>
 </p>
 
 - Pledge (may vary depending on parameters)
 <p align="center">
-<img src="assets/gifs/pledge.gif" width="49%"alt="Animation showing the process of Pledge's pathfinder"> <br><br>
+    <img src="assets/gifs/pledge.gif" width="49%"alt="Animation showing the process of Pledge's pathfinder"> 
+    <br>
+    <br>
 </p>
 
 - Dead End Filler
 <p align="center">
-<img src="assets/gifs/dead_end_filler.gif" width="49%"alt="Animation showing the process of Dead End Filler pathfinder"> <br><br>
+    <img src="assets/gifs/dead_end_filler.gif" width="49%"alt="Animation showing the process of Dead End Filler pathfinder"> 
+    <br>
+    <br>
 </p>
 
 - Depth First Search
 <p align="center">
-<img src="assets/gifs/dfs.gif" width="49%"alt="Animation showing the process of Deep First Search pathfinder"> <br><br>
+    <img src="assets/gifs/dfs.gif" width="49%"alt="Animation showing the process of Deep First Search pathfinder"> 
+    <br>
+    <br>
 </p>
 
 - Breadth First Search and Dijkstra
 <p align="center">
-<img src="assets/gifs/bfs.gif" width="49%"alt="Animation showing the process of Breadth First Search pathfinder"> <br><br>
+    <img src="assets/gifs/bfs.gif" width="49%"alt="Animation showing the process of Breadth First Search pathfinder"> 
+    <br>
+    <br>
 </p>
 
 - Greedy Best First Search
 <p align="center">
-<img src="assets/gifs/gbfs.gif" width="49%"alt="Animation showing the process of Greedy Best First Search pathfinder"> <br><br>
+    <img src="assets/gifs/gbfs.gif" width="49%"alt="Animation showing the process of Greedy Best First Search   pathfinder"> 
+    <br>
+    <br>
 </p>
 
 - A\*
 <p align="center">
-<img src="assets/gifs/a_star.gif" width="49%"alt="Animation showing the process of A* pathfinder"> <br><br>
+    <img src="assets/gifs/a_star.gif" width="49%"alt="Animation showing the process of A* pathfinder"> 
+    <br>
+    <br>
 </p>
 
 ## 8 - Maze Generation Benchmarks
@@ -353,8 +409,7 @@ If you want the values of these graphs, watch this:
 
 <img src="assets/images/csv_generation_screen.png">
 <p align="center">
-<a href="assets/csv/maze_generation_time.csv">Download csv here
-</a>
+<a href="assets/csv/maze_generation_time.csv">Download csv here</a>
 </p>
 
 > **Note**: These values can change depending on the version of Python and your PC<br><br>
@@ -390,8 +445,7 @@ If you want the values of these graphs, watch this:
 
 <img src="assets/images/csv_pathfinder_screen.png">
 <p align="center">
-<a href="assets/csv/pathfinder_time.csv">Download csv here
-</a>
+<a href="assets/csv/pathfinder_time.csv">Download csv here</a>
 </p>
 
 > **Note**: These values can change depending on the version of Python and your PC<br><br>
