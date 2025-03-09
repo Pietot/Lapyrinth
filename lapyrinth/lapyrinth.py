@@ -222,6 +222,51 @@ class Maze:
         self.set_start_end()
         self.algorithm = "True Prim"
 
+    def modified_prim(self, start: tuple[int, int] | None = None) -> None:
+        """Applies the modified version of Prim's algorithm to generate a maze.
+
+        This implementation focuses on cells rather than edges and maintains
+        three cell states:
+        - "Visited" (value 2): Cells that are part of the maze
+        - "Unvisited" (value 3): Cells not yet part of the maze or adjacent to it
+        - "Frontier" (value 4): Cells adjacent to "in" cells but not yet part of the maze
+
+        It starts by selecting a starting cell, either specified in parameter or chosen randomly
+        and assigning it the value 2.\n
+        Then, it creates a list of frontier cells and
+        adds all the neighbors of the starting cell to it and assigning the value 4\n
+        While there are frontier cells,
+        it randomly selects one and carves a path to a connected "in" cell.\n
+        Then it adds the neighbors of the frontier cell to the list of frontier cells.\n
+
+        Args:
+            start (tuple[int, int] | None, optional):
+                The starting cell coordinates.\n
+                Defaults to None, meaning a random starting cell will be chosen within the maze.
+        """
+        frontier_cells: list[tuple[tuple[int, int], tuple[int, int]]] = []
+        start = start if start else self.get_random_cell((self.maze.shape[0], self.maze.shape[1]))
+        self.maze[start] = 2
+        for neighbor, direction in self.get_neighbors(self.maze, start):
+            self.maze[neighbor] = 4
+            frontier_cells.append((neighbor, start))
+        while frontier_cells:
+            index = rdm.randint(0, len(frontier_cells) - 1)
+            frontier_cell, in_cell = frontier_cells.pop(index)
+            direction = (in_cell[0] - frontier_cell[0], in_cell[1] - frontier_cell[1])
+            wall_coordinates = (
+                frontier_cell[0] + direction[0] // 2,
+                frontier_cell[1] + direction[1] // 2,
+            )
+            self.maze[wall_coordinates] = 2
+            self.maze[frontier_cell] = 2
+            for next_neighbor, _ in self.get_neighbors(self.maze, frontier_cell):
+                if self.maze[next_neighbor] != 4:
+                    self.maze[next_neighbor] = 4
+                    frontier_cells.append((next_neighbor, frontier_cell))
+        self.set_start_end()
+        self.algorithm = "Modified Prim"
+
     def hunt_and_kill(
         self,
         start: tuple[int, int] | None = None,
