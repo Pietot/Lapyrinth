@@ -254,7 +254,8 @@ class Maze:
         self.maze[start] = 2
         neighbors.extend(self.get_neighbors(self.maze, start))
         while neighbors:
-            neighbor, direction = rdm.choice(neighbors)
+            index = rdm.randint(0, len(neighbors) - 1)
+            neighbor, direction = neighbors.pop(index)
             # Avoid overlapping, maybe this condition can be removed idk
             if self.maze[neighbor] != 2:
                 self.maze[neighbor] = 2
@@ -263,7 +264,6 @@ class Maze:
                     neighbor[1] - direction[1] // 2,
                 )
                 self.maze[wall_coordinates] = 2
-            neighbors.remove((neighbor, direction))
             neighbors.extend(self.get_neighbors(self.maze, neighbor))
         self.set_start_end()
         self.algorithm = "Simplified Prim"
