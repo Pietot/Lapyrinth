@@ -105,9 +105,8 @@ class Maze:
                 left_value = self.maze[coordinates[0], coordinates[1] - 1]
                 right_value = self.maze[coordinates[0], coordinates[1] + 1]
                 values = (left_value, right_value)
-            if values[0] == values[1]:
-                continue
-            self.merge_values(coordinates, values)
+            if values[0] != values[1]:
+                self.merge_values(coordinates, values)
         self.set_start_end()
         self.algorithm = "Kruskal"
 
