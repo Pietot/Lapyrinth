@@ -1,4 +1,4 @@
-Here are ideas/tips to improve maze.py:
+Here are ideas/tips to improve lapyrinth.py:
 
     Specific:
         Add Growing Forest algorithm (https://www.astrolog.org/labyrnth/algrithm.htm)
@@ -8,7 +8,7 @@ Here are ideas/tips to improve maze.py:
         Maybe remove directions and calulate it directly with the current cell and it neighbor
 
     General:
-        Optimize algorithms (especially using numpy instead of tuple and list maybe)
+        Optimize algorithms (especially using numpy instead of tuple and list maybe). Priority go to the slowest algorithms (Kruskal, Eller, Hunt and Kill & Origin Shift)
 
 Here are ideas/tips to improve pathfinder.py:
 
