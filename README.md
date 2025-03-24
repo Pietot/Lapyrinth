@@ -387,20 +387,6 @@ Wonder which algorithm is **faster**?
 
 Well.. I already did it for you! So here you are:
 
-- Chart for slow algorithms:
-
-<img src="assets/svg/generation_slow.svg"><br><br>
-
-- Chart for moderately fast algorithms:
-
-<img src="assets/svg/generation_medium.svg"><br><br>
-
-- Chart for fast algorithms:
-
-<img src="assets/svg/generation_fast.svg"><br><br>
-
-- Chart for all algorithms:
-
 <img src="assets/svg/generation_full.svg"><br><br>
 
 > **Note**: Aldous-Broder and Wilson algorithms were not tested because they are truly random (""luck"" based in other words), so their times are very inconsistent on a generation to another. But for an idea, they are even slower than Kruskal's algorithm.
