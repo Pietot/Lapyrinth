@@ -12,7 +12,7 @@ setup(
     version="1.17.0",
     packages=find_packages(),
     package_data={
-        "": ["*.pyi"],
+        "lapyrinth": ["*.pyi", "py.typed"],
     },
     install_requires=required,
     author="Piétôt",
