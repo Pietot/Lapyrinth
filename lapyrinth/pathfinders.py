@@ -72,7 +72,7 @@ from collections import deque
 import numpy as np
 from PIL import Image, ImageDraw
 
-from lapyrinth import Maze
+from .lapyrinth import Maze
 
 
 class UnsolvableMaze(Exception):
@@ -877,7 +877,7 @@ def generate_path(
     filename = (
         filename + ".png"
         if filename
-        else f"Maze_{size[0]//2}x{size[1]//2}_{maze_obj.pathfinder}.png"
+        else f"Maze_{size[0] // 2}x{size[1] // 2}_{maze_obj.pathfinder}.png"
     )
 
     image = Image.new("RGB", (size[1] * cell_size, size[0] * cell_size), (255, 255, 255))
@@ -900,7 +900,7 @@ def generate_path(
             if int(cell_value) in (0, 1):
                 draw.rectangle((x1, y1, x2, y2), fill=(0, 0, 0))
             elif index in path:
-                step = path.index(index)
+                step = path.index((index[0], index[1]))
                 path_color = get_color(step, path_length)
                 draw.rectangle((x1, y1, x2, y2), fill=path_color)
 
