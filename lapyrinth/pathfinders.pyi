@@ -1,9 +1,7 @@
-from _typeshed import Incomplete
-
 from lapyrinth import Maze as Maze
 
 class UnsolvableMaze(Exception):
-    message: Incomplete
+    message: str
     def __init__(self, algorithm: str, error_message: str = "") -> None: ...
 
 def left_hand(maze_obj: Maze) -> list[tuple[int, int]]: ...

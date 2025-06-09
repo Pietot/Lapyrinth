@@ -1,16 +1,15 @@
 from typing import Any, Generator
 
 import numpy as np
-from _typeshed import Incomplete
 from numpy import typing as npt
 
 class Maze:
-    maze: Incomplete
-    algorithm: Incomplete
-    pathfinder: Incomplete
+    maze: npt.NDArray[np.uint]
+    algorithm: str | None
+    pathfinder: str | None
     have_value: bool
-    start: Incomplete
-    end: Incomplete
+    start: tuple[int, int]
+    end: tuple[int, int]
     def __init__(
         self,
         *nb_cells_by_sides: int,
