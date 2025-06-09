@@ -1,3 +1,5 @@
+"""Setup script for Lapyrinth."""
+
 from setuptools import find_packages, setup
 
 with open("requirements.txt", encoding="utf-8") as f:
