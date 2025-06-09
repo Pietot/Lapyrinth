@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: lapyrinth
-Version: 1.17.0
+Version: 1.17.1
 Summary: A program capable of creating mazes with many different algorithms and solving them with different pathfinders.
 Home-page: https://github.com/Pietot/Lapyrinth
 Author: Piétôt

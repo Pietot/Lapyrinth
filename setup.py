@@ -11,7 +11,7 @@ Nothing more, nothing less. More info at https://github.com/Pietot/Lapyrinth"
 
 setup(
     name="lapyrinth",
-    version="1.17.0",
+    version="1.17.1",
     packages=find_packages(),
     package_data={
         "lapyrinth": ["*.pyi", "py.typed"],
